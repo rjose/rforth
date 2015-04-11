@@ -1,0 +1,22 @@
+= Pass 1: Build an assembly language program
+
+Build a basic assembly language program
+
+
+== Tasks
+- [] Create example from Professional Assembly Language
+- [] Add Makefile
+- [] Debug
+- [] Use strace to look at system call
+
+== Status
+- Effort spent: 0h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 02/28/2015
+
+----
+----

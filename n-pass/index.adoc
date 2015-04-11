@@ -1,0 +1,15 @@
+= n-pass index
+rforth development passes
+
+* [ ] Pass 1: Build an assembly language program
+* [ ] Pass 2: Collect input into a line buffer
+* [ ] Pass 3: Write line buffer to output
+* [ ] Pass 4: Write a next word function
+* [ ] Pass : Create a dictionary with lookup
+* [ ] Pass : Execute routine from dictionary
+
+
+
+== Passes
+include::pass1/pass1.adoc[leveloffset=+2]
+
