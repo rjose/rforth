@@ -2,3 +2,4 @@
 *.o
 /n-pass/index.html
 /n-pass/pass1/cpuid_dbg
+/n-pass/pass2/read_keyboard

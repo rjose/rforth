@@ -15,25 +15,38 @@ input_length:
 	
 	.comm buffer, BUFFER_LEN
 
+	
 	#===============================================================================
 	# TEXT section
 	#===============================================================================
 	.section .text
-	.globl _start
 	.globl main
 
-main:
-#_start:
-	nop
-
-	# Read characters
+	#-------------------------------------------------------------------------------
+	# Read line
+	#
+	# Reads BUFFER_LEN-1 characters from keyboard into buffer. The number of
+	# charcters read is left in eax.
+	#
+	# NOTE: This clobbers eax, ebx, ecx.
+	#-------------------------------------------------------------------------------
+	.type read_line, @function
+read_line:
 	movl $3, %eax
-	movl $0, %ebx       # stdin is 0
-	movl $buffer, %ecx  # destination
+	movl $0, %ebx       		 # stdin is 0
+	movl $buffer, %ecx  		 # destination
 	movl $(BUFFER_LEN-1), %edx       # num chars
 	int $0x80
+	ret
 
-	# Store num chars read
+
+	#-------------------------------------------------------------------------------
+	# main
+	#-------------------------------------------------------------------------------
+main:
+	nop
+
+	call read_line
 	movl %eax, input_length
 
 	# Echo characters back
@@ -47,3 +60,4 @@ main:
 	movl $1, %eax
 	movl $0, %ebx
 	int $0x80
+
