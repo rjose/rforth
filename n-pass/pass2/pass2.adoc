@@ -1,0 +1,23 @@
+= Pass 2: Collect input into a line buffer
+
+Grab input from the keyboard and print it out
+
+
+== Tasks
+- [x] Read data from the keyboard
+- [x] Print data read from keyboard
+- [x] Limit data read from keyboard
+- [x] Echo data
+
+
+== Status
+- Effort spent: 0h
+- Effort left: 0h
+- Initial estimate: 4h
+
+== Log
+
+=== Saturday, 04/11/2015
+
+----
+----
