@@ -4,19 +4,35 @@ Build a basic assembly language program
 
 
 == Tasks
-- [] Create example from Professional Assembly Language
-- [] Add Makefile
-- [] Debug
-- [] Use strace to look at system call
+- [x] Create example from Professional Assembly Language
+- [x] Add Makefile
+- [x] Debug
+
 
 == Status
-- Effort spent: 0h
+- Effort spent: 2h
 - Effort left: 0h
 - Initial estimate: 3h
 
 == Log
 
-=== Saturday, 02/28/2015
+=== Saturday, 04/11/2015
 
 ----
+** 06:24 >> Let's build an assembly language program
+I'll start with an example from "Professional Assembly Language" and
+then create a Makefile around it. I should also see if I can debug
+it. 
+
+** 06:42 (18 min) System calls are in /usr/include/asm/unistd.h
+
+
+** 06:50 (26 min) Use man pages to see args for system calls
+For example, 'man 3 write' describes the arguments. These are placed
+in registers starting from EBC and going from there.
+
+** 07:23 << (39 min) Fixed a typo (.section text -> .section .text)
+
+** 07:24 Break
+Let's check in and then get some breakfast
 ----

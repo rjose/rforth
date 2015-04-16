@@ -1,7 +1,7 @@
 = n-pass index
 rforth development passes
 
-* [ ] Pass 1: Build an assembly language program
+* [x] Pass 1: Build an assembly language program
 * [ ] Pass 2: Collect input into a line buffer
 * [ ] Pass 3: Write line buffer to output
 * [ ] Pass 4: Write a next word function
