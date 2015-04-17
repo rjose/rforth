@@ -8,10 +8,11 @@ Grab input from the keyboard and print it out
 - [x] Print data read from keyboard
 - [x] Limit data read from keyboard
 - [x] Echo data
+- [x] Use a function to print
 
 
 == Status
-- Effort spent: 0h
+- Effort spent: 1.5h
 - Effort left: 0h
 - Initial estimate: 4h
 
