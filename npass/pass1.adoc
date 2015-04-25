@@ -1,0 +1,19 @@
+= Pass 1: Build an assembly language program
+
+== Tasks
+- [x] Create a program that just exits
+- [ ] Add an exit.s file that implements exit
+
+
+
+
+== Status
+- Effort spent: 0h
+- Effort left: 0h
+- Initial estimate: 2h
+
+== Log
+
+=== Saturday, 04/11/2015
+
+----
