@@ -1,0 +1,6 @@
+= rforth development passes
+
+* Pass 1: Build an empty rforth program
+* Pass 2: Read words from input
+* Pass 3: Search for words in dictionary
+* Pass 4: Execute code in dictionary
