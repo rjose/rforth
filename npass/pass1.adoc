@@ -2,18 +2,40 @@
 
 == Tasks
 - [x] Create a program that just exits
-- [ ] Add an exit.s file that implements exit
-
-
+- [x] Add an exit.s file that implements exit
 
 
 == Status
-- Effort spent: 0h
+- Effort spent: 1h
 - Effort left: 0h
 - Initial estimate: 2h
 
 == Log
 
-=== Saturday, 04/11/2015
+=== Saturday, 04/25/2015
 
+----
+** 06:40 >> Let's start pass1
+The first thing is to build an rforth program that just exits.
+
+** 06:56 (16 min) Got a program that just exits
+Let's add an exit.s file next and call it.
+
+** 07:01 (21 min) Pass all args on stack
+I think I'll take the convention that we always pass arguments on the
+stack. The functions should be responsible for consuming the data and
+doing something with it.
+
+** 07:02 (22 min) First figure out global and then pass an argument
+
+** 07:09 (29 min) Need the .globl directive
+If it's not there, then the label isn't visible outside of that file.
+
+** 07:10 (30 min) Use the stack to pass the exit code
+
+** 07:27 << (47 min) Internal functions can use registers
+When calling external functions, we should use the stack. Within an
+assembly file, we can use registers. However, if we call an external
+function somewhere in between, we need to preserve the registers we
+care about.
 ----
