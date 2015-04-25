@@ -5,10 +5,13 @@
 	.globl exit
 
 #-------------------------------------------------------------------------------
-# exit
+# exits program
+#
+# Args:
+#   * 1: exit code
 #-------------------------------------------------------------------------------
 	.type exit, @function
 exit:
 	movq $60, %rax
-	movq $21, %rdi
+	movq 8(%rsp), %rdi		# Exit code
 	syscall
