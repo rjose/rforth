@@ -77,7 +77,7 @@ next_word:
 	je 0f
 
 	# Compute start of word
-	addl $1, %ecx
+	addl $1, %ecx                   # Advance count to get to first non-space char
 	subl input_length, %ecx
 	negl %ecx                       # ECX contains index of start of word
 
@@ -91,9 +91,10 @@ next_word:
 1:	# Loop, copying characters
 	movb (%esi), %bl
 	cmp $SPACE, %bl
-	je 2f                           # Return
+	je 2f
+	
 	cmp $0, %ecx
-	je 2f                           # Return
+	je 2f
 
 	movsb
 	subl $1, %ecx

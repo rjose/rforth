@@ -1,14 +1,12 @@
-= Pass 2: Collect input into a line buffer
+= Pass 3: Write a next word function
 
-Grab input from the keyboard and print it out
+Copy the first word read from an input to a location
 
 
 == Tasks
-- [x] Read data from the keyboard
-- [x] Print data read from keyboard
-- [x] Limit data read from keyboard
-- [x] Echo data
-- [x] Use a function to print
+- [x] Skip spaces
+- [x] Copy word
+- [x] Return index of next word
 
 
 == Status
