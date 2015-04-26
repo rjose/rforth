@@ -12,16 +12,21 @@ default: help
 # Targets: PROGRAMS
 #=======================================
 
+# Variables to define obj files for normal and debug targets
+functions = rforth exit getc
+obj_files = $(foreach f, $(functions), src/gas/$(f).o)
+dbg_obj_files = $(foreach f, $(functions), src/gas/$(f)_dbg.o)
+
 #-------------------------------------------------------------------------------
 # Builds main rforth app
 #-------------------------------------------------------------------------------
-rforth: src/gas/rforth.o src/gas/exit.o src/gas/getc.o
+rforth: $(obj_files)
 	ld -e main -s -o $@ $^
 
 #-------------------------------------------------------------------------------
 # Builds debuggable rforth app
 #-------------------------------------------------------------------------------
-rforth_dbg: src/gas/rforth_dbg.o src/gas/exit_dbg.o src/gas/getc_dbg.o
+rforth_dbg: $(dbg_obj_files)
 	gcc -g -o $@ $^
 
 
@@ -46,6 +51,11 @@ help:
 	@echo -e "\tclean-doc:\tRemoves generated doc files"
 
 
+#-------------------------------------------------------------------------------
+# Removes program files and obj files
+#-------------------------------------------------------------------------------
+clean:
+	rm -f rforth rforth_dbg $(obj_files) $(dbg_obj_files)
 
 #-------------------------------------------------------------------------------
 # Builds all documentation
