@@ -1,0 +1,19 @@
+= Pass 2: Read words from input
+
+== Tasks
+- [ ] Bring getc over from swtools
+- [ ] Study word routine in Starting Forth and POL
+- [ ] Copy word into a PAD area
+
+
+== Status
+- Effort spent: 0h
+- Effort left: 0h
+- Initial estimate: 8h
+
+== Log
+
+=== Saturday, 04/25/2015
+
+----
+----

@@ -8,7 +8,7 @@
 # BSS section
 #===============================================================================
 	.section .bss
-
+	.comm test_buffer, 100
 
 #===============================================================================
 # TEXT section
@@ -21,8 +21,10 @@
 #-------------------------------------------------------------------------------
 main:
 	nop
+	movq $test_buffer, %rdi
+	call getc
 
 0:	# Exit
-	pushq 	$42		# Exit code
+	pushq 	$0		# Exit code
 	call exit
-	addq $8*1, %rsp		# Don't really need to remove stack arg, but still :-)
+	addq $8*1, %rsp		# Don't need to remove stack arg, but still :-)

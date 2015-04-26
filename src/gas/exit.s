@@ -15,3 +15,4 @@ exit:
 	movq $60, %rax
 	movq 8(%rsp), %rdi		# Exit code
 	syscall
+	ret
