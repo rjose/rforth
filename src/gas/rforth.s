@@ -22,6 +22,7 @@
 main:
 	nop
 	call read_word
+	call read_word
 
 0:	# Exit
 	pushq 	$0		# Exit code

@@ -6,6 +6,9 @@
 	.section .data
 
 	.equ	 MAXLINE, 256
+
+	# Chars to look for
+	.equ     NEWLINE, 10
 	.equ	 EOF, 0
 	.equ     SPACE, 32
 
@@ -46,9 +49,11 @@ read_word:
 	movl $0, tib_count
 	movq $tib, %rdi
 
-1:	# Skip spaces
+1:	# Skip spaces and newlines
 	call getc
 	cmp $SPACE, (%rdi)
+	je 1b
+	cmp $NEWLINE, (%rdi)
 	je 1b
 
 2:	# Get next char
@@ -57,7 +62,7 @@ read_word:
 	incl tib_count
 	addq $1, %rdi		# Move destination to next byte
 	cmpl $MAXLINE, tib_count
-	jle 3f	      # Continue getting char
+	jle 3f			# Continue getting char
 
 	# Abort since buffer will overflow
 	pushq $1
@@ -65,7 +70,17 @@ read_word:
 
 3:	# Continue getting char
 	call getc
-	cmp $SPACE, (%rdi)
-	jne 2b	    # Get next char
 
+	# If we get a space, newline, or EOF, we're done
+	cmp $SPACE, (%rdi)
+	je 0f
+	cmp $NEWLINE, (%rdi)
+	je 0f
+	cmp $EOF, (%rdi)
+	je 0f
+
+	# Otherwise, loop
+	jmp 2b			# Get next char
+
+0:	# Return
 	ret
