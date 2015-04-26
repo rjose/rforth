@@ -21,8 +21,7 @@
 #-------------------------------------------------------------------------------
 main:
 	nop
-	movq $test_buffer, %rdi
-	call getc
+	call read_word
 
 0:	# Exit
 	pushq 	$0		# Exit code

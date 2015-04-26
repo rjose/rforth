@@ -34,7 +34,10 @@
 #-------------------------------------------------------------------------------
 # getc - Returns char read from STDIN and puts it in %rdi
 #
-# Characters are loaded into |buffer| and returned from there.
+# Args:
+#   * %rdi: destination for char
+#
+# NOTE: Characters are loaded into |buffer| and returned from there.
 #-------------------------------------------------------------------------------
 	.globl getc
 	.type getc, @function
