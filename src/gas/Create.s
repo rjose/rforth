@@ -29,7 +29,7 @@ Create_rt:
 	.globl Create
 	.type Create, @function
 Create:
-	call read_word
+	call ReadWord
 
 	# Put count in current count cell (pointed to by pfa)
 	movb tib_count, %bl

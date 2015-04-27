@@ -34,7 +34,7 @@ tib_count:
 	.section .text
 
 #-------------------------------------------------------------------------------
-# read_word - Reads word via Getc and stores in tib buffer
+# ReadWord - Reads word via Getc and stores in tib buffer
 #
 #
 # Reads characters into start of tib buffer.  If the word fits in tib,
@@ -42,9 +42,9 @@ tib_count:
 # a code of 1.
 #
 #-------------------------------------------------------------------------------
-	.globl read_word
-	.type read_word, @function
-read_word:
+	.globl ReadWord
+	.type ReadWord, @function
+ReadWord:
 	# Start at the beginning of the buffer
 	movl $0, tib_count
 	movq $tib, %rdi
