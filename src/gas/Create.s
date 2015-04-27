@@ -24,7 +24,12 @@ Create_rt:
 #-------------------------------------------------------------------------------
 # Create - Creates a new dictionary entry and advances dictionary pointers
 #
-# If the dictionary entry extends past the dictionary limit, abort.
+# This reads the next word in the input stream and uses that as the name
+# of the entry. On successful execution, a new entry will be added to the
+# dictionary, |dp| will point to this latest entry, and |pfa| will point
+# to that entries first parameter cell.
+#
+# If the dictionary entry extends past the dictionary limit, this exits.
 #-------------------------------------------------------------------------------
 	.globl Create
 	.type Create, @function
