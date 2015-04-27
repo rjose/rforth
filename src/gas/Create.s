@@ -67,7 +67,7 @@ Create:
 
 	# Otherwise, abort
 	pushq $1
-	call exit
+	call Exit
 
 0:	# Return
 	ret

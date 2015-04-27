@@ -45,5 +45,5 @@ main:
 
 0:	# Exit
 	pushq 	$0		# Exit code
-	call exit
+	call Exit
 	addq $8*1, %rsp		# Don't need to remove stack arg, but still :-)

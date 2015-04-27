@@ -67,7 +67,7 @@ read_word:
 
 	# Abort since buffer will overflow
 	pushq $1
-	call exit
+	call Exit
 
 3:	# Continue getting char
 	call getc

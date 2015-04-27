@@ -2,7 +2,7 @@
 # TEXT section
 #===============================================================================
 	.section .text
-	.globl exit
+	.globl Exit
 
 #-------------------------------------------------------------------------------
 # exits program
@@ -10,8 +10,8 @@
 # Args:
 #   * 1: exit code
 #-------------------------------------------------------------------------------
-	.type exit, @function
-exit:
+	.type Exit, @function
+Exit:
 	movq $60, %rax
 	movq 8(%rsp), %rdi		# Exit code
 	syscall
