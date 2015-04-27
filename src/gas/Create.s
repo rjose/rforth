@@ -23,6 +23,8 @@ Create_rt:
 
 #-------------------------------------------------------------------------------
 # Create - Creates a new dictionary entry and advances dictionary pointers
+#
+# If the dictionary entry extends past the dictionary limit, abort.
 #-------------------------------------------------------------------------------
 	.globl Create
 	.type Create, @function
@@ -58,4 +60,14 @@ Create:
 	movq $pfa, %rax
 	movq %rbx, (%rax)
 
+	# Check that we haven't exceeded the dictionary size
+	movq pfa, %rax
+	cmp dict_size, %rax
+	jle 0f
+
+	# Otherwise, abort
+	pushq $1
+	call exit
+
+0:	# Return
 	ret

@@ -7,17 +7,20 @@
 	.equ DICT_SIZE, 24000
 
 #-------------------------------------------------------------------------------
-# Dictionary pointer
+# Dictionary pointers
 #
 # These are initialized to point to the first dictionary entry.
 #-------------------------------------------------------------------------------
-	.globl dp, pfa
+	.globl dp, pfa, dict_size
 
 dp:	# Pointer to last dictionary entry
 	.quad 0
 
 pfa:	# "Parameter field address", also the next available dictionary cell
 	.quad dictionary
+
+dict_size:
+	.int DICT_SIZE
 
 
 #===============================================================================
