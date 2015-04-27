@@ -29,19 +29,19 @@
 # TEXT section
 #===============================================================================
 	.section .text
-	.globl getc
+	.globl Getc
 
 #-------------------------------------------------------------------------------
-# getc - Returns char read from STDIN and puts it in %rdi
+# Returns char read from STDIN and puts it in %rdi
 #
 # Args:
 #   * %rdi: destination for char
 #
 # NOTE: Characters are loaded into |buffer| and returned from there.
 #-------------------------------------------------------------------------------
-	.globl getc
-	.type getc, @function
-getc:
+	.globl Getc
+	.type Getc, @function
+Getc:
 	# If there are stil chars in the buffer, return the next one
 	movl .buf_index, %eax
 	cmp .num_chars_read, %eax

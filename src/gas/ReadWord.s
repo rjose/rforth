@@ -34,7 +34,7 @@ tib_count:
 	.section .text
 
 #-------------------------------------------------------------------------------
-# read_word - Reads word via getc and stores in tib buffer
+# read_word - Reads word via Getc and stores in tib buffer
 #
 #
 # Reads characters into start of tib buffer.  If the word fits in tib,
@@ -51,7 +51,7 @@ read_word:
 	movl $0, (%rdi)		# Zero out first 4 bytes of tib
 
 1:	# Skip spaces and newlines
-	call getc
+	call Getc
 	cmp $SPACE, (%rdi)
 	je 1b
 	cmp $NEWLINE, (%rdi)
@@ -70,7 +70,7 @@ read_word:
 	call Exit
 
 3:	# Continue getting char
-	call getc
+	call Getc
 
 	# If we get a space, newline, or EOF, we're done
 	cmp $SPACE, (%rdi)
