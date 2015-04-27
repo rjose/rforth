@@ -48,6 +48,7 @@ read_word:
 	# Start at the beginning of the buffer
 	movl $0, tib_count
 	movq $tib, %rdi
+	movl $0, (%rdi)		# Zero out first 4 bytes of tib
 
 1:	# Skip spaces and newlines
 	call getc

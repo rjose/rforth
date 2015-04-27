@@ -3,12 +3,26 @@
 #===============================================================================
 	.section .data
 
+	# Assuming 200 words with an avg of 10 params each
+	.equ DICT_SIZE, 24000
+
+#-------------------------------------------------------------------------------
+# Dictionary pointer
+#
+# These are initialized to point to the first dictionary entry.
+#-------------------------------------------------------------------------------
+dp:	# Pointer to last dictionary entry
+	.quad 0
+
+pfa:	# "Parameter field address", also the next available dictionary cell
+	.quad dictionary
+
 
 #===============================================================================
 # BSS section
 #===============================================================================
 	.section .bss
-	.comm test_buffer, 100
+	.comm dictionary, DICT_SIZE
 
 #===============================================================================
 # TEXT section
