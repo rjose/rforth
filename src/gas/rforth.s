@@ -11,6 +11,8 @@
 #
 # These are initialized to point to the first dictionary entry.
 #-------------------------------------------------------------------------------
+	.globl dp, pfa
+
 dp:	# Pointer to last dictionary entry
 	.quad 0
 
@@ -35,8 +37,8 @@ pfa:	# "Parameter field address", also the next available dictionary cell
 #-------------------------------------------------------------------------------
 main:
 	nop
-	call read_word
-	call read_word
+	call Create
+	call Create
 
 0:	# Exit
 	pushq 	$0		# Exit code

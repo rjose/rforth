@@ -13,6 +13,7 @@
 	.equ     SPACE, 32
 
 # Current word size
+  	  .globl tib_count
 tib_count:
 	.int	0
 
@@ -31,7 +32,6 @@ tib_count:
 # TEXT section
 #===============================================================================
 	.section .text
-	.globl getc
 
 #-------------------------------------------------------------------------------
 # read_word - Reads word via getc and stores in tib buffer
