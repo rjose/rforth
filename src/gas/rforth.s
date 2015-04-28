@@ -40,8 +40,9 @@ dict_size:
 #-------------------------------------------------------------------------------
 main:
 	nop
+	call Tick
 	call Create
-	call Create
+	call Tick
 
 0:	# Exit
 	pushq 	$0		# Exit code
