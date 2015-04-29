@@ -54,12 +54,13 @@ Create:
 	movq %rbx, 16(%rax)
 
 	# Increment dictionary pointers
-	# dp = pfa
+	
+	# dp := pfa
 	movq pfa, %rbx
 	movq $dp, %rax
 	movq %rbx, (%rax)
 
-	# pfa = dp + 24
+	# pfa := dp + 24
 	movq dp, %rbx
 	addq $24, %rbx
 	movq $pfa, %rax
@@ -67,6 +68,7 @@ Create:
 
 	# Check that we haven't exceeded the dictionary size
 	movq pfa, %rax
+	subq $dictionary, %rax
 	cmp dict_size, %rax
 	jle 0f
 

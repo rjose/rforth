@@ -4,7 +4,11 @@
 	.section .data
 
 	# Assuming 200 words with an avg of 10 params each
-	.equ DICT_SIZE, 24000
+	.equ DICT_SIZE, 24576
+
+	# Parameter stack size (256 8-byte words)
+	.equ PARAM_STACK_SIZE, 2048
+
 
 #-------------------------------------------------------------------------------
 # Dictionary pointers
@@ -16,11 +20,23 @@
 dp:	# Pointer to last dictionary entry
 	.quad 0
 
-pfa:	# "Parameter field address", also the next available dictionary cell
+pfa:	# "Parameter field address". Also the next available dictionary cell.
 	.quad dictionary
 
 dict_size:
 	.int DICT_SIZE
+
+#-------------------------------------------------------------------------------
+# Parameter Stack Pointers
+#-------------------------------------------------------------------------------
+	.globl psp, ps_size
+
+psp:	# Parameter stack pointer
+	.quad param_stack
+
+ps_size:      # Max size of parameter stack
+	.int PARAM_STACK_SIZE
+
 
 
 #===============================================================================
@@ -28,6 +44,7 @@ dict_size:
 #===============================================================================
 	.section .bss
 	.comm dictionary, DICT_SIZE
+	.comm param_stack, PARAM_STACK_SIZE
 
 #===============================================================================
 # TEXT section
@@ -40,7 +57,6 @@ dict_size:
 #-------------------------------------------------------------------------------
 main:
 	nop
-	call Tick
 	call Create
 	call Tick
 

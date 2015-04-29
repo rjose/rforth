@@ -54,8 +54,7 @@ Tick:
 	jmp 1b
 	
 
-0:	# Return value
-	# TODO: call PushData
-	movq (%rsp), %rbx # TODO: Remove
+0:	# Return address of entry on param stack
+	call PushParam
 	addq $8, %rsp	# Remove stack arg
 	ret
