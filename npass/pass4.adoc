@@ -1,0 +1,82 @@
+= Pass 4: Execute code in dictionary
+
+Create a Constant and run Interpret to execute it
+
+== Tasks
+- [x] Create a function that adds constants to the dictionary
+  - [x] Write Constant_rt function
+  - [x] Write DropParam function
+- [x] Write an Interpret function
+- [x] Initialize dictionary with some constants
+- [x] Call Tick and specify a constant
+- [x] Call Interpret and examine stack
+
+
+
+== Status
+- Effort spent: 2.5h
+- Effort left: 0h
+- Initial estimate: 10h
+
+== Log
+
+=== Saturday, 05/02/2015
+
+----
+** 09:58 >> Add Constant function
+Let's use Create to create a new dictionary entry. After this is
+called, the dp will point to the new entry. Let's spec this out.
+
+** 10:09 (11 min) Spec'ing out Constant function
+
+** 10:23 << (25 min) Done
+
+** 11:53 >> Implement Constant function
+
+** 12:11 (19 min) Implemented Constant
+Need to implement DropParam next
+
+** 12:20 (28 min) Implemented DropParam
+Let's test DropParam and then try creating a Constant entry.
+
+** 12:35 << (43 min) Looks good.
+Let's check this in and then think about how to execute it
+
+** 12:39 Break
+After a break, let's add the Constant_rt function and figure out an
+execution loop.
+
+** 12:42 How should execute work?
+If we were entering input into a forth repl (and if LIMIT were a word
+in the dictionary). Hmmm...I guess we could code one pass of the loop
+in assembly and then start from there. Once we have "QUIT", we could
+run this in a loop. Once we have loops, we can replace the assembly
+with the forth loop.
+
+** 14:38 >> Implement Execute
+Let's spec this out a little.
+
+** 14:44 Actually, let's implement Interpret which will in turn call Execute
+
+** 14:51 (13 min) Implement Interpret
+
+
+** 15:07 (29 min) It works!
+Interpret was able to find an entry and execute it. Let's try it when
+it doesn't find an entry. After that, we can write some code to push
+the constant value onto the stack.
+
+** 15:10 << (32 min) Looks good.
+Let's check in.
+
+** 15:20 >> Create Constant_rt
+Alright, let's implement Constant_rt. Its only function is to push its
+param value onto the forth stack.
+
+Uh, so how does it know where its param value is? I suppose we need to
+push the value onto the stack.
+
+** 16:03 << (43 min) Works
+Looks like the Constant_rt function is working
+
+----

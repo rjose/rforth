@@ -4,6 +4,11 @@
 * [x] Pass 2: Read words from input
 * [x] Pass 3: Search for words in dictionary
 * [ ] Pass 4: Execute code in dictionary
+
+* [ ] Pass : Implement number runner
+* [ ] Pass : Print param stack
+* [ ] Pass : Add arithmetic operators
+
 * [ ] Pass : Add a control loop
 
 == Passes
