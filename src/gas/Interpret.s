@@ -26,8 +26,13 @@ Interpret:
 	je 1f			# Number runner
 
 	call DropParam		# Pop param stack
-	movq 16(%rbx), %rax	# %rax points to code for entry
-	call %rax
+	
+	movq %rbx, %rax
+	addq $16, %rax		# %rax points to code for entry
+
+	pushq %rbx     		# Push current entry onto stack
+	call *(%rax)
+	addq $8, %rsp
 
 
 1:	# TODO: Implement number runner

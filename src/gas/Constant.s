@@ -10,12 +10,20 @@
 
 #-------------------------------------------------------------------------------
 # Constant_rt - Runtime code for Constant
+#
+# The entry address is on the return stack. We'll use that to find the
+# parameter value.
 #-------------------------------------------------------------------------------
 	.globl Constant_rt
 	.type Constant_rt, @function
 Constant_rt:
-	# TODO: Implement this
-	nop
+	movq 8(%rsp), %rbx	# First arg is dictionary entry
+	movq 24(%rbx), %rax	# Parameter value
+
+	# Push onto param stack
+	pushq %rax
+	call PushParam
+	addq $8, %rsp		# Drop pushed value from assmebly stack
 	ret
 
 

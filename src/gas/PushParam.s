@@ -12,6 +12,9 @@
 #-------------------------------------------------------------------------------
 # PushParam - Pushes a value onto the parameter stack
 #
+# Args:
+#   * Arg1: value to push onto stack
+#
 # If the stack size exceeds the max param stack size, this aborts.
 #-------------------------------------------------------------------------------
 	.globl PushParam
