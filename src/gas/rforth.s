@@ -31,7 +31,7 @@ dict_size:
 #-------------------------------------------------------------------------------
 	.globl psp, ps_size
 
-psp:	# Parameter stack pointer
+psp:	# Parameter stack pointer (points to next available stack element)
 	.quad param_stack
 
 ps_size:      # Max size of parameter stack
@@ -57,8 +57,13 @@ ps_size:      # Max size of parameter stack
 #-------------------------------------------------------------------------------
 main:
 	nop
-	call Create
-	call Tick
+
+	# Create a new constant entry
+	pushq $99
+	call PushParam
+	addq $8, %rsp
+
+	call Constant
 
 0:	# Exit
 	pushq 	$0		# Exit code
