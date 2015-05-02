@@ -62,8 +62,11 @@ main:
 	pushq $99
 	call PushParam
 	addq $8, %rsp
-
 	call Constant
+
+	# Simulate one pass of the control loop
+	call Interpret
+
 
 0:	# Exit
 	pushq 	$0		# Exit code
