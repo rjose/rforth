@@ -19,6 +19,12 @@
 	.equ	 ASCII_0, 48
 	.equ	 ASCII_9, 57
 
+	# Status codes
+	.equ	 STATUS_OK, 1
+	.equ	 STATUS_LOST_PRECISION, 2
+	.equ	 STATUS_TOO_BIG, -1
+	.equ	 STATUS_INVALID, -2
+
 	#----------------------------------------------------------------------
 	# Globals
 	#
@@ -34,7 +40,7 @@ RN_value:
 	.quad	0
 
 RN_status:
-	.int 1
+	.int STATUS_OK
 
 	#----------------------------------------------------------------------
 	# Locals
@@ -82,7 +88,7 @@ ReadNumber:
 	movl $0, .is_negative
 	movl $0, .have_decimal
 	movq $0, RN_value
-	movl $1, RN_status	# Start assuming everything is good
+	movl $STATUS_OK, RN_status
 	movl $0, %eax		# %eax holds the index of the current char
 	movq $tib, %rsi		# %rsi holds a pointer to the cur char
 	movl $NUM_DIGITS, .num_digits_left
@@ -117,7 +123,7 @@ ReadNumber:
 	jmp .add_number
 
 .invalid_number:
-	movl $-2, RN_status
+	movl $STATUS_INVALID, RN_status
 	jmp 0f		# Return
 
 .add_number:
@@ -130,11 +136,11 @@ ReadNumber:
 	je .number_too_big
 
 	# Otherwise, we're just losing precision
-	movl $2, RN_status
+	movl $STATUS_LOST_PRECISION, RN_status
 	jmp .negate_if_needed
 
 .number_too_big:
-	movl $-1, RN_status
+	movl $STATUS_TOO_BIG, RN_status
 	jmp 0f	  # Return
 
 .add_next_digit:
@@ -164,11 +170,19 @@ ReadNumber:
 	jmp .check_cur_char
 
 
+	#------------------------------------------------------------
+	# At this point, we're just wrapping up to return the value.
+	# We need to negate the value if we have a minus sign. We
+	# also need to scale the value to the fixed point.
+	#
+	# The result will be in %rdx before writing to RN_value.
+	#------------------------------------------------------------
 .negate_if_needed:
 	movq RN_value, %rcx
 	cmpl $0, .is_negative
 	je .scale_value
 	neg %rcx
+	movq %rcx, %rdx		# Load %rdx with result in case nothing else will be done
 
 .scale_value:
 	cmpl $0, .have_decimal
