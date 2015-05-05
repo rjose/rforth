@@ -59,13 +59,8 @@ main:
 	nop
 
 	# Create a new constant entry
-	pushq $99
-	call PushParam
-	addq $8, %rsp
-	call Constant
-
-	# Simulate one pass of the control loop
-	call Interpret
+	call ReadWord
+	call ReadNumber
 
 
 0:	# Exit
