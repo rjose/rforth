@@ -1,16 +1,22 @@
 = rforth development passes
 
+== Passes
+include::pass3.adoc[leveloffset=+2]
+
+
 * [x] Pass 1: Build an empty rforth program
 * [x] Pass 2: Read words from input
 * [x] Pass 3: Search for words in dictionary
-* [ ] Pass 4: Execute code in dictionary
-
+* [x] Pass 4: Execute code in dictionary
 * [ ] Pass : Implement number runner
+
+* [ ] Pass : Add functions to install builtin words
 * [ ] Pass : Print param stack
+* [ ] Pass : Add arithmetic operations
+
+* [ ] Pass : Add first pass at definining words
 * [ ] Pass : Add arithmetic operators
 
 * [ ] Pass : Add a control loop
 
-== Passes
-include::pass3.adoc[leveloffset=+2]
 

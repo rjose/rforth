@@ -1,0 +1,16 @@
+= Pass 5: Create a number runner
+
+Need something that can push numbers onto our param stack
+
+== Tasks
+- [x] Recognize an integer
+- [x] Convert string to integer value and push onto stack
+- [x] If not a number, we'll abort (later we'll call Quit)
+
+
+
+== Status
+- Effort spent: 2h
+- Effort left: 0h
+- Initial estimate: 4h
+
