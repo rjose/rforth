@@ -59,9 +59,7 @@ main:
 	nop
 
 	# Create a new constant entry
-	call ReadWord
-	call ReadNumber
-
+	call Interpret
 
 0:	# Exit
 	pushq 	$0		# Exit code
