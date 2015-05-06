@@ -58,7 +58,9 @@ ps_size:      # Max size of parameter stack
 main:
 	nop
 
-	# Create a new constant entry
+	# Define builtins
+	call DefineMathWords
+	
 	call Interpret
 
 0:	# Exit

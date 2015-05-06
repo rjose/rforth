@@ -15,27 +15,26 @@
 	.globl Create_rt
 	.type Create_rt, @function
 Create_rt:
-	# TODO: Implement this
 	nop
 	ret
 
 
-
 #-------------------------------------------------------------------------------
-# Create - Creates a new dictionary entry and advances dictionary pointers
+# CreateAfterReadWord - Creates a dictionary entry assuming ReadWord has was called
 #
-# This reads the next word in the input stream and uses that as the name
-# of the entry. On successful execution, a new entry will be added to the
+# Args:
+#   * tib: Should have the name of the entry to create
+#   * tib_count: Should have length of name
+#
+# On successful execution, a new entry will be added to the
 # dictionary, |dp| will point to this latest entry, and |pfa| will point
 # to that entries first parameter cell.
 #
 # If the dictionary entry extends past the dictionary limit, this exits.
 #-------------------------------------------------------------------------------
-	.globl Create
-	.type Create, @function
-Create:
-	call ReadWord
-
+	.globl CreateAfterReadWord
+	.type CreateAfterReadWord, @function
+CreateAfterReadWord:
 	# Put count in current count cell (pointed to by pfa)
 	movb tib_count, %bl
 	movq pfa, %rax
@@ -77,4 +76,18 @@ Create:
 	call Exit
 
 0:	# Return
+	ret
+
+
+#-------------------------------------------------------------------------------
+# Create - Creates a new dictionary entry and advances dictionary pointers
+#
+# This reads the next word in the input stream and then calls CreateAfterReadWord
+# to actually create the entry. See the comments for that function above.
+#-------------------------------------------------------------------------------
+	.globl Create
+	.type Create, @function
+Create:
+	call ReadWord
+	call CreateAfterReadWord
 	ret

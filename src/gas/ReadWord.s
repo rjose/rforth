@@ -74,14 +74,17 @@ ReadWord:
 
 	# If we get a space, newline, or EOF, we're done
 	cmp $SPACE, (%rdi)
-	je 0f
+	je .null_out_cur_byte
 	cmp $NEWLINE, (%rdi)
-	je 0f
+	je .null_out_cur_byte
 	cmp $EOF, (%rdi)
-	je 0f
+	je .null_out_cur_byte
 
 	# Otherwise, loop
 	jmp 2b			# Get next char
+
+.null_out_cur_byte:
+	movb $0, (%rdi)
 
 0:	# Return
 	ret
