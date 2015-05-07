@@ -61,7 +61,9 @@ main:
 	# Define builtins
 	call DefineMathWords
 	
-	call Interpret
+	call Interpret		# Put first number
+	call Interpret		# Put second number
+	call Interpret		# Call "+"
 
 0:	# Exit
 	pushq 	$0		# Exit code

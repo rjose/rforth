@@ -16,6 +16,8 @@
 #   * (value) : value
 #
 # This consumes the first element of the forth stack.
+#
+# NOTE: This modifies %rax
 #-------------------------------------------------------------------------------
 	.globl DropParam
 	.type DropParam, @function
