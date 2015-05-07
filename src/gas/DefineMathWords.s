@@ -14,6 +14,8 @@
 	# Word names
 ._plus_name:
 	.ascii "+\0\0\0"
+._minus_name:
+	.ascii "-\0\0\0"
 
 #-------------------------------------------------------------------------------
 # _plus_rt - Runtime code for "+" word
@@ -28,7 +30,23 @@ _plus_rt:
 	# Return value
 	pushq %rcx
 	call PushParam
-	addq $8, %rsp		# TODO: Make this into a macro
+	MClearStackArgs 1
+
+	ret
+
+#-------------------------------------------------------------------------------
+# _minus_rt - Runtime code for "-" word
+#-------------------------------------------------------------------------------
+	.type _minus_rt, @function
+_minus_rt:
+	MPop %rbx
+	MPop %rcx
+	subq %rcx, %rbx
+
+	# Return value
+	pushq %rbx
+	call PushParam
+	MClearStackArgs 1
 
 	ret
 
@@ -38,9 +56,8 @@ _plus_rt:
 	.globl DefineMathWords
 	.type DefineMathWords, @function
 DefineMathWords:
-	#--------------------------------------------------
 	# Define "+"
-	#--------------------------------------------------
 	MDefineWord ._plus_name, $1, _plus_rt
+	MDefineWord ._minus_name, $1, _minus_rt
 
 	ret
