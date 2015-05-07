@@ -1,8 +1,10 @@
+
 #===============================================================================
 # DATA section
 #===============================================================================
 	.section .data
 	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 #===============================================================================
 # TEXT section
@@ -45,15 +47,6 @@ DefineMathWords:
 	#--------------------------------------------------
 	# Define "+"
 	#--------------------------------------------------
+	MDefineWord ._plus, $1, _plus_rt
 
-	# Create entry for "+"
-	movl ._plus, %eax
-	movl %eax, tib
-	movl $1, tib_count
-	call CreateAfterReadWord
-
-	# Copy address of function into code slot
-	lea _plus_rt, %rbx
-	movq dp, %rax
-	movq %rbx, CODE_OFFSET(%rax)
 	ret
