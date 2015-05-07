@@ -20,3 +20,16 @@
        movq dp, %rax
        movq %rbx, CODE_OFFSET(%rax)
 .endm
+
+#---------------------------------------------------------------------------
+# Pops a value off the forth stack into a register
+#
+# Args:
+#   * dest_reg: Destination register for value
+#   * address_reg=%rsi: Register to hold address of psp pointer
+#---------------------------------------------------------------------------
+.macro MPop dest_reg, address_reg=%rsi
+	call DropParam
+	movq psp, \address_reg
+	movq (\address_reg), \dest_reg
+.endm

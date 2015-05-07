@@ -12,7 +12,7 @@
 	.section .text
 
 	# Word names
-._plus:
+._plus_name:
 	.ascii "+\0\0\0"
 
 #-------------------------------------------------------------------------------
@@ -20,14 +20,8 @@
 #-------------------------------------------------------------------------------
 	.type _plus_rt, @function
 _plus_rt:
-	call DropParam
-	movq psp, %rsi
-	movq (%rsi), %rbx
-
-	call DropParam
-	movq psp, %rsi
-	movq (%rsi), %rcx
-
+	MPop %rbx
+	MPop %rcx
 	addq %rbx, %rcx
 	# TODO: Check for overflow
 
@@ -47,6 +41,6 @@ DefineMathWords:
 	#--------------------------------------------------
 	# Define "+"
 	#--------------------------------------------------
-	MDefineWord ._plus, $1, _plus_rt
+	MDefineWord ._plus_name, $1, _plus_rt
 
 	ret
