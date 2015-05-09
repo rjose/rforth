@@ -10,7 +10,6 @@
 #===============================================================================
 	.section .text
 
-
 #-------------------------------------------------------------------------------
 # Create_rt - Runtime code for Create
 #-------------------------------------------------------------------------------
@@ -20,50 +19,50 @@ Create_rt:
 	nop
 	ret
 
-
 #-------------------------------------------------------------------------------
 # CreateAfterReadWord - Creates a dictionary entry assuming ReadWord has was called
 #
-# Args:
-#   * tib: Should have the name of the entry to create
-#   * tib_count: Should have length of name
+# Assumptions:
+#   * RW_tib: Should have the name of the entry to create
+#   * RW_tib_count: Should have length of name
 #
 # On successful execution, a new entry will be added to the
-# dictionary, |dp| will point to this latest entry, and |pfa| will point
+# dictionary, |G_dp| will point to this latest entry, and |pfa| will point
 # to that entries first parameter cell.
 #
 # If the dictionary entry extends past the dictionary limit, this exits.
 #-------------------------------------------------------------------------------
 	.globl CreateAfterReadWord
 	.type CreateAfterReadWord, @function
+
 CreateAfterReadWord:
-	# Put count in current count cell (pointed to by pfa)
+	# Put count in current count cell (pointed to by G_pfa)
 	movb RW_tib_count, %bl
 	movq G_pfa, %rax
 	movb %bl, (%rax)
 
-	# Copy first 4 chars from tib to name cells (offset by 4 bytes)
-	movq RW_tib, %rbx
-	movq %rbx, 4(%rax)
+	# Copy first 4 chars from tib to name cells
+	movl RW_tib, %ebx
+	movl %ebx, ENTRY_NAME_OFFSET(%rax)
 
 	# Store link to previous dictionary entry
 	movq G_dp, %rbx
-	movq %rbx, 8(%rax)
+	movq %rbx, ENTRY_LINK_OFFSET(%rax)
 
 	# Store Create_rt in code pointer
 	lea Create_rt, %rbx
-	movq %rbx, 16(%rax)
+	movq %rbx, ENTRY_CODE_OFFSET(%rax)
 
 	# Increment dictionary pointers
 	
-	# Dp := Pfa
+	# Make G_dp point to the new entry (currently G_pfa)
 	movq G_pfa, %rbx
 	movq $G_dp, %rax
 	movq %rbx, (%rax)
 
-	# Pfa := Dp + 24
+	# Make G_pfa point to the first parameter field of the new entry
 	movq G_dp, %rbx
-	addq $24, %rbx
+	addq $ENTRY_PFA_OFFSET, %rbx
 	movq $G_pfa, %rax
 	movq %rbx, (%rax)
 
