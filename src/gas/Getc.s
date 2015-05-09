@@ -2,11 +2,12 @@
 # DATA section
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 	.equ	 MAXLINE, 256
-	.equ	 READ, 0
 	.equ	 STDIN, 0
-	.equ	 EOF, 0
+
 
 # Number of chars currently loaded into buffer
 .num_chars_read:
@@ -41,33 +42,33 @@
 #-------------------------------------------------------------------------------
 	.globl Getc
 	.type Getc, @function
+
 Getc:
-	# If there are stil chars in the buffer, return the next one
+	# If there are stil chars in the buffer, return the next one...
 	movl .buf_index, %eax
 	cmp .num_chars_read, %eax
-	jl 1f	# Next char
+	jl .store_next_char
 
-	# Otherwise, we need to read in another line
-	pushq %rdi   # Save rdi since we're gonna stomp on it
-	movq $READ, %rax
+	# ...otherwise, we're out of chars and need to read in another line
+	pushq %rdi	        # Save rdi since we're gonna need it for this call
+	movq $SYSCALL_READ, %rax
 	movq $STDIN, %rdi
 	movq $buffer, %rsi
 	movq $MAXLINE, %rdx
 	syscall
+	popq %rdi		# Restore rdi
 
+	# Reset buf_index and num_chars_read
 	movl $0, .buf_index
 	movl %eax, .num_chars_read
-	popq %rdi   # Restore rdi
 
-	# If have input, return the next char
+	# If have input, store the next char; otherwise store an EOF
 	cmp $0, .num_chars_read
-	jg 1f	# Next char
-
-	# If no input, return EOF
-	movb $0, (%rdi)
+	jg .store_next_char
+	movb $ASCII_EOF, (%rdi)
 	jmp 0f	 # Return
 
-1:	# Next char
+.store_next_char:
 	movl .buf_index, %esi
 	movb buffer(%esi), %al
 	movb %al, (%rdi)
