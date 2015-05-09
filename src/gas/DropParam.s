@@ -18,14 +18,12 @@
 #   * (value) : value
 #
 # This consumes the first element of the forth stack.
-#
-# NOTE: This modifies %rax
 #-------------------------------------------------------------------------------
 	.globl DropParam
 	.type DropParam, @function
 DropParam:
 	# Move stack pointer back an element
-	subq $8, G_psp
+	subq $WORD_SIZE, G_psp
 
 	# Check for underflow
 	movq G_psp, %rax
