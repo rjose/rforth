@@ -30,42 +30,40 @@ RW_tib_count:
 	.section .text
 
 #-------------------------------------------------------------------------------
-# ReadWord - Reads word via Getc and stores in Tib buffer
+# ReadWord - Reads word via Getc and stores in RW_tib buffer
 #
-#
-# Reads characters into start of Tib buffer.  If the word fits in Tib,
+# Reads characters into start of Tib buffer.  If the word fits in RW_tib,
 # the number of characters read is TibCount. Otherwise, it exits with
 # a code of 1.
-#
 #-------------------------------------------------------------------------------
 	.globl ReadWord
 	.type ReadWord, @function
+
 ReadWord:
 	# Start at the beginning of the buffer
 	movl $0, RW_tib_count
 	movq $RW_tib, %rdi
 	movl $0, (%rdi)		# Zero out first 4 bytes of Tib
 
-1:	# Skip spaces and newlines
+.skip_whitespace:
 	call Getc
 	cmp $ASCII_SPACE, (%rdi)
-	je 1b
+	je .skip_whitespace
 	cmp $ASCII_NEWLINE, (%rdi)
-	je 1b
+	je .skip_whitespace
 
-2:	# Get next char
-	# NOTE: At this point a non-space char has just been read into the
-	#       current Tib slot.
+.loop:
+	# NOTE: At this point a non-space char is in the current RW_tib slot.
 	incl RW_tib_count
 	addq $1, %rdi		# Move destination to next byte
 	cmpl $MAXLINE, RW_tib_count
-	jle 3f			# Continue getting char
+	jle .get_next_char
 
 	# Abort since buffer will overflow
 	pushq $1
 	call Exit
 
-3:	# Continue getting char
+.get_next_char:
 	call Getc
 
 	# If we get a space, newline, or EOF, we're done
@@ -77,7 +75,7 @@ ReadWord:
 	je .null_out_cur_byte
 
 	# Otherwise, loop
-	jmp 2b			# Get next char
+	jmp .loop
 
 .null_out_cur_byte:
 	movb $0, (%rdi)

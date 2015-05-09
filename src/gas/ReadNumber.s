@@ -15,7 +15,9 @@
 	.equ	 BASE, 10
 	.equ	 FIXED_POINT_UNITS, 1000	# BASE^NUM_FRAC_DIGITS
 
+	#----------------------------------------------------------------------
 	# Status codes
+	#----------------------------------------------------------------------
 	.equ	 STATUS_OK, 1
 	.equ	 STATUS_LOST_PRECISION, 2
 	.equ	 STATUS_TOO_BIG, -1
