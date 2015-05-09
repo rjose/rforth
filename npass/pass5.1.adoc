@@ -1,0 +1,19 @@
+= Pass 5.1: Do consistency pass
+
+Ensure naming conventions, label conventions, macro usage
+
+== Tasks
+- [x] Rewrite Tick.s, Create.s
+- [x] Rewrite ReadNumber.s
+- [x] Rewrite PushParam.s, DropParam.s
+- [x] Rewrite DefineMathWords.s, Constant.s
+- [x] Rewrite Exit.s, Getc.s, ReadWord.s
+- [x] Rewrite macros.s, defines.s, rforth.s
+
+
+
+== Status
+- Effort spent: 3h
+- Effort left: 0h
+- Initial estimate: 5h
+

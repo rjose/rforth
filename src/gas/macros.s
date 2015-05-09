@@ -67,5 +67,5 @@
 # Moves stack pointer up num_args entries to clear stack
 #---------------------------------------------------------------------------
 .macro MClearStackArgs num_args
-       	addq $8*\num_args, %rsp
+       	addq $WORD_SIZE*\num_args, %rsp
 .endm
