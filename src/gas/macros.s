@@ -33,3 +33,10 @@
 	movq psp, \address_reg
 	movq (\address_reg), \dest_reg
 .endm
+
+#---------------------------------------------------------------------------
+# Moves stack pointer up num_args entries to clear stack
+#---------------------------------------------------------------------------
+.macro MClearStackArgs num_args
+       	addq $8*\num_args, %rsp
+.endm
