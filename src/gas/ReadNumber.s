@@ -26,10 +26,10 @@
 	#
 	# RN_value: value of number read
 	# RN_status: status of algorithm
-	#   1: Number was read successfully
-	#   2: Number was read but some precision was lost
-	#  -1: Number was too big to fit into fixed point representation
-	#  -2: Invalid number
+	#   STATUS_OK:			Number was read successfully
+	#   STATUS_LOST_PRECISION:	Number was read but some precision was lost
+	#   STATUS_TOO_BIG:		Number was too big to fit into fixed point representation
+	#   STATUS_INVALID:		Invalid number
 	#----------------------------------------------------------------------
 	.globl RN_value, RN_status
 RN_value:
@@ -41,11 +41,11 @@ RN_status:
 	#----------------------------------------------------------------------
 	# Locals
 	#
-	# .is_negative:		counts num "-" in word (at most 2)
-	# .have_decimal:	counts num "." in word (at most 2)
+	# .is_negative:		counts the number of "-" in word (at most 2)
+	# .have_decimal:	counts the number of "." in word (at most 2)
 	# .num_digits_left:	Max num digits left in number. This starts as
-	#    NUM_DIGITS but then is set to NUM_FRAC_DIGITS once a "."
-	#    is encountered.
+	#                       NUM_DIGITS but then is set to NUM_FRAC_DIGITS
+	#                       once we hit a ".".
 	#----------------------------------------------------------------------
 .is_negative:
 	.int 0
@@ -73,12 +73,13 @@ RN_status:
 # The resulting value is stored in RN_value. The status of the read is stored
 # in RN_status (see above for codes).
 #
-# This uses the following registers:
-#    * %eax:	index of cur char in tib buffer
+# The following registers are used throughout:
+#    * %eax:	index of cur char in RW_tib buffer
 #    * %rsi:    Address of cur char
 #-------------------------------------------------------------------------------
 	.globl ReadNumber
 	.type ReadNumber, @function
+
 ReadNumber:
 	# Initialize variables
 	movl $0, .is_negative
@@ -86,52 +87,59 @@ ReadNumber:
 	movq $0, RN_value
 	movl $STATUS_OK, RN_status
 	movl $0, %eax		# %eax holds the index of the current char
-	movq $RW_tib, %rsi		# %rsi holds a pointer to the cur char
+	movq $RW_tib, %rsi	# %rsi holds a pointer to the cur char
 	movl $NUM_DIGITS, .num_digits_left
 
-.check_cur_char:
-	# If at end of tib buffer, we're done
+
+	#------------------------------------------------------------
+	# The first part of this is looping through the characters
+	# in the RW_tib buffer.
+	#------------------------------------------------------------
+.loop:
+	# If at end of RW_tib buffer, we're done
 	cmp RW_tib_count, %eax
 	jge .negate_if_needed
 
 	# Check for "-"
 	cmpb $ASCII_MINUS, (%rsi)
 	jne .check_for_dot
+
 	incl .is_negative
 	jmp .check_flags
 
 .check_for_dot:
+	# If char isn't a dot, check for digit...
 	cmpb $ASCII_DOT, (%rsi)
 	jne .check_for_digit
 
-	# Update .num_digits_left
+	# ...otherwise, only look for at most NUM_FRAC_DIGITS
 	movq $NUM_FRAC_DIGITS, .num_digits_left
-
 	incl .have_decimal
 	jmp .check_flags
 
 .check_for_digit:
 	cmpb $ASCII_0, (%rsi)
 	jl .invalid_number
-
 	cmpb $ASCII_9, (%rsi)
 	jg .invalid_number
+
 	jmp .add_number
 
 .invalid_number:
 	movl $STATUS_INVALID, RN_status
-	jmp 0f		# Return
+	jmp 0f
 
 .add_number:
+	# If there are more digits to check, add next digit...
 	decl .num_digits_left
 	cmpl $0, .num_digits_left
 	jge .add_next_digit
 
-	# If out of digits and no decimal, then the number's too big
+	# ...otherwise, the number may be too big...
 	cmpl $0, .have_decimal
 	je .number_too_big
 
-	# Otherwise, we're just losing precision
+	# ...or we're just losing precision.
 	movl $STATUS_LOST_PRECISION, RN_status
 	jmp .negate_if_needed
 
@@ -163,7 +171,7 @@ ReadNumber:
 	# Go to next character and loop
 	inc %eax
 	inc %rsi
-	jmp .check_cur_char
+	jmp .loop
 
 
 	#------------------------------------------------------------
