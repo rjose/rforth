@@ -1,32 +1,28 @@
 #===============================================================================
 # DATA section
-#
-# |tib_count| is a global variable with the size of the current word
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 	.equ	 MAXLINE, 256
 
-	# Chars to look for
-	.equ     NEWLINE, 10
-	.equ	 EOF, 0
-	.equ     SPACE, 32
+#-------------------------------------------------------------------------------
+# Global variables
+#-------------------------------------------------------------------------------
+  	  .globl RW_tib_count
 
-# Current word size
-  	  .globl tib_count
-tib_count:
+# Size of the last read word
+RW_tib_count:
 	.int	0
 
 #===============================================================================
 # BSS section
-#
-# |tib| is a global buffer containing the current word
 #===============================================================================
 	.section .bss
 
-	# Text input buffer
-	.comm tib, MAXLINE
-
+	# "Text input buffer" containing last read word
+	.comm RW_tib, MAXLINE
 
 #===============================================================================
 # TEXT section
@@ -34,11 +30,11 @@ tib_count:
 	.section .text
 
 #-------------------------------------------------------------------------------
-# ReadWord - Reads word via Getc and stores in tib buffer
+# ReadWord - Reads word via Getc and stores in Tib buffer
 #
 #
-# Reads characters into start of tib buffer.  If the word fits in tib,
-# the number of characters read is tib_count. Otherwise, it exits with
+# Reads characters into start of Tib buffer.  If the word fits in Tib,
+# the number of characters read is TibCount. Otherwise, it exits with
 # a code of 1.
 #
 #-------------------------------------------------------------------------------
@@ -46,9 +42,9 @@ tib_count:
 	.type ReadWord, @function
 ReadWord:
 	# Start at the beginning of the buffer
-	movl $0, tib_count
-	movq $tib, %rdi
-	movl $0, (%rdi)		# Zero out first 4 bytes of tib
+	movl $0, RW_tib_count
+	movq $RW_tib, %rdi
+	movl $0, (%rdi)		# Zero out first 4 bytes of Tib
 
 1:	# Skip spaces and newlines
 	call Getc
@@ -59,10 +55,10 @@ ReadWord:
 
 2:	# Get next char
 	# NOTE: At this point a non-space char has just been read into the
-	#       current tib slot.
-	incl tib_count
+	#       current Tib slot.
+	incl RW_tib_count
 	addq $1, %rdi		# Move destination to next byte
-	cmpl $MAXLINE, tib_count
+	cmpl $MAXLINE, RW_tib_count
 	jle 3f			# Continue getting char
 
 	# Abort since buffer will overflow

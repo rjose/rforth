@@ -2,6 +2,8 @@
 # DATA section
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 #===============================================================================
 # TEXT section
@@ -23,11 +25,11 @@
 	.type DropParam, @function
 DropParam:
 	# Move stack pointer back an element
-	subq $8, psp
+	subq $8, G_psp
 
 	# Check for underflow
-	movq psp, %rax
-	subq $param_stack, %rax
+	movq G_psp, %rax
+	subq $G_param_stack, %rax
 	cmp $0, %rax
 	jge 0f
 

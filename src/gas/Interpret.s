@@ -2,6 +2,8 @@
 # DATA section
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 #===============================================================================
 # BSS section
@@ -24,7 +26,7 @@ Interpret:
 	call Tick
 
 	# Check top of stack
-	movq psp, %rax
+	movq G_psp, %rax
 	movq -8(%rax), %rbx	# %rbx points to entry
 	cmp $0, %rbx
 	je .number_runner

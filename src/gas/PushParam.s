@@ -2,6 +2,8 @@
 # DATA section
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 #===============================================================================
 # TEXT section
@@ -21,9 +23,9 @@
 	.type PushParam, @function
 PushParam:
 	# Check param stack size
-	movq psp, %rax
-	subq $param_stack, %rax
-	cmp ps_size, %rax
+	movq G_psp, %rax
+	subq $G_param_stack, %rax
+	cmp $PARAM_STACK_SIZE, %rax
 	jl 1f	     # Push onto stack
 
 	# Otherwise, abort
@@ -32,12 +34,12 @@ PushParam:
 
 1:	# Push first arg onto param stack
 	movq 8(%rsp), %rbx
-	movq psp, %rax
+	movq G_psp, %rax
 	movq %rbx, (%rax)
 
 	# Advance psp pointer
 	addq $8, %rax
-	movq %rax, psp
+	movq %rax, G_psp
 
 0:	# Return
 	ret

@@ -2,6 +2,8 @@
 # DATA section
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 #===============================================================================
 # TEXT section
@@ -44,18 +46,18 @@ Constant:
 
 	# Point the code for this entry to Constant_rt
 	lea Constant_rt, %rbx
-	movq dp, %rax
+	movq G_dp, %rax
 	movq %rbx, 16(%rax)
 
 	# Store the value of the constant in pfa
-	movq psp, %rax
+	movq G_psp, %rax
 	movq -8(%rax), %rbx	# Top of stack is one element before psp
-	movq pfa, %rax
+	movq G_pfa, %rax
 	movq %rbx, (%rax)
 	call DropParam
 
 	# Advance pfa
 	addq $8, %rax
-	movq %rax, pfa
+	movq %rax, G_pfa
 
 	ret

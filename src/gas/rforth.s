@@ -2,49 +2,40 @@
 # DATA section
 #===============================================================================
 	.section .data
-
-	# Assuming 200 words with an avg of 10 params each
-	.equ DICT_SIZE, 24576
-
-	# Parameter stack size (256 8-byte words)
-	.equ PARAM_STACK_SIZE, 2048
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 
 #-------------------------------------------------------------------------------
 # Dictionary pointers
-#
-# These are initialized to point to the first dictionary entry.
 #-------------------------------------------------------------------------------
-	.globl dp, pfa, dict_size
+	.globl G_dp, G_pfa
 
-dp:	# Pointer to last dictionary entry
+# Pointer to last dictionary entry
+G_dp:
 	.quad 0
 
-pfa:	# "Parameter field address". Also the next available dictionary cell.
-	.quad dictionary
+# "Parameter field address". Also the next available cell in the Dictionary
+G_pfa:
+	.quad G_dictionary
 
-dict_size:
-	.int DICT_SIZE
 
 #-------------------------------------------------------------------------------
 # Parameter Stack Pointers
 #-------------------------------------------------------------------------------
-	.globl psp, ps_size
+	.globl G_psp
 
-psp:	# Parameter stack pointer (points to next available stack element)
-	.quad param_stack
-
-ps_size:      # Max size of parameter stack
-	.int PARAM_STACK_SIZE
-
+# Parameter stack pointer (points to next available stack element)
+G_psp:
+	.quad G_param_stack
 
 
 #===============================================================================
 # BSS section
 #===============================================================================
 	.section .bss
-	.comm dictionary, DICT_SIZE
-	.comm param_stack, PARAM_STACK_SIZE
+	.comm G_dictionary, DICT_SIZE
+	.comm G_param_stack, PARAM_STACK_SIZE
 
 #===============================================================================
 # TEXT section
@@ -68,4 +59,4 @@ main:
 0:	# Exit
 	pushq 	$0		# Exit code
 	call Exit
-	addq $8*1, %rsp		# Don't need to remove stack arg, but still :-)
+	MClearStackArgs 1

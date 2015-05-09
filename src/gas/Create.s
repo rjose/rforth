@@ -2,6 +2,8 @@
 # DATA section
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 #===============================================================================
 # TEXT section
@@ -36,16 +38,16 @@ Create_rt:
 	.type CreateAfterReadWord, @function
 CreateAfterReadWord:
 	# Put count in current count cell (pointed to by pfa)
-	movb tib_count, %bl
-	movq pfa, %rax
+	movb RW_tib_count, %bl
+	movq G_pfa, %rax
 	movb %bl, (%rax)
 
 	# Copy first 4 chars from tib to name cells (offset by 4 bytes)
-	movq tib, %rbx
+	movq RW_tib, %rbx
 	movq %rbx, 4(%rax)
 
 	# Store link to previous dictionary entry
-	movq dp, %rbx
+	movq G_dp, %rbx
 	movq %rbx, 8(%rax)
 
 	# Store Create_rt in code pointer
@@ -54,21 +56,21 @@ CreateAfterReadWord:
 
 	# Increment dictionary pointers
 	
-	# dp := pfa
-	movq pfa, %rbx
-	movq $dp, %rax
+	# Dp := Pfa
+	movq G_pfa, %rbx
+	movq $G_dp, %rax
 	movq %rbx, (%rax)
 
-	# pfa := dp + 24
-	movq dp, %rbx
+	# Pfa := Dp + 24
+	movq G_dp, %rbx
 	addq $24, %rbx
-	movq $pfa, %rax
+	movq $G_pfa, %rax
 	movq %rbx, (%rax)
 
 	# Check that we haven't exceeded the dictionary size
-	movq pfa, %rax
-	subq $dictionary, %rax
-	cmp dict_size, %rax
+	movq G_pfa, %rax
+	subq $G_dictionary, %rax
+	cmp $DICT_SIZE, %rax
 	jle 0f
 
 	# Otherwise, abort

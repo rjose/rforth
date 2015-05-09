@@ -2,6 +2,8 @@
 # DATA section
 #===============================================================================
 	.section .data
+	.include "./src/gas/defines.s"
+	.include "./src/gas/macros.s"
 
 	# The total num digits is 19 (this is the number of decimal digits
 	# in the largest signed 64 bit number).
@@ -12,12 +14,6 @@
 	.equ     NUM_DIGITS, 16
 	.equ	 BASE, 10
 	.equ	 FIXED_POINT_UNITS, 1000	# BASE^NUM_FRAC_DIGITS
-
-	# Char ASCII codes
-	.equ	 ASCII_MINUS, 45
-	.equ     ASCII_DOT, 46
-	.equ	 ASCII_0, 48
-	.equ	 ASCII_9, 57
 
 	# Status codes
 	.equ	 STATUS_OK, 1
@@ -90,12 +86,12 @@ ReadNumber:
 	movq $0, RN_value
 	movl $STATUS_OK, RN_status
 	movl $0, %eax		# %eax holds the index of the current char
-	movq $tib, %rsi		# %rsi holds a pointer to the cur char
+	movq $RW_tib, %rsi		# %rsi holds a pointer to the cur char
 	movl $NUM_DIGITS, .num_digits_left
 
 .check_cur_char:
 	# If at end of tib buffer, we're done
-	cmp tib_count, %eax
+	cmp RW_tib_count, %eax
 	jge .negate_if_needed
 
 	# Check for "-"
