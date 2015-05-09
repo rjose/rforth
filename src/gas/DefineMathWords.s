@@ -10,17 +10,22 @@
 #===============================================================================
 	.section .text
 
+	#------------------------------------------------------------
 	# Word names
-._plus_name:
+	#------------------------------------------------------------
+.name_plus:
 	.ascii "+\0\0\0"
-._minus_name:
+.name_minus:
 	.ascii "-\0\0\0"
+.name_CONSTANT:
+	.ascii "CONS"
 
 #-------------------------------------------------------------------------------
-# _plus_rt - Runtime code for "+" word
+# plus_rt - Runtime code for "+" word
 #-------------------------------------------------------------------------------
-	.type _plus_rt, @function
-_plus_rt:
+	.type plus_rt, @function
+
+plus_rt:
 	MPop %rbx
 	MPop %rcx
 	addq %rbx, %rcx
@@ -34,10 +39,11 @@ _plus_rt:
 	ret
 
 #-------------------------------------------------------------------------------
-# _minus_rt - Runtime code for "-" word
+# minus_rt - Runtime code for "-" word
 #-------------------------------------------------------------------------------
-	.type _minus_rt, @function
-_minus_rt:
+	.type minus_rt, @function
+
+minus_rt:
 	MPop %rbx
 	MPop %rcx
 	subq %rcx, %rbx
@@ -54,9 +60,13 @@ _minus_rt:
 #-------------------------------------------------------------------------------
 	.globl DefineMathWords
 	.type DefineMathWords, @function
+
 DefineMathWords:
-	# Define "+"
-	MDefineWord ._plus_name, $1, _plus_rt
-	MDefineWord ._minus_name, $1, _minus_rt
+	# Define "+", "-"
+	MDefineWord .name_plus, $1, plus_rt
+	MDefineWord .name_minus, $1, minus_rt
+
+	# Define "CONSTANT"
+	MDefineWord .name_CONSTANT, $8, Constant
 
 	ret

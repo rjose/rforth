@@ -60,7 +60,7 @@ Interpret:
 	jg .push_number
 
 	# If not a number, we abort
-	pushq 5
+	pushq $5
 	call Exit
 	addq $8, %rsp
 	jmp 0f

@@ -13,19 +13,18 @@
 #-------------------------------------------------------------------------------
 # Constant_rt - Runtime code for Constant
 #
-# The entry address is on the return stack. We'll use that to find the
-# parameter value.
+# Stack Args:
+#   * Arg 1: Address of dictionary entry
+#
+# This pushes the parameter value of the dictionary entry onto the forth stack.
 #-------------------------------------------------------------------------------
 	.globl Constant_rt
 	.type Constant_rt, @function
-Constant_rt:
-	movq 8(%rsp), %rbx	# First arg is dictionary entry
-	movq 24(%rbx), %rax	# Parameter value
 
-	# Push onto param stack
-	pushq %rax
-	call PushParam
-	addq $8, %rsp		# Drop pushed value from assmebly stack
+Constant_rt:
+	movq STACK_ARG_1(%rsp), %rbx		# First arg is dictionary entry
+	movq ENTRY_PFA_OFFSET(%rbx), %rax	# Parameter value
+	MPush %rax
 	ret
 
 
@@ -40,6 +39,7 @@ Constant_rt:
 #-------------------------------------------------------------------------------
 	.globl Constant
 	.type Constant, @function
+
 Constant:
 	# Create new dictionary entry
 	call Create
@@ -47,17 +47,9 @@ Constant:
 	# Point the code for this entry to Constant_rt
 	lea Constant_rt, %rbx
 	movq G_dp, %rax
-	movq %rbx, 16(%rax)
+	movq %rbx, ENTRY_CODE_OFFSET(%rax)
 
-	# Store the value of the constant in pfa
-	movq G_psp, %rax
-	movq -8(%rax), %rbx	# Top of stack is one element before psp
-	movq G_pfa, %rax
-	movq %rbx, (%rax)
-	call DropParam
-
-	# Advance pfa
-	addq $8, %rax
-	movq %rax, G_pfa
-
+	# Pop a value off the forth stack and put it into the next parameter field slot
+	MPop %rbx
+	MAddParameter %rbx
 	ret

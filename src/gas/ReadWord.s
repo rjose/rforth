@@ -69,11 +69,11 @@ ReadWord:
 	call Getc
 
 	# If we get a space, newline, or EOF, we're done
-	cmp $ASCII_SPACE, (%rdi)
+	cmpb $ASCII_SPACE, (%rdi)
 	je .null_out_cur_byte
-	cmp $ASCII_NEWLINE, (%rdi)
+	cmpb $ASCII_NEWLINE, (%rdi)
 	je .null_out_cur_byte
-	cmp $ASCII_EOF, (%rdi)
+	cmpb $ASCII_EOF, (%rdi)
 	je .null_out_cur_byte
 
 	# Otherwise, loop

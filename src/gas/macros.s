@@ -22,6 +22,18 @@
 .endm
 
 #---------------------------------------------------------------------------
+# Pushes a value onto the forth stack
+#
+# Args:
+#   * value: Value to push onto stack
+#---------------------------------------------------------------------------
+.macro MPush value
+	pushq \value
+	call PushParam
+	addq $WORD_SIZE, %rsp		# Drop pushed value from assmebly stack
+.endm
+
+#---------------------------------------------------------------------------
 # Pops a value off the forth stack into a register
 #
 # Args:
@@ -32,6 +44,23 @@
 	call DropParam
 	movq G_psp, \address_reg
 	movq (\address_reg), \dest_reg
+.endm
+
+
+#---------------------------------------------------------------------------
+# Adds a new parameter at G_pfa and advances G_pfa pointer
+#
+# Args:
+#   * value: new parameter value
+#   * address_reg=%rdi: Register to hold address of G_pfa pointer
+#---------------------------------------------------------------------------
+.macro MAddParameter value, address_reg=%rdi
+	movq G_pfa, \address_reg
+	movq \value, (\address_reg)
+
+	# Advance pfa
+	addq $WORD_SIZE, \address_reg
+	movq \address_reg, G_pfa
 .endm
 
 #---------------------------------------------------------------------------
