@@ -23,9 +23,9 @@
 	#--------------------------------------------------
 	# ASCII codes
 	#--------------------------------------------------
-	.equ     NEWLINE, 10
-	.equ	 EOF, 0
-	.equ     SPACE, 32
+	.equ     ASCII_NEWLINE, 10
+	.equ	 ASCII_EOF, 0
+	.equ     ASCII_SPACE, 32
 	.equ	 ASCII_MINUS, 45
 	.equ     ASCII_DOT, 46
 	.equ	 ASCII_0, 48

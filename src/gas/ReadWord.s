@@ -48,9 +48,9 @@ ReadWord:
 
 1:	# Skip spaces and newlines
 	call Getc
-	cmp $SPACE, (%rdi)
+	cmp $ASCII_SPACE, (%rdi)
 	je 1b
-	cmp $NEWLINE, (%rdi)
+	cmp $ASCII_NEWLINE, (%rdi)
 	je 1b
 
 2:	# Get next char
@@ -69,11 +69,11 @@ ReadWord:
 	call Getc
 
 	# If we get a space, newline, or EOF, we're done
-	cmp $SPACE, (%rdi)
+	cmp $ASCII_SPACE, (%rdi)
 	je .null_out_cur_byte
-	cmp $NEWLINE, (%rdi)
+	cmp $ASCII_NEWLINE, (%rdi)
 	je .null_out_cur_byte
-	cmp $EOF, (%rdi)
+	cmp $ASCII_EOF, (%rdi)
 	je .null_out_cur_byte
 
 	# Otherwise, loop
