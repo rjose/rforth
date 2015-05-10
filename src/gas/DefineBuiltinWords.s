@@ -19,6 +19,7 @@
 
 .name_minus:
 	.ascii "-\0\0\0"
+	.equ LEN_MINUS, 1
 
 
 #===============================================================================
@@ -27,22 +28,6 @@
 	.section .text
 
 
-#-------------------------------------------------------------------------------
-# minus_rt - Runtime code for "-" word
-#-------------------------------------------------------------------------------
-	.type minus_rt, @function
-
-minus_rt:
-	MPop %rbx
-	MPop %rcx
-	subq %rcx, %rbx
-
-	# Return value
-	pushq %rbx
-	call PushParam
-	MClearStackArgs 1
-
-	ret
 
 #-------------------------------------------------------------------------------
 # DefineBuiltinWords - Defines words for math functions
@@ -53,7 +38,7 @@ minus_rt:
 DefineBuiltinWords:
 	# Define "+", "-"
 	MDefineWord .name_plus, $LEN_PLUS, WPlus
-	MDefineWord .name_minus, $1, minus_rt
+	MDefineWord .name_minus, $LEN_MINUS, WMinus
 
 	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant
 
