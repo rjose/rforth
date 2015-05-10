@@ -16,7 +16,7 @@ default: help
 functions = rforth \
             Exit Getc ReadWord ReadNumber Create Tick \
             PushParam DropParam PushEntryParam1 Interpret \
-	    DefineBuiltinWords WConstant WPlus WMinus WStar
+	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash
 
 obj_files = $(foreach f, $(functions), src/gas/$(f).o)
 dbg_obj_files = $(foreach f, $(functions), src/gas/$(f)_dbg.o)

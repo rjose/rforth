@@ -24,6 +24,10 @@
 	.ascii "*\0\0\0"
 	.equ LEN_STAR, 1
 
+.name_slash:
+	.ascii "/\0\0\0"
+	.equ LEN_SLASH, 1
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -41,6 +45,7 @@ DefineBuiltinWords:
 	MDefineWord .name_plus, $LEN_PLUS, WPlus
 	MDefineWord .name_minus, $LEN_MINUS, WMinus
 	MDefineWord .name_star, $LEN_STAR, WStar
+	MDefineWord .name_slash, $LEN_SLASH, WSlash
 
 	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant
 
