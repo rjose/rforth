@@ -5,24 +5,25 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+
 #===============================================================================
 # TEXT section
 #===============================================================================
 	.section .text
 
 #-------------------------------------------------------------------------------
-# Constant - Creates a constant entry in the dictionary.
+# WConstant - Creates a constant entry in the dictionary.
 #
 # Args:
-#   * (value) : Constant value
+#   * (value) : WConstant value
 #   * next word: Name of the entry
 #
 # This consumes the first element of the forth stack.
 #-------------------------------------------------------------------------------
-	.globl Constant
-	.type Constant, @function
+	.globl WConstant
+	.type WConstant, @function
 
-Constant:
+WConstant:
 	# Create new dictionary entry
 	call Create
 

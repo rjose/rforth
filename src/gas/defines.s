@@ -18,20 +18,20 @@
 	#
 	# These are offsets from %rsp for arguments passed on the stack
 	#-----------------------------------------------------------------------
-	.EQU	STACK_ARG_1, 8
-	.EQU	STACK_ARG_2, 16
-	.EQU	STACK_ARG_3, 24
-	.EQU	STACK_ARG_4, 32
-	.EQU	STACK_ARG_5, 40
+	.equ	STACK_ARG_1, 8
+	.equ	STACK_ARG_2, 16
+	.equ	STACK_ARG_3, 24
+	.equ	STACK_ARG_4, 32
+	.equ	STACK_ARG_5, 40
 
 	#-----------------------------------------------------------------------
 	# Dictionary entry defines
 	#-----------------------------------------------------------------------
-	.EQU	 ENTRY_COUNT_OFFSET, 0
-	.EQU	 ENTRY_NAME_OFFSET, 4
-	.EQU	 ENTRY_LINK_OFFSET, 8
-	.EQU	 ENTRY_CODE_OFFSET, 16
-	.EQU	 ENTRY_PFA_OFFSET, 24
+	.equ	 ENTRY_COUNT_OFFSET, 0
+	.equ	 ENTRY_NAME_OFFSET, 4
+	.equ	 ENTRY_LINK_OFFSET, 8
+	.equ	 ENTRY_CODE_OFFSET, 16
+	.equ	 ENTRY_PFA_OFFSET, 24
 
 	#-----------------------------------------------------------------------
 	# ASCII codes
@@ -47,5 +47,5 @@
 	#-----------------------------------------------------------------------
 	# System calls
 	#-----------------------------------------------------------------------
-	.EQU	SYSCALL_READ, 0
-	.EQU	SYSCALL_EXIT, 60
+	.equ	SYSCALL_READ, 0
+	.equ	SYSCALL_EXIT, 60

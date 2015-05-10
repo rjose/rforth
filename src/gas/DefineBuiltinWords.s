@@ -5,20 +5,24 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-#===============================================================================
-# TEXT section
-#===============================================================================
-	.section .text
 
-	#------------------------------------------------------------
-	# Word names
-	#------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Word names
+#-------------------------------------------------------------------------------
+.name_CONSTANT:
+	.ascii "CONS"
+	.equ LEN_CONSTANT, 8
+
 .name_plus:
 	.ascii "+\0\0\0"
 .name_minus:
 	.ascii "-\0\0\0"
-.name_CONSTANT:
-	.ascii "CONS"
+
+
+#===============================================================================
+# TEXT section
+#===============================================================================
+	.section .text
 
 #-------------------------------------------------------------------------------
 # plus_rt - Runtime code for "+" word
@@ -66,7 +70,6 @@ DefineBuiltinWords:
 	MDefineWord .name_plus, $1, plus_rt
 	MDefineWord .name_minus, $1, minus_rt
 
-	# Define "CONSTANT"
-	MDefineWord .name_CONSTANT, $8, Constant
+	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant
 
 	ret
