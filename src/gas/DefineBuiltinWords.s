@@ -15,6 +15,8 @@
 
 .name_plus:
 	.ascii "+\0\0\0"
+	.equ LEN_PLUS, 1
+
 .name_minus:
 	.ascii "-\0\0\0"
 
@@ -24,23 +26,6 @@
 #===============================================================================
 	.section .text
 
-#-------------------------------------------------------------------------------
-# plus_rt - Runtime code for "+" word
-#-------------------------------------------------------------------------------
-	.type plus_rt, @function
-
-plus_rt:
-	MPop %rbx
-	MPop %rcx
-	addq %rbx, %rcx
-	# TODO: Check for overflow
-
-	# Return value
-	pushq %rcx
-	call PushParam
-	MClearStackArgs 1
-
-	ret
 
 #-------------------------------------------------------------------------------
 # minus_rt - Runtime code for "-" word
@@ -67,7 +52,7 @@ minus_rt:
 
 DefineBuiltinWords:
 	# Define "+", "-"
-	MDefineWord .name_plus, $1, plus_rt
+	MDefineWord .name_plus, $LEN_PLUS, WPlus
 	MDefineWord .name_minus, $1, minus_rt
 
 	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant

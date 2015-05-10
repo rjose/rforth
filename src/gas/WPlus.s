@@ -5,36 +5,31 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-
 #===============================================================================
 # TEXT section
 #===============================================================================
 	.section .text
 
 #-------------------------------------------------------------------------------
-# WConstant - Creates a constant entry in the dictionary.
-#
-# Forth Stack:
-#   * value: value of constant
-#
-# Next Word: Name of the entry
-#
-# This consumes the first element of the forth stack and reads the next word
-# from the input stream.
+# WPlus - Adds top two values from the forth stack
 #-------------------------------------------------------------------------------
-	.globl WConstant
-	.type WConstant, @function
+	.globl WPlus
+	.type WPlus, @function
 
-WConstant:
-	# Create new dictionary entry
-	call Create
-
-	# A constant entry just pushes its value onto the forth stack
-	lea PushEntryParam1, %rbx
-	movq G_dp, %rax
-	movq %rbx, ENTRY_CODE_OFFSET(%rax)
-
-	# Pop a value off the forth stack and put it into the next parameter field slot
+WPlus:
 	MPop %rbx
-	MAddParameter %rbx
+	MPop %rcx
+	addq %rbx, %rcx
+
+	# Check for overflow
+	jno 0f
+	pushq $8
+	call Exit
+
+0:
+	# Return value
+	pushq %rcx
+	call PushParam
+	MClearStackArgs 1
+
 	ret
