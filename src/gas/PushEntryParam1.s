@@ -10,28 +10,18 @@
 #===============================================================================
 	.section .text
 
+
 #-------------------------------------------------------------------------------
-# Constant - Creates a constant entry in the dictionary.
+# PushEntryParam1 - Pushes first parameter of an entry onto forth stack
 #
-# Args:
-#   * (value) : Constant value
-#   * next word: Name of the entry
-#
-# This consumes the first element of the forth stack.
+# Stack Args:
+#   * Arg 1: Address of dictionary entry
 #-------------------------------------------------------------------------------
-	.globl Constant
-	.type Constant, @function
+	.globl PushEntryParam1
+	.type PushEntryParam1, @function
 
-Constant:
-	# Create new dictionary entry
-	call Create
-
-	# A constant entry just pushes its value onto the forth stack
-	lea PushEntryParam1, %rbx
-	movq G_dp, %rax
-	movq %rbx, ENTRY_CODE_OFFSET(%rax)
-
-	# Pop a value off the forth stack and put it into the next parameter field slot
-	MPop %rbx
-	MAddParameter %rbx
+PushEntryParam1:
+	movq STACK_ARG_1(%rsp), %rbx		# Dictionary entry
+	movq ENTRY_PFA_OFFSET(%rbx), %rax	# Param1 value
+	MPush %rax
 	ret
