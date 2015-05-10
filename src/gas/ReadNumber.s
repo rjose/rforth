@@ -5,15 +5,6 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-	# The total num digits is 19 (this is the number of decimal digits
-	# in the largest signed 64 bit number).
-	#
-	# We're using fixed point representation for our numbers with
-	# NUM_FRAC_DIGITS to the right of the decimal point.
-	.equ	 NUM_FRAC_DIGITS, 3
-	.equ     NUM_DIGITS, 16
-	.equ	 BASE, 10
-	.equ	 FIXED_POINT_UNITS, 1000	# BASE^NUM_FRAC_DIGITS
 
 	#----------------------------------------------------------------------
 	# Status codes

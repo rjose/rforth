@@ -5,7 +5,6 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-
 #-------------------------------------------------------------------------------
 # Word names
 #-------------------------------------------------------------------------------
@@ -21,12 +20,14 @@
 	.ascii "-\0\0\0"
 	.equ LEN_MINUS, 1
 
+.name_star:
+	.ascii "*\0\0\0"
+	.equ LEN_STAR, 1
 
 #===============================================================================
 # TEXT section
 #===============================================================================
 	.section .text
-
 
 
 #-------------------------------------------------------------------------------
@@ -36,9 +37,10 @@
 	.type DefineBuiltinWords, @function
 
 DefineBuiltinWords:
-	# Define "+", "-"
+	# Define "+", "-", "*", "/"
 	MDefineWord .name_plus, $LEN_PLUS, WPlus
 	MDefineWord .name_minus, $LEN_MINUS, WMinus
+	MDefineWord .name_star, $LEN_STAR, WStar
 
 	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant
 
