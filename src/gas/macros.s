@@ -61,6 +61,17 @@
 	# Advance pfa
 	addq $WORD_SIZE, \address_reg
 	movq \address_reg, G_pfa
+
+	# Check bounds
+	subq $G_dictionary, \address_reg
+	cmp $DICT_SIZE, \address_reg
+	jle .MAddParameter_OK
+
+	# Otherwise, abort
+	pushq $7
+	call Exit
+
+.MAddParameter_OK:
 .endm
 
 #---------------------------------------------------------------------------
