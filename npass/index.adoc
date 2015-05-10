@@ -9,15 +9,15 @@ include::pass3.adoc[leveloffset=+2]
 * [x] Pass 3: Search for words in dictionary
 * [x] Pass 4: Execute code in dictionary
 * [x] Pass 5: Implement number runner
-* [ ] Pass 5.1: Do consistency pass
+* [x] Pass 5.1: Do consistency pass
 * [ ] Pass 6: Add functions to install builtin words
 
 * [ ] Pass : Print param stack
-* [ ] Pass : Add arithmetic operations
-
-* [ ] Pass : Add first pass at definining words
-* [ ] Pass : Add arithmetic operators
-
+* [ ] Pass : Define words in forth
+* [ ] Pass : Add conditions
+* [ ] Pass : Add loops
+* [ ] Pass : Add variables
 * [ ] Pass : Add a control loop
-
-
+* [ ] Pass : Add stack operations
+* [ ] Pass : Add signal handlers
+* [ ] Pass : Add LOAD
