@@ -50,7 +50,7 @@ main:
 	nop
 
 	# Define builtins
-	call DefineMathWords
+	call DefineBuiltinWords
 	
 	call Interpret		# Put first number
 	call Interpret		# Put second number

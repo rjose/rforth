@@ -56,12 +56,12 @@ minus_rt:
 	ret
 
 #-------------------------------------------------------------------------------
-# DefineMathWords - Defines words for math functions
+# DefineBuiltinWords - Defines words for math functions
 #-------------------------------------------------------------------------------
-	.globl DefineMathWords
-	.type DefineMathWords, @function
+	.globl DefineBuiltinWords
+	.type DefineBuiltinWords, @function
 
-DefineMathWords:
+DefineBuiltinWords:
 	# Define "+", "-"
 	MDefineWord .name_plus, $1, plus_rt
 	MDefineWord .name_minus, $1, minus_rt
