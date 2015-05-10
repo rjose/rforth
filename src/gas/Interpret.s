@@ -40,6 +40,8 @@ Interpret:
 	MClearStackArgs 1
 	jmp 0f
 
+
+.number_runner:
 	#------------------------------------------------------------
 	# At this point, the last read word is still in the tib
 	# buffer, and we need to see if this is a number. If it is a number,
@@ -47,7 +49,6 @@ Interpret:
 	# need to abort (at some point, print a message and clear
 	# the param stack).
 	#------------------------------------------------------------
-.number_runner:
 	call ReadNumber
 	cmp $0, RN_status
 	jg .push_number

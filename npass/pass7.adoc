@@ -1,0 +1,23 @@
+= Pass 7: Print param stack
+
+The goal of this pass is to implement the ".s" word to print the stack.
+
+== Tasks
+- [ ] Create an empty ".s" word an hook up
+- [ ] Port the putc code from our sw_tools repo
+- [ ] Figure out how to print the contents of the stack
+- [ ] Hook everything up
+
+
+== Status
+- Effort spent: 0h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Tuesday, 05/05/2015
+
+----
+
+----
