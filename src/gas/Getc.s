@@ -50,13 +50,9 @@ Getc:
 	jl .store_next_char
 
 	# ...otherwise, we're out of chars and need to read in another line
-	pushq %rdi	        # Save rdi since we're gonna need it for this call
 	movq $SYSCALL_READ, %rax
-	movq $STDIN, %rdi
-	movq $buffer, %rsi
-	movq $MAXLINE, %rdx
-	syscall
-	popq %rdi		# Restore rdi
+	MSyscall $STDIN, $buffer, $MAXLINE
+
 
 	# Reset buf_index and num_chars_read
 	movl $0, .buf_index

@@ -14,9 +14,10 @@ default: help
 
 # Variables to define obj files for normal and debug targets
 functions = rforth \
-            Exit Getc ReadWord ReadNumber Create Tick \
+            Exit Getc Putc ReadWord ReadNumber Create Tick \
             PushParam DropParam PushEntryParam1 Interpret \
-	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash
+	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash \
+            WDotS
 
 obj_files = $(foreach f, $(functions), src/gas/$(f).o)
 dbg_obj_files = $(foreach f, $(functions), src/gas/$(f)_dbg.o)

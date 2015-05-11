@@ -28,6 +28,10 @@
 	.ascii "/\0\0\0"
 	.equ LEN_SLASH, 1
 
+.name_dot_s:
+	.ascii ".s\0\0"
+	.equ LEN_DOT_S, 2
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -48,5 +52,7 @@ DefineBuiltinWords:
 	MDefineWord .name_slash, $LEN_SLASH, WSlash
 
 	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant
+
+	MDefineWord .name_dot_s, $LEN_DOT_S, WDotS
 
 	ret

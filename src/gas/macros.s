@@ -1,3 +1,4 @@
+
 #---------------------------------------------------------------------------
 # Defines a new dictionary entry
 #
@@ -79,4 +80,32 @@
 #---------------------------------------------------------------------------
 .macro MClearStackArgs num_args
        	addq $WORD_SIZE*\num_args, %rsp
+.endm
+
+
+#---------------------------------------------------------------------------
+# Make a system call
+#---------------------------------------------------------------------------
+.macro MSyscall arg1=$0, arg2=$0, arg3=$0, arg4=$0, arg5=$0, arg6=$0
+       pushq %rdi
+       pushq %rsi
+       pushq %rdx
+       pushq %r10
+       pushq %r8
+       pushq %r9
+
+       movq \arg1, %rdi
+       movq \arg2, %rsi
+       movq \arg3, %rdx
+       movq \arg4, %r10
+       movq \arg5, %r8
+       movq \arg6, %r9
+       syscall
+
+       popq %r9
+       popq %r8
+       popq %r10
+       popq %rdx
+       popq %rsi
+       popq %rdi
 .endm
