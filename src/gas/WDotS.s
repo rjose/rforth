@@ -28,10 +28,8 @@ put_number:
 	cmp $0, %ecx
 	jle 0f
 
-	# Put a character
-	movb (%rdx), %al
-	call Putc
-	
+	MPutc (%rdx)
+
 	# Update the indexes
 	dec %ecx
 	inc %rdx
@@ -73,21 +71,20 @@ WDotS:
 	cmp $G_param_stack, %rsi
 	jl .done
 
+	# Otherwise, print the number (and then a newline)
 	movq (%rsi), %rax
 	call WriteNumber
 	call put_number
-	movb $ASCII_NEWLINE, %al
-	call Putc
+	MPutc $ASCII_NEWLINE
+
+	# Go to next element on the stack
 	subq $WORD_SIZE, %rsi
 	jmp .print_element
 
 .done:
-	movb $ASCII_MINUS, %al
-	call Putc
-	movb $ASCII_MINUS, %al
-	call Putc
-	movb $ASCII_NEWLINE, %al
-	call Putc
+	MPutc $ASCII_MINUS
+	MPutc $ASCII_MINUS
+	MPutc $ASCII_NEWLINE
 	call Flush
 0:
 	ret
