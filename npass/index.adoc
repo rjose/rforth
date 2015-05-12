@@ -1,7 +1,7 @@
 = rforth development passes
 
 == Passes
-include::pass7.adoc[leveloffset=+2]
+include::pass8.adoc[leveloffset=+2]
 
 * [ ] Pass 8: Add .q and a simple control loop
 

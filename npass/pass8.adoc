@@ -1,0 +1,21 @@
+= Pass 8: Add .q and a simple control loop
+
+The goal of this pass is to enable a control loop
+
+== Tasks
+- [ ] Create a .q word that exits
+- [ ] Create a simple control loop
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 2h
+
+== Log
+
+=== Sunday, 05/10/2015
+
+----
+
+----
