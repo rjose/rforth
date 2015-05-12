@@ -56,13 +56,10 @@ main:
 	# Define builtins
 	call DefineBuiltinWords
 
-	movb $65, %al
-	call Putc
-	call Flush
-
-	call Interpret		# Put first number
-	call Interpret		# Put second number
-	call Interpret		# Call "+"
+	call Interpret
+	call Interpret
+	call Interpret
+	call Interpret
 
 0:	# Exit
 	pushq 	$0		# Exit code
