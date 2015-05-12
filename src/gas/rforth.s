@@ -49,6 +49,10 @@ G_psp:
 main:
 	nop
 
+	# Try WriteNumber
+	movq $1234, %rax
+	call WriteNumber
+
 	# Define builtins
 	call DefineBuiltinWords
 

@@ -14,7 +14,7 @@ default: help
 
 # Variables to define obj files for normal and debug targets
 functions = rforth \
-            Exit Getc Putc ReadWord ReadNumber Create Tick \
+            Exit Getc Putc ReadWord ReadNumber WriteNumber Create Tick \
             PushParam DropParam PushEntryParam1 Interpret \
 	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash \
             WDotS
@@ -48,7 +48,7 @@ help:
 
 	@echo -e "\nPROGRAMS"
 	@echo -e "\trforth:\t\tBuilds rforth program"
-	@echo -e "\trforth-dbg:\tBuilds debuggable rforth program"
+	@echo -e "\trforth_dbg:\tBuilds debuggable rforth program"
 
 	@echo -e "\nMISC"
 	@echo -e "\thelp:\t\tShows this message"
