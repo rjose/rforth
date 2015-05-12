@@ -3,21 +3,83 @@
 The goal of this pass is to implement the ".s" word to print the stack.
 
 == Tasks
-- [ ] Create an empty ".s" word an hook up
-- [ ] Port the putc code from our sw_tools repo
-- [ ] Figure out how to print the contents of the stack
-- [ ] Hook everything up
+- [x] Create an empty ".s" word an hook up
+- [x] Port the putc code from our sw_tools repo
+- [x] Implement WriteNumber
+- [x] Figure out how to print the contents of the stack
+- [x] Hook everything up
 
 
 == Status
-- Effort spent: 0h
+- Effort spent: 3h
 - Effort left: 0h
 - Initial estimate: 3h
 
 == Log
 
-=== Tuesday, 05/05/2015
+=== Sunday, 05/10/2015
 
 ----
+** 11:18 >> Let's get Pass7 set up
 
+** 11:22 (4 min) Created new branch and pass docs
+Let's start by creating an empty ".s" word and hooking it up.
+
+** 11:26 (8 min) Stubbed out a .s word
+
+** 11:30 (12 min) Port the putc code over
+We need to be able to put characters and flush them.
+
+Let's start with our GetC and revise to PutC.
+
+** 12:16 << (58 min) Take a break
+Hmmm...I don't think the macros work the way I was thinking. We should
+use a macro per line of instruction instead of trying to work
+something into the line. This would clean things up better
+anyways. For instance, we should have: MSyscall num arg1 arg2 arg3
+----
+
+=== Monday, 05/11/2015
+
+
+----
+** 16:37 >> Let's spec out WriteNumber first
+
+** 17:05 << (28 min) Looks good
+Let's take a break and then implement this.
+
+** 18:33 >> Implement WriteNumber
+
+** 19:09 << (36 min) Finished coding
+OK, I implemented WriteNumber. Let's take a break and then I'll get it working.
+
+** 19:54 >> Debug WriteNumber
+
+** 19:57 (3 min) Got it to assemble
+Let's step through it and make sure it works
+
+** 20:15 << (21 min) Got it working
+Looks good. Let's check in and then spec out ".s" a bit.
+
+** 21:12 >> Spec out WDotS
+
+** 21:33 (11 min) Done with spec
+
+** 21:33 (11 min) Let's implement WDotS
+
+** 21:45 (23 min) Done implementing
+Let's get this to assemble and then take a break.
+
+** 21:45 << (23 min) Wow, it just assembled
+We'll take a little break and then try it out. We'll do an empty
+stack, then we'll put an element. Then we'll do a math operation.
+
+** 21:52 >> Let's give it a try
+
+** 22:17 (25 min) Got it working
+Most of my errors came from not getting the addresses of things
+properly. Let's check in and then add a macro for putting a character.
+
+** 22:26 << (34 min) Looks good
+Let's finish pass7, check in and sketch out pass8.
 ----

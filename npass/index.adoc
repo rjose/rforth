@@ -3,8 +3,7 @@
 == Passes
 include::pass7.adoc[leveloffset=+2]
 
-* [ ] Pass 7: Print param stack
-
+* [ ] Pass 8: Add .q and a simple control loop
 
 * [ ] Pass : Define words in forth
 * [ ] Pass : Add conditions
@@ -24,3 +23,4 @@ include::pass7.adoc[leveloffset=+2]
 * [x] Pass 5: Implement number runner
 * [x] Pass 5.1: Do consistency pass
 * [x] Pass 6: Add functions to install builtin words
+* [x] Pass 7: Print param stack
