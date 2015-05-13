@@ -32,6 +32,10 @@
 	.ascii ".s\0\0"
 	.equ LEN_DOT_S, 2
 
+.name_dot_q:
+	.ascii ".q\0\0"
+	.equ LEN_DOT_Q, 2
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -54,5 +58,6 @@ DefineBuiltinWords:
 	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant
 
 	MDefineWord .name_dot_s, $LEN_DOT_S, WDotS
+	MDefineWord .name_dot_q, $LEN_DOT_Q, WDotQ
 
 	ret

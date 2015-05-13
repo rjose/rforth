@@ -49,6 +49,9 @@ put_number:
 	.type WDotS, @function
 
 WDotS:
+	# Start off with a newline
+	MPutc $ASCII_NEWLINE
+
 	# If stack is empty, we're done
 	movq G_psp, %rsi
 	cmp $G_param_stack, %rsi

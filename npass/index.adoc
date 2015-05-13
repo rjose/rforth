@@ -11,8 +11,9 @@ include::pass8.adoc[leveloffset=+2]
 * [ ] Pass : Add variables
 * [ ] Pass : Add a control loop
 * [ ] Pass : Add stack operations
-* [ ] Pass : Add signal handlers
 * [ ] Pass : Add LOAD
+* [ ] Pass : Add signal handlers
+
 
 
 === Completed Passes
