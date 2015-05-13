@@ -8,14 +8,19 @@ The goal of this pass is to enable a control loop
 
 
 == Status
-- Effort spent: h
+- Effort spent: 0.5h
 - Effort left: 0h
 - Initial estimate: 2h
 
 == Log
 
-=== Sunday, 05/10/2015
+=== Tuesday, 05/12/2015
 
 ----
+** 21:00 >> Implement .q
 
+** 21:17 (17 min) Done implementing .q
+Looks good. Let's check in and then add a simple control loop.
+
+** 21:22 << (22 min) Done implementing control loop
 ----
