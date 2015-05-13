@@ -49,19 +49,13 @@ G_psp:
 main:
 	nop
 
-	# Try WriteNumber
-	movq $1234, %rax
-	call WriteNumber
-
-	# Define builtins
 	call DefineBuiltinWords
 
+.loop:
 	call Interpret
-	call Interpret
-	call Interpret
-	call Interpret
+	jmp .loop
 
-0:	# Exit
-	pushq 	$0		# Exit code
+0:
+	pushq 	$0
 	call Exit
 	MClearStackArgs 1

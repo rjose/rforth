@@ -3,8 +3,8 @@
 The goal of this pass is to enable a control loop
 
 == Tasks
-- [ ] Create a .q word that exits
-- [ ] Create a simple control loop
+- [X] Create a .q word that exits
+- [X] Create a simple control loop
 
 
 == Status
