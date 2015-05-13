@@ -1,0 +1,27 @@
+= Pass 9: Define words in forth
+
+This defines the ":" word for defining new words.
+
+Note that in this pass, we'll only be compiling "straightline"
+definitions without conditions or loops.
+
+== Tasks
+- [ ] Create Exit and Literal_rt words
+- [ ] Add function to search like Tick but without calling ReadWord
+- [ ] Create Compile word
+- [ ] Create ":" and ";" words
+- [ ] Add code that can execute a definition
+
+
+
+== Status
+- Effort spent: 0h
+- Effort left: 0h
+- Initial estimate: 5h
+
+== Log
+
+=== Tuesday, 05/12/2015
+
+----
+----

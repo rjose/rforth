@@ -23,6 +23,21 @@
 .endm
 
 #---------------------------------------------------------------------------
+# Defines a new immediate dictionary entry
+#
+# Args:
+#   * name: Address to first 4 bytes of word entry
+#   * name_len: Total length of entry name
+#   * rt_func: Runtime function that's run when word is executed
+#---------------------------------------------------------------------------
+.macro MDefineImmediateWord name, name_len, rt_func
+       MDefineWord \name, \name_len, \rt_func
+
+       # After MDefineWord, the address of the current entry is in %rax
+       movb $1, ENTRY_IMMEDIATE_OFFSET(%rax)
+.endm
+
+#---------------------------------------------------------------------------
 # Pushes a value onto the forth stack
 #
 # Args:

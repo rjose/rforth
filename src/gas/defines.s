@@ -42,6 +42,7 @@
 	# Dictionary entry defines
 	#-----------------------------------------------------------------------
 	.equ	 ENTRY_COUNT_OFFSET, 0
+	.equ	 ENTRY_IMMEDIATE_OFFSET, 1
 	.equ	 ENTRY_NAME_OFFSET, 4
 	.equ	 ENTRY_LINK_OFFSET, 8
 	.equ	 ENTRY_CODE_OFFSET, 16

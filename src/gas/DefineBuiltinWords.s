@@ -36,6 +36,14 @@
 	.ascii ".q\0\0"
 	.equ LEN_DOT_Q, 2
 
+.name_colon:
+	.ascii ":\0\0\0"
+	.equ LEN_COLON, 1
+
+.name_semicolon:
+	.ascii ";\0\0\0"
+	.equ LEN_SEMICOLON, 1
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -60,4 +68,6 @@ DefineBuiltinWords:
 	MDefineWord .name_dot_s, $LEN_DOT_S, WDotS
 	MDefineWord .name_dot_q, $LEN_DOT_Q, WDotQ
 
+	MDefineImmediateWord .name_semicolon, $LEN_SEMICOLON, WSemicolon
+	MDefineWord .name_colon, $LEN_COLON, WColon
 	ret
