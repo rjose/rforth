@@ -32,7 +32,7 @@ WConstant:
 	# A constant entry just pushes its value onto the forth stack
 	lea PushEntryParam1, %rbx
 	movq G_dp, %rax
-	movq %rbx, ENTRY_CODE_OFFSET(%rax)
+	movq %rbx, ENTRY_CODE(%rax)
 
 	# Pop a value off the forth stack and put it into the next parameter field slot
 	MPop %rbx

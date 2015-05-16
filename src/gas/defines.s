@@ -46,12 +46,12 @@
 	#-----------------------------------------------------------------------
 	# Dictionary entry defines
 	#-----------------------------------------------------------------------
-	.equ	 ENTRY_COUNT_OFFSET, 0
-	.equ	 ENTRY_IMMEDIATE_OFFSET, 1
-	.equ	 ENTRY_NAME_OFFSET, 4
-	.equ	 ENTRY_LINK_OFFSET, 8
-	.equ	 ENTRY_CODE_OFFSET, 16
-	.equ	 ENTRY_PFA_OFFSET, 24
+	.equ	 ENTRY_COUNT, 0
+	.equ	 ENTRY_IMMEDIATE, 1
+	.equ	 ENTRY_NAME, 4
+	.equ	 ENTRY_LINK, 8
+	.equ	 ENTRY_CODE, 16
+	.equ	 ENTRY_PFA, 24
 
 	#-----------------------------------------------------------------------
 	# ASCII codes

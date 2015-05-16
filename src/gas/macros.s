@@ -19,7 +19,7 @@
        # Copy address of function into code slot
        lea \rt_func, %rbx
        movq G_dp, %rax
-       movq %rbx, ENTRY_CODE_OFFSET(%rax)
+       movq %rbx, ENTRY_CODE(%rax)
 .endm
 
 #---------------------------------------------------------------------------
@@ -34,7 +34,7 @@
        MDefineWord \name, \name_len, \rt_func
 
        # After MDefineWord, the address of the current entry is in %rax
-       movb $1, ENTRY_IMMEDIATE_OFFSET(%rax)
+       movb $1, ENTRY_IMMEDIATE(%rax)
 .endm
 
 #---------------------------------------------------------------------------
@@ -111,7 +111,7 @@
 .macro MExecuteEntry reg
 	pushq \reg
 	# TODO: See if we can use addressing here
-	addq $ENTRY_CODE_OFFSET, \reg
+	addq $ENTRY_CODE, \reg
 	call *(\reg)
 	MClearStackArgs 1
 .endm

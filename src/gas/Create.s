@@ -43,15 +43,15 @@ CreateAfterReadWord:
 
 	# Copy first 4 chars from tib to name cells
 	movl RW_tib, %ebx
-	movl %ebx, ENTRY_NAME_OFFSET(%rax)
+	movl %ebx, ENTRY_NAME(%rax)
 
 	# Store link to previous dictionary entry
 	movq G_dp, %rbx
-	movq %rbx, ENTRY_LINK_OFFSET(%rax)
+	movq %rbx, ENTRY_LINK(%rax)
 
 	# Store Create_rt in code pointer
 	lea Create_rt, %rbx
-	movq %rbx, ENTRY_CODE_OFFSET(%rax)
+	movq %rbx, ENTRY_CODE(%rax)
 
 	# Increment dictionary pointers
 	
@@ -62,7 +62,7 @@ CreateAfterReadWord:
 
 	# Make G_pfa point to the first parameter field of the new entry
 	movq G_dp, %rbx
-	addq $ENTRY_PFA_OFFSET, %rbx
+	addq $ENTRY_PFA, %rbx
 	movq $G_pfa, %rax
 	movq %rbx, (%rax)
 

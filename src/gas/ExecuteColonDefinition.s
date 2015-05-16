@@ -30,7 +30,7 @@ ExecuteColonDefinition:
 .loop:
 	movq STACK_ARG_1(%rbp), %rbx              		 # rbx holds the colon definition's entry address
 	movq (%rsp), %rcx                         		 # rcx holds current parameter index
-	movq ENTRY_PFA_OFFSET(%rbx, %rcx, WORD_SIZE), %rdx       # rdx holds address of parameter's entry
+	movq ENTRY_PFA(%rbx, %rcx, WORD_SIZE), %rdx              # rdx holds address of parameter's entry
 
 	lea Exit_rt, %rax                                        # rax holds address of Exit_rt
 	cmp %rax, %rdx                                           # If current parameter is an Exit_rt, we're done

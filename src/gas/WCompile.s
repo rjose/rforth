@@ -52,7 +52,7 @@ Literal_rt:
 
 	movq STACK_ARG_2(%rbp), %rcx                             # rcx has address of colon definition
 
-	movq ENTRY_PFA_OFFSET(%rcx, %rbx, WORD_SIZE), %rax       # Get the literal value...
+	movq ENTRY_PFA(%rcx, %rbx, WORD_SIZE), %rax              # Get the literal value...
 	MPush %rax                                               # ...and push it onto the forth stack
 
 	# NOTE: We update the param index directly so it points
@@ -99,7 +99,7 @@ WCompile:
 
 	# If it's an immediate word, execute it now...
 .check_immediate_byte:
-	cmpb $1, ENTRY_IMMEDIATE_OFFSET(%rbx)
+	cmpb $1, ENTRY_IMMEDIATE(%rbx)
 	je .execute_immediately
 
 	# ...otherwise add the entry's address as the next parameter

@@ -37,19 +37,19 @@ Tick:
 .check_entry:
 	# Compare RW_tib_count with count in entry
 	movb  RW_tib_count, %bl
-	cmp %bl, ENTRY_COUNT_OFFSET(%rax)
+	cmp %bl, ENTRY_COUNT(%rax)
 	jne .try_previous_entry
 
 	# Compare first 4 chars with entry
 	movl RW_tib, %ebx
-	cmp %ebx, ENTRY_NAME_OFFSET(%rax)
+	cmp %ebx, ENTRY_NAME(%rax)
 	jne .try_previous_entry
 
 	# Otherwise, we have a match!
 	jmp 0f
 
 .try_previous_entry:
-	movq ENTRY_LINK_OFFSET(%rax), %rbx
+	movq ENTRY_LINK(%rax), %rbx
 	movq %rbx, %rax
 	jmp .loop
 	

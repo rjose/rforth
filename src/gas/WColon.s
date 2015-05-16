@@ -24,7 +24,7 @@ WColon:
 	# Store ExecuteColonDefinition in code pointer
 	lea ExecuteColonDefinition, %rbx
 	movq G_dp, %rax
-	movq %rbx, ENTRY_CODE_OFFSET(%rax)
+	movq %rbx, ENTRY_CODE(%rax)
 
 	# We start off in non-macro (i.e, normal) mode
 	movb $0, WC_macro_mode
