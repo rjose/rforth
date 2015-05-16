@@ -23,6 +23,8 @@
 	.type PushParam, @function
 
 PushParam:
+	MPrologue
+
 	# Check param stack size
 	movq G_psp, %rax
 	subq $G_param_stack, %rax
@@ -34,7 +36,7 @@ PushParam:
 	call Exit
 
 .push_arg:
-	movq STACK_ARG_1(%rsp), %rbx
+	movq STACK_ARG_1(%rbp), %rbx
 	movq G_psp, %rax
 	movq %rbx, (%rax)
 
@@ -43,4 +45,5 @@ PushParam:
 	movq %rax, G_psp
 
 0:
+	MEpilogue
 	ret

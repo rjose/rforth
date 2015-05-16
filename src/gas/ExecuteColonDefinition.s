@@ -10,21 +10,21 @@
 #===============================================================================
 	.section .text
 
+
 #-------------------------------------------------------------------------------
-# exits program
-#
-# Stack Args:
-#   * Arg 1: exit code
+# Executes a colon definition
 #-------------------------------------------------------------------------------
-	.globl Exit
-	.type Exit, @function
+	.globl ExecuteColonDefinition
+	.type ExecuteColonDefinition, @function
 
-Exit:
-	MPrologue
+ExecuteColonDefinition:
 
-	movq $SYSCALL_EXIT, %rax
-	movq STACK_ARG_1(%rbp), %rdi
-	syscall
+	# Push first parameter index (i.e., 0) onto the program stack
+	pushq $0
 
-	MEpilogue
+.execute_current_instruction:
+	# The top of the stack will be the parameter index
+	movq (%rsp), %rcx
+
+.done:
 	ret

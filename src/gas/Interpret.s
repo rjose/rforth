@@ -34,10 +34,7 @@ Interpret:
 	je .number_runner
 
 	# Otherwise, call the entry's runtime function
-	pushq %rbx
-	addq $ENTRY_CODE_OFFSET, %rbx
-	call *(%rbx)
-	MClearStackArgs 1
+	MExecuteEntry %rbx
 	jmp 0f
 
 

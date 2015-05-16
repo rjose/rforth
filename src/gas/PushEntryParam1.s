@@ -21,7 +21,11 @@
 	.type PushEntryParam1, @function
 
 PushEntryParam1:
-	movq STACK_ARG_1(%rsp), %rbx		# Dictionary entry
+	MPrologue
+
+	movq STACK_ARG_1(%rbp), %rbx		# Dictionary entry
 	movq ENTRY_PFA_OFFSET(%rbx), %rax	# Param1 value
 	MPush %rax
+
+	MEpilogue
 	ret

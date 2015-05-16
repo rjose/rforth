@@ -6,11 +6,12 @@ Note that in this pass, we'll only be compiling "straightline"
 definitions without conditions or loops.
 
 == Tasks
-- [ ] Create Exit and Literal_rt words
-- [ ] Add function to search like Tick but without calling ReadWord
-- [ ] Create Compile word
-- [ ] Create ":" and ";" words
-- [ ] Add code that can execute a definition
+- [x] Create Exit and ";"
+- [x] Implement Compile word
+- [x] Implement Literal_rt
+- [x] Implement WDotColon for ":"
+- [ ] Revise STACK_ARGs to use function prologue/epilogue
+- [ ] Implement ExecuteColonDefinition
 
 
 

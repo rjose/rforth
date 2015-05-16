@@ -46,7 +46,7 @@
 .macro MPush value
 	pushq \value
 	call PushParam
-	addq $WORD_SIZE, %rsp		# Drop pushed value from assmebly stack
+	addq $WORD_SIZE, %rsp		# Drop pushed value from program stack
 .endm
 
 #---------------------------------------------------------------------------
@@ -69,6 +69,9 @@
 # Args:
 #   * value: new parameter value
 #   * address_reg=%rdi: Register to hold address of G_pfa pointer
+#
+# NOTE: We use a label of 777 in this macro. You need to make sure any code
+#       that includes this does not also use 777 inadvertently.
 #---------------------------------------------------------------------------
 .macro MAddParameter value, address_reg=%rdi
 	movq G_pfa, \address_reg
@@ -81,13 +84,13 @@
 	# Check bounds
 	subq $G_dictionary, \address_reg
 	cmp $DICT_SIZE, \address_reg
-	jle .MAddParameter_OK
+	jle 777f
 
 	# Otherwise, abort
 	pushq $7
 	call Exit
 
-.MAddParameter_OK:
+777:
 .endm
 
 #---------------------------------------------------------------------------
@@ -95,6 +98,22 @@
 #---------------------------------------------------------------------------
 .macro MClearStackArgs num_args
        	addq $WORD_SIZE*\num_args, %rsp
+.endm
+
+#---------------------------------------------------------------------------
+# Executes entry whose address is in the specified register
+#
+# Args:
+#   * reg: Register where entry's address is
+#
+# NOTE: This modifies reg so that it holds the pointer to the entry's code.
+#---------------------------------------------------------------------------
+.macro MExecuteEntry reg
+	pushq \reg
+	# TODO: See if we can use addressing here
+	addq $ENTRY_CODE_OFFSET, \reg
+	call *(\reg)
+	MClearStackArgs 1
 .endm
 
 
@@ -106,6 +125,30 @@
 	call Putc
 .endm
 
+
+#---------------------------------------------------------------------------
+# Function prologue
+#
+# This pushes the %rbp register and stores the stack pointer in %rbp. The
+# MEpilogue macro should be called at the end of the function to restore %rbp.
+#
+# Any function that requires stack arguments should call use this.
+#---------------------------------------------------------------------------
+.macro MPrologue
+       pushq %rbp
+       movq %rsp, %rbp
+.endm
+
+#---------------------------------------------------------------------------
+# Function epilogue
+#
+# This restores the %rbp contents from an MPrologue and returns the stack
+# to its previous state.
+#---------------------------------------------------------------------------
+.macro MEpilogue
+       movq %rbp, %rsp
+       popq %rbp
+.endm
 
 #---------------------------------------------------------------------------
 # Make a system call

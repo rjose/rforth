@@ -30,13 +30,18 @@
 	#-----------------------------------------------------------------------
 	# Stack Args
 	#
-	# These are offsets from %rsp for arguments passed on the stack
+	# These are offsets from %rbp for arguments passed on the stack. This
+	# assumes that we've pushed the old value of %rbp and then stored
+	# %rsp in %rbp.
+	#
+	# The stack looks like: Old EBP, Return Address, Arg1, Arg2, ...
+	#                       0      , +8            , +16 , +24 , ...
 	#-----------------------------------------------------------------------
-	.equ	STACK_ARG_1, 8
-	.equ	STACK_ARG_2, 16
-	.equ	STACK_ARG_3, 24
-	.equ	STACK_ARG_4, 32
-	.equ	STACK_ARG_5, 40
+	.equ	STACK_ARG_1, 16
+	.equ	STACK_ARG_2, 24
+	.equ	STACK_ARG_3, 32
+	.equ	STACK_ARG_4, 40
+	.equ	STACK_ARG_5, 48
 
 	#-----------------------------------------------------------------------
 	# Dictionary entry defines
