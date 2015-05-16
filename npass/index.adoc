@@ -4,7 +4,6 @@
 include::pass9.adoc[leveloffset=+2]
 
 
-* [ ] Pass 9: Define words in forth
 
 * [ ] Pass : Add conditions
 * [ ] Pass : Add loops
@@ -26,3 +25,4 @@ include::pass9.adoc[leveloffset=+2]
 * [x] Pass 6: Add functions to install builtin words
 * [x] Pass 7: Print param stack
 * [x] Pass 8: Add .q and a simple control loop
+* [x] Pass 9: Define words in forth
