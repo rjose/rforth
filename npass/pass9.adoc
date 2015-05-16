@@ -10,8 +10,8 @@ definitions without conditions or loops.
 - [x] Implement Compile word
 - [x] Implement Literal_rt
 - [x] Implement WDotColon for ":"
-- [ ] Revise STACK_ARGs to use function prologue/epilogue
-- [ ] Implement ExecuteColonDefinition
+- [x] Revise STACK_ARGs to use function prologue/epilogue
+- [x] Implement ExecuteColonDefinition
 
 
 

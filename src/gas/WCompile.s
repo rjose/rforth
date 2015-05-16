@@ -47,20 +47,18 @@ WC_macro_mode:
 Literal_rt:
 	MPrologue
 
-	# Figure out address of the next parameter
-	movq STACK_ARG_1(%rbp), %rbx
-	movq STACK_ARG_2(%rbp), %rcx
+	movq STACK_ARG_1(%rbp), %rbx                             # Get the current parameter index
+	addq $1, %rbx                                            # The next cell holds the literal's value
 
-	# Advance parameter index to next entry (where the literal value is) and
-	# then grab the value and push it onto the forth stack.
-	addq $1, %rbx
-	movq ENTRY_PFA_OFFSET(%rcx, %rbx, WORD_SIZE), %rax
-	MPush %rax
+	movq STACK_ARG_2(%rbp), %rcx                             # rcx has address of colon definition
 
-	# Advance parameter index to next parameter and return this
-	addq $1, %rbx
-	pushq %rbx
-	
+	movq ENTRY_PFA_OFFSET(%rcx, %rbx, WORD_SIZE), %rax       # Get the literal value...
+	MPush %rax                                               # ...and push it onto the forth stack
+
+	# NOTE: We update the param index directly so it points
+	#       to the next instruction in the colon definition.
+	addq $2, STACK_ARG_1(%rbp)                               # Next instr is after value cell
+
 	MEpilogue
 	ret
 
