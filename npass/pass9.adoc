@@ -99,6 +99,7 @@ Let's step through it tomorrow.
 === Saturday, 05/16/2015
 ----
 ** 05:45 >> Execute colon definition
+
 ** 06:43 << (58 min) Got a colon definition to execute!
 I had to figure out a couple of things:
    * Special functions should be executed directly

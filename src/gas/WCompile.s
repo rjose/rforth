@@ -27,15 +27,15 @@ WC_macro_mode:
 	.section .text
 
 #-------------------------------------------------------------------------------
-# Pushes the next parameter's value onto the forth stack
+# Pushes a literal value onto the forth stack
 #
 # Args:
 #   * Stack arg 1: current parameter index
 #   * Stack arg 2: address of the associated colon definition
 #
-# NOTE: Every "special function" *must* push the next value of the
-#       parameter index onto the program stack before returning. This is
-#       used during the execution of the colon definition.
+# NOTE: Every "special function" *must* update the param index to point to
+#       the next colon definition parameter to execute. This is done directly
+#       to STACK_ARG_1(%rbp).
 #
 # Throughout this function:
 #   * rbx holds the parameter index

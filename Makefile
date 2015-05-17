@@ -17,7 +17,8 @@ functions = rforth \
             Exit Getc Putc ReadWord ReadNumber WriteNumber Create Tick \
             PushParam DropParam PushEntryParam1 Interpret ExecuteColonDefinition \
 	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash \
-            WDotS WDotQ WColon WSemicolon WCompile
+            WDotS WDotQ WColon WSemicolon WCompile \
+            WIf WThen
 
 obj_files = $(foreach f, $(functions), src/gas/$(f).o)
 dbg_obj_files = $(foreach f, $(functions), src/gas/$(f)_dbg.o)

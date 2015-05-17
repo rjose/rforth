@@ -74,20 +74,18 @@
 #       that includes this does not also use 777 inadvertently.
 #---------------------------------------------------------------------------
 .macro MAddParameter value, address_reg=%rdi
-	movq G_pfa, \address_reg
-	movq \value, (\address_reg)
+	movq G_pfa, \address_reg                       # Store address of next parameter cell in reg
+	movq \value, (\address_reg)                    # Write new value into this parameter cell
 
-	# Advance pfa
-	addq $WORD_SIZE, \address_reg
-	movq \address_reg, G_pfa
+	addq $WORD_SIZE, \address_reg                  # Point to next parameter cell
+	movq \address_reg, G_pfa                       # Update G_pfa to point to this cell
+	incq G_param_index                             # Increment current param index
 
-	# Check bounds
-	subq $G_dictionary, \address_reg
-	cmp $DICT_SIZE, \address_reg
-	jle 777f
+	subq $G_dictionary, \address_reg               # Figure out number of entries we've used
+	cmp $DICT_SIZE, \address_reg                   # and compare it to our max dictionary size.
+	jl 777f                                        # If it's less, then we're good
 
-	# Otherwise, abort
-	pushq $7
+	pushq $7                                       # Otherwise, abort
 	call Exit
 
 777:

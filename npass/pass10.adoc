@@ -1,0 +1,58 @@
+= Pass 10: Add conditions
+
+This adds support for IF THEN and IF ELSE THEN constructs
+
+
+== Tasks
+- [x] Spec out IF ELSE THEN constructs
+- [ ] Define IF and THEN immediate words
+- [ ] Define ELSE immediate word
+- [ ] Ensure conditions nest properly
+
+
+
+== Status
+- Effort spent: 2h
+- Effort left: 3h
+- Initial estimate: 5h
+
+== Log
+
+=== Saturday, 05/16/2015
+
+----
+** 09:55 >> Let's spec out how IF ELSE THEN should work
+
+** 10:27 << Take a break
+
+** 10:35 >> OK, let's continue this
+
+** 10:49 (14 min) We're gonna need to keep track of the current parameter index
+I think this should live in WCompile. We should reset it to 0 when we
+create a colon definition. We should increment it everytime we add a
+parameter. No one should mess with this variable outside of these two cases.
+
+** 11:22 << (47 min) OK, I have the IF, ELSE, THEN compile steps spec'd out
+When we get back, I'll spec out how to execute this.
+
+** 14:55 >> Think through executing a colon definition with a condition
+Hmmm...I think we need a special function in here someplace. Let's
+revise the examples I have and the spec for IF, ELSE, and THEN.
+
+** 15:04 (9 min) Came up with something that should work (at least un-nested)
+Let's re-spec our words.
+
+** 15:17 (22 min) Worked out that we just need Jmp_rt and Jmp_false_rt
+It seems like this should be fairly straightforward. However, let's go
+through a nested conditional example to make sure it all still works.
+
+** 15:38 << (43 min) The nested version seems to work
+When we get back from the play, I'll work on the WIf, WThen, WElse
+words and try compiling something simple. We'll stub out Jmp_rt and
+Jmp_false_rt. After that, we'll implement both.
+
+** 23:27 Wrote up a spec on loops
+I defined WWhile and WRepeat words. It looks like this can be done via
+Jmp and Jmp_false, too.
+
+----

@@ -1,11 +1,11 @@
 = rforth development passes
 
 == Passes
-include::pass9.adoc[leveloffset=+2]
+include::pass10.adoc[leveloffset=+2]
+
+* [ ] Pass 10: Add conditions
 
 
-
-* [ ] Pass : Add conditions
 * [ ] Pass : Add loops
 * [ ] Pass : Add variables
 * [ ] Pass : Add a control loop

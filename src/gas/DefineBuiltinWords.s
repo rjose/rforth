@@ -44,6 +44,15 @@
 	.ascii ";\0\0\0"
 	.equ LEN_SEMICOLON, 1
 
+.name_if:
+	.ascii "IF\0\0"
+	.equ LEN_IF, 2
+
+.name_then:
+	.ascii "THEN"
+	.equ LEN_THEN, 4
+
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -70,4 +79,8 @@ DefineBuiltinWords:
 
 	MDefineImmediateWord .name_semicolon, $LEN_SEMICOLON, WSemicolon
 	MDefineWord .name_colon, $LEN_COLON, WColon
+
+	MDefineImmediateWord .name_if, $LEN_IF, WIf
+	MDefineImmediateWord .name_then, $LEN_THEN, WThen
+
 	ret

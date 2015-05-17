@@ -1,6 +1,6 @@
-#===============================================================================
+#========================================
 # DATA section
-#===============================================================================
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
@@ -9,37 +9,41 @@
 #-------------------------------------------------------------------------------
 # Dictionary pointers
 #-------------------------------------------------------------------------------
-	.globl G_dp, G_pfa
+	.globl G_dp, G_pfa, G_param_index
 
-# Pointer to last dictionary entry
-G_dp:
-	.quad 0
 
-# "Parameter field address". Also the next available cell in the Dictionary
-G_pfa:
-	.quad G_dictionary
+G_dp:                                   # Pointer to most recently created
+	.quad 0                         # dictionary entry
 
+
+G_pfa:                                  # "Parameter field address". Also the next
+	.quad G_dictionary              # available cell in the Dictionary
+
+
+G_param_index:                          # Index into the current parameter for a
+	.quad 0                         # dictionary entry. This is reset to 0
+	                                # when a new entry is Create'd and
+					# incremented by MAddParameter.
 
 #-------------------------------------------------------------------------------
 # Parameter Stack Pointers
 #-------------------------------------------------------------------------------
 	.globl G_psp
 
-# Parameter stack pointer (points to next available stack element)
-G_psp:
-	.quad G_param_stack
+G_psp:                                  # "Parameter stack pointer" (points to
+	.quad G_param_stack             # next available stack element)
 
 
-#===============================================================================
+#========================================
 # BSS section
-#===============================================================================
+#========================================
 	.section .bss
 	.comm G_dictionary, DICT_SIZE
 	.comm G_param_stack, PARAM_STACK_SIZE
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 	.globl main
 
@@ -47,15 +51,12 @@ G_psp:
 # main
 #-------------------------------------------------------------------------------
 main:
-	nop
+	call DefineBuiltinWords         # Define builtin rforth words
 
-	call DefineBuiltinWords
-
-.loop:
+.loop:                                  # Continuously interpret words
 	call Interpret
 	jmp .loop
 
-0:
-	pushq 	$0
+done:
+	pushq 	$0                      # Normal exit code is 0
 	call Exit
-	MClearStackArgs 1

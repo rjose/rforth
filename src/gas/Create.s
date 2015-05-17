@@ -36,6 +36,8 @@ Create_rt:
 	.type CreateAfterReadWord, @function
 
 CreateAfterReadWord:
+	movq $0, G_param_index          # Reset param index for this definition
+
 	# Put count in current count cell (pointed to by G_pfa)
 	movb RW_tib_count, %bl
 	movq G_pfa, %rax
