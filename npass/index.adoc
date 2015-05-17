@@ -3,12 +3,9 @@
 == Passes
 include::pass10.adoc[leveloffset=+2]
 
-* [ ] Pass 10: Add conditions
-
-
 * [ ] Pass : Add loops
-* [ ] Pass : Add variables
 * [ ] Pass : Add a control loop
+* [ ] Pass : Add variables
 * [ ] Pass : Add stack operations
 * [ ] Pass : Add LOAD
 * [ ] Pass : Add signal handlers
@@ -26,3 +23,4 @@ include::pass10.adoc[leveloffset=+2]
 * [x] Pass 7: Print param stack
 * [x] Pass 8: Add .q and a simple control loop
 * [x] Pass 9: Define words in forth
+* [x] Pass 10: Add conditions

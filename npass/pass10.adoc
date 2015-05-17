@@ -7,19 +7,17 @@ This adds support for IF THEN and IF ELSE THEN constructs
 - [x] Spec out IF ELSE THEN constructs
 - [x] Define IF and THEN immediate words
 - [x] Define ELSE immediate word
-- [ ] Ensure conditions nest properly
-
+- [x] Ensure conditions nest properly
 
 
 == Status
-- Effort spent: 2h
-- Effort left: 3h
+- Effort spent: 5.5h
+- Effort left: 0h
 - Initial estimate: 5h
 
 == Log
 
 === Saturday, 05/16/2015
-
 ----
 ** 09:55 >> Let's spec out how IF ELSE THEN should work
 
@@ -54,5 +52,102 @@ Jmp_false_rt. After that, we'll implement both.
 ** 23:27 Wrote up a spec on loops
 I defined WWhile and WRepeat words. It looks like this can be done via
 Jmp and Jmp_false, too.
+----
 
+
+=== Sunday, 05/17/2015
+----
+** 06:55 >> Define WIf, WElse, and WThen
+Let's start with WIf and WThen.
+
+** 07:00 (5 min) Define logic and stub out Jmp_false_rt
+Let's define the function first and then define the associated word.
+
+** 07:08 (13 min) Also need to define and manage WC_param_index
+The WC_param_index is the current param index in an entry. Actually,
+it should be G_param_index since it's really the index version of
+G_pfa. Well before we rename anything, let's see how we use
+MAddParameter.
+
+** 07:14 (19 min) All MAddParameter calls are in words
+I suppose whenever we called Create, we could zero out the
+G_param_index and whenever MAddParameter was called, we could
+increment it. I think this makes perfect sense.
+
+** 07:16 (21 min) Add G_param_index
+
+** 07:32 (37 min) Added G_param_index
+I'm also revising the comment styles for every file I hit.
+
+** 07:38 (43 min) Done hooking up G_param_index
+Let's define the WIf word and get it to compile.
+
+** 07:40 << (45 min) Assembles!
+Alright, let's take a break and then add the THEN word. Once we have
+that, we should be able to compile a condition.
+
+** 07:54 >> Define WThen
+Let's define WThen and then see if we can compile a condition.
+
+** 08:15 (21 min) Running into difficulties pushing the param index
+I can't use the program stack because the WThen word will be executing
+in a different stack frame from where WIf was running. That means I
+need to use the forth stack (which means other immediate words need to
+be very careful about maintaining the forth stack consistency across
+IF, THEN, and ELSE).
+
+** 08:20 (26 min) Let's give it a try
+We'll compile our sample: 
+
+   : SAMPLE IF 5 THEN ;
+
+
+
+** 08:46 << (52 min) Got the IF THEN compilation to work
+What was messing me up was that MPop was zeroing out the %rax register
+that I had filled out with the latest dictionary entry. Anyways, it
+looks like it compiles properly. Let's take a break and then implement
+Jmp_false_rt. 
+
+** 09:04 >> Let's start implementing Jmp_false_rt
+
+** 09:24 (20 min) Done with implementing
+Let's define a condition and give it a try.
+
+** 09:31 << (27 min) Looks like it works!
+Let's check in and then implement WElse.
+
+** 09:45 >> Let's define WElse next.
+
+** 10:10 << (25 min) Implemented WElse
+Let's take a break and then try compiling a condition with an ELSE.
+
+** 11:31 >> Let's try compiling an ELSE
+We'll step through the WElse word and also look at the parameters. The
+definition we'll compile is:
+
+    : SAMPLE IF 10 ELSE 20 THEN ;
+
+** 11:49 (18 min) Got an segfault
+Ah, I bet it's because I didn't look for Jmp_rt as a special function.
+
+** 11:52 (21 min) Looks like it works!
+Let's check in
+
+** 11:56 (25 min) Let's see if we could define a nested condition
+I'll first see if it compiles correctly. We'll use
+
+    x/12g (G_dp + 24) to see each cell
+
+
+** 12:06 (35 min) The definition looks like it compiled:
+
+   : NESTED IF 10 ELSE IF 20 THEN 30 THEN ;
+
+If the stack is (1 0), then we should get (20 30)
+If the stack is (0 0), then we should get (30)
+
+
+** 12:11 << (40 min) Nested looks good!
+Let's check in.
 ----
