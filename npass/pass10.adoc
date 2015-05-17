@@ -5,8 +5,8 @@ This adds support for IF THEN and IF ELSE THEN constructs
 
 == Tasks
 - [x] Spec out IF ELSE THEN constructs
-- [ ] Define IF and THEN immediate words
-- [ ] Define ELSE immediate word
+- [x] Define IF and THEN immediate words
+- [x] Define ELSE immediate word
 - [ ] Ensure conditions nest properly
 
 

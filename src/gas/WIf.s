@@ -78,8 +78,8 @@ WIf:
 	lea Jmp_false_rt, %rbx                  # Get a pointer to Jmp_false_rt,
 	MAddParameter %rbx                      # and add it as the next colon def param
 
-	MPush G_param_index                     # Note cur param index to fill out later
-	MAddParameter $0                        # Add a placeholder to hold the jmp index
+	MPush G_param_index                     # Note cur param index to fill out later...
+	MAddParameter $0                        # ...and hold a placeholder for it
 .done:
 	ret
 

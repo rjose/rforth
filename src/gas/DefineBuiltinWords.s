@@ -52,6 +52,9 @@
 	.ascii "THEN"
 	.equ LEN_THEN, 4
 
+.name_else:
+	.ascii "ELSE"
+	.equ LEN_ELSE, 4
 
 #===============================================================================
 # TEXT section
@@ -82,5 +85,6 @@ DefineBuiltinWords:
 
 	MDefineImmediateWord .name_if, $LEN_IF, WIf
 	MDefineImmediateWord .name_then, $LEN_THEN, WThen
+	MDefineImmediateWord .name_else, $LEN_ELSE, WElse
 
 	ret

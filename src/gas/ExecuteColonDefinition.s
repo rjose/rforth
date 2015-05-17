@@ -48,6 +48,11 @@ ExecuteColonDefinition:
 	cmp %rax, %rdx
 	je .execute_directly                                     # ...then execute it directly.
 
+	# Check if parameter is Jmp_rt
+	lea Jmp_rt, %rax                                         # If the entry points directly to Jmp_rt...
+	cmp %rax, %rdx
+	je .execute_directly                                     # ...then execute it directly.
+
 	MExecuteEntry %rdx                                       # Otherwise, execute rdx as a normal word
 
 	incq (%rsp)                                              # Go to next item in colon definition
