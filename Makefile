@@ -18,7 +18,7 @@ functions = rforth \
             PushParam DropParam PushEntryParam1 Interpret ExecuteColonDefinition \
 	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash \
             WDotS WDotQ WColon WSemicolon WCompile \
-            WIf WThen WElse
+            WIf WThen WElse WWhile WRepeat
 
 obj_files = $(foreach f, $(functions), src/gas/$(f).o)
 dbg_obj_files = $(foreach f, $(functions), src/gas/$(f)_dbg.o)

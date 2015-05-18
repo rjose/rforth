@@ -56,6 +56,14 @@
 	.ascii "ELSE"
 	.equ LEN_ELSE, 4
 
+.name_while:
+	.ascii "WHIL"
+	.equ LEN_WHILE, 5
+
+.name_repeat:
+	.ascii "REPE"
+	.equ LEN_REPEAT, 6
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -86,5 +94,8 @@ DefineBuiltinWords:
 	MDefineImmediateWord .name_if, $LEN_IF, WIf
 	MDefineImmediateWord .name_then, $LEN_THEN, WThen
 	MDefineImmediateWord .name_else, $LEN_ELSE, WElse
+
+	MDefineImmediateWord .name_while, $LEN_WHILE, WWhile
+	MDefineImmediateWord .name_repeat, $LEN_REPEAT, WRepeat
 
 	ret
