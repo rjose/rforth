@@ -1,13 +1,14 @@
 = rforth development passes
 
 == Passes
-include::pass10.adoc[leveloffset=+2]
+include::pass11.adoc[leveloffset=+2]
 
-* [ ] Pass : Add loops
+* [ ] Pass 11: Add loops
+
+* [ ] Pass : Add LOAD
 * [ ] Pass : Add a control loop
 * [ ] Pass : Add variables
 * [ ] Pass : Add stack operations
-* [ ] Pass : Add LOAD
 * [ ] Pass : Add signal handlers
 
 

@@ -1,0 +1,38 @@
+= Pass 11: Add loops
+
+This adds support for a generic loop word.
+
+The format of the word is "<TEST?> WHILE <YYY> REPEAT"
+
+
+== Tasks
+- [x] Spec out loop
+- [x] Implement WWhile and WRepeat words
+
+== Status
+- Effort spent: 1h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 05/16/2015
+----
+** 16:02 >> Let's start Pass11 by implementing WWhile
+
+
+** 16:34 (32 min) Implemented WWhile and WRepeat
+Let's hook these up and then compile an expression and review. We may
+need a NOP word so we can use it in the place of a test where we've
+preloaded booleans onto the stack. Though, I suppose we could use .s
+for this.
+
+** 16:38 (36 min) Assembled fine
+Let's create a definition and review it's compiled result. We'll do
+the following:
+
+   : SAMPLE .s WHILE 1 - REPEAT ;
+
+** 16:59 << (57 min) Loop seems to run fine
+Let's check in and then take a break. 
+----
