@@ -64,6 +64,10 @@
 	.ascii "REPE"
 	.equ LEN_REPEAT, 6
 
+.name_dot_quote:
+	.ascii ".\"\0\0"
+	.equ LEN_DOT_QUOTE, 2
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -97,5 +101,7 @@ DefineBuiltinWords:
 
 	MDefineImmediateWord .name_while, $LEN_WHILE, WWhile
 	MDefineImmediateWord .name_repeat, $LEN_REPEAT, WRepeat
+
+	MDefineWord .name_dot_quote, $LEN_DOT_QUOTE, WDotQuote
 
 	ret

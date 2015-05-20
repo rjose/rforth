@@ -38,8 +38,12 @@ G_psp:                                  # "Parameter stack pointer" (points to
 # BSS section
 #========================================
 	.section .bss
-	.comm G_dictionary, DICT_SIZE
+	.comm G_dictionary, DICT_SIZE   # Holds all words the rforth interpreter knows about
 	.comm G_param_stack, PARAM_STACK_SIZE
+	                                # Interpreter value stack
+	.comm G_short_strings, SHORT_STR_LEN*MAX_SHORT_STRINGS
+	                                # Memory location of short strings
+
 
 #========================================
 # TEXT section

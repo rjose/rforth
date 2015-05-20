@@ -1,0 +1,30 @@
+= Pass 12: Add LOAD
+
+This adds support for loading and interpreting a forth file.
+
+
+
+== Tasks
+- [ ] Implement support for short strings
+- [ ] Open and close a file
+- [ ] Interpret words from file
+- [ ] Add function to load a specific file
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Monday, 05/18/2015
+----
+** 21:21 Spec'd out short strings
+Not sure what the format of getting a short string should be. We have
+to pass a GetString function an index which will return an address. I
+suppose the address could come back in rax. If it's 0, then something
+went wrong. We could pass the index in rsi.
+
+Whatever we pick, we should make sure we're able to open a file.
+
+----
