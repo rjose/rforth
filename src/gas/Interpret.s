@@ -26,8 +26,6 @@ Interpret:
 	# Read next word and look it up in the dictionary
 	call Tick
 
-	# TODO: If get EOF, we should indicate this
-
 	# Pop the address of the entry Tick found into %rbx
 	MPop %rbx
 
@@ -43,16 +41,16 @@ Interpret:
 .number_runner:
 	#------------------------------------------------------------
 	# At this point, the last read word is still in the tib
-	# buffer, and we need to see if this is a number. If it is a number,
-	# we push that number onto the param stack. If not, then we
-	# need to abort (at some point, print a message and clear
-	# the param stack).
+	# buffer, and we need to see if this is a number.
 	#------------------------------------------------------------
-	call ReadNumber
-	cmp $0, RN_status
-	jg .push_number
+	call ReadNumber                 # Try reading a number
+	cmp $0, RN_status               # Check the read status
+	jg .push_number                 # If OK, push number
 
-	pushq $5
+	cmpl $1, RW_is_eof              # If not OK, see if we're at EOF...
+	je 0f                           # ...and just exit if we are
+
+	pushq $5                        # Otherwise, abort
 	call Exit
 
 .push_number:

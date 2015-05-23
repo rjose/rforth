@@ -5,10 +5,10 @@ This adds support for loading and interpreting a forth file.
 
 
 == Tasks
-- [ ] Implement support for short strings
-- [ ] Open and close a file
+- [x] Implement support for short strings
+- [x] Open and close a file
 - [ ] Interpret words from file
-- [ ] Add function to load a specific file
+
 
 == Status
 - Effort spent: h
@@ -26,5 +26,51 @@ suppose the address could come back in rax. If it's 0, then something
 went wrong. We could pass the index in rsi.
 
 Whatever we pick, we should make sure we're able to open a file.
+----
 
+
+=== Friday, 05/22/2015
+----
+** 19:13 Let's spec out LOAD in a bit
+
+** 19:21 Once we have LOAD working, I'll implementing a control loop
+We'll want the control loop to reset the state of the interperter at
+each pass. If there was an error, we should print that to STDERR as
+well. 
+
+** 19:38 Alright, I spec'd out LOAD
+What we need to do next is to create a G_input_fd and use this in
+Getc. Then we need to figure out how to use the open and close system
+calls. After that, it's pretty much writing the code.
+
+** 19:41 Open system call
+The id is 2. First arg is a char* to the filename. The next arg is an
+open flag. We'll just need O_RDONLY (0)
+
+** 20:36 >> Reconfigure Getc to use G_input_fd
+Let's lay the groundwork for LOAD.
+
+** 20:44 (8 min) Done
+Let's check in.
+
+** 20:46 (10 min) Let's stub out WLoad
+
+** 20:50 (14 min) Done stubbing out LOAD
+Let's check this in
+
+** 20:51 (15 min) Let's try opening a file
+
+** 21:01 (25 min) Implemented code to open a file
+Let's give it a try.
+
+** 21:18 (42 min) Can open a file!
+
+** 21:26 (50 min) Let's close the file now...
+
+** 21:29 (53 min) OK, let's see if we can close the fd
+
+** 21:31 << (55 min) Looks good
+Let's check in. We'll have to modify our read logic to indicate when
+we get an EOF and then have Interpret signal something when that
+happens.
 ----

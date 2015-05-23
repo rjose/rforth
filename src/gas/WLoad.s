@@ -13,6 +13,8 @@
 
 #-------------------------------------------------------------------------------
 # WLoad - Loads and interprets an rforth file.
+#
+# This assumes there's a pointer to a filename string on the forth stack.
 #-------------------------------------------------------------------------------
 	.globl WLoad
 	.type WLoad, @function
@@ -37,7 +39,9 @@ WLoad:
 	movl %eax, G_input_fd           # Set fd to opened file
 
 .interpret:
-	# TODO: Implement this
+	call Interpret                  # Interpret next word
+	cmpl $0, RW_is_eof              # If not at the EOF...
+	je .interpret                   # ...loop
 
 	# Close file
 	movq $SYSCALL_CLOSE, %rax       # Indicate that we'll do an "close" syscall

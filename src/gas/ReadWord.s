@@ -5,24 +5,26 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-	.equ	 MAXLINE, 256
+	.equ	 MAXLINE, 256           # Buffer size
 
 #-------------------------------------------------------------------------------
 # Global variables
 #-------------------------------------------------------------------------------
-  	  .globl RW_tib_count
+  	  .globl RW_tib_count, RW_is_eof
 
-# Size of the last read word
-RW_tib_count:
-	.int	0
+
+RW_tib_count:                           # Size of the last word read
+	.int  0
+
+RW_is_eof:                              # 1 if at EOF
+	.int  0
 
 #===============================================================================
 # BSS section
 #===============================================================================
 	.section .bss
 
-	# "Text input buffer" containing last read word
-	.comm RW_tib, MAXLINE
+	.comm RW_tib, MAXLINE           # "Text input buffer" holding last read
 
 #===============================================================================
 # TEXT section
@@ -40,42 +42,42 @@ RW_tib_count:
 	.type ReadWord, @function
 
 ReadWord:
-	# Start at the beginning of the buffer
-	movl $0, RW_tib_count
-	movq $RW_tib, %rdi
-	movl $0, (%rdi)		# Zero out first 4 bytes of Tib
+	movl $0, RW_tib_count           # Reset num chars read
+	movq $RW_tib, %rdi              # Set rdi to start of buffer for Getc
+	movl $0, (%rdi)		        # Zero first 4 chars to pad short words with \0
+	movl $0, RW_is_eof              # Assume we're not at the EOF
 
 .skip_whitespace:
-	call Getc
-	cmp $ASCII_SPACE, (%rdi)
-	je .skip_whitespace
-	cmp $ASCII_NEWLINE, (%rdi)
-	je .skip_whitespace
+	call Getc                       # Get the next character from input
+	cmp $ASCII_SPACE, (%rdi)        # If it's a space...
+	je .skip_whitespace             # ...check for more whitespace
+	cmp $ASCII_NEWLINE, (%rdi)      # If it's a newline...
+	je .skip_whitespace             # ...check for more whitespace
+
+	# NOTE: At this point, we have our first char
 
 .loop:
-	# NOTE: At this point a non-space char is in the current RW_tib slot.
-	incl RW_tib_count
-	addq $1, %rdi		# Move destination to next byte
-	cmpl $MAXLINE, RW_tib_count
-	jle .get_next_char
+	incl RW_tib_count               # Increment char count
+	inc %rdi                        # Advance destination pointer
+	cmpl $MAXLINE, RW_tib_count     # Check char count against buffer size
+	jle .get_next_char              # If we have room, get another char
 
-	# Abort since buffer will overflow
-	pushq $1
+	pushq $1                        # Otherwise, abort
 	call Exit
 
 .get_next_char:
-	call Getc
+	call Getc                       # Get next char from input
 
-	# If we get a space, newline, or EOF, we're done
-	cmpb $ASCII_SPACE, (%rdi)
-	je .null_out_cur_byte
-	cmpb $ASCII_NEWLINE, (%rdi)
-	je .null_out_cur_byte
-	cmpb $ASCII_EOF, (%rdi)
-	je .null_out_cur_byte
+	cmpb $ASCII_SPACE, (%rdi)       # If it's a space...
+	je .null_out_cur_byte           # ...wrap up
+	cmpb $ASCII_NEWLINE, (%rdi)     # If it's a newline...
+	je .null_out_cur_byte           # ...wrap up
+	cmpb $ASCII_EOF, (%rdi)         # If it's an EOF...
+	je .got_eof                     # ...wrap up EOF
+	jmp .loop                       # Otherwise, loop
 
-	# Otherwise, loop
-	jmp .loop
+.got_eof:
+	movl $1, RW_is_eof              # Set EOF flag
 
 .null_out_cur_byte:
 	movb $0, (%rdi)
