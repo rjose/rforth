@@ -21,9 +21,9 @@
 
 WLoad:
 	# Open the file on the stack
-	MPop %rdi                       # Pop filename into rdi
-	movq $SYSCALL_OPEN, %rax        # Indicate that we'll do an "open" syscall
-	MSyscall %rdi, $O_RDONLY, $0    # Open the file read only
+	MPop %rdi                       # Pop filename into rdi...
+	movq $SYSCALL_OPEN, %rax        # and open it read-only
+	MSyscall %rdi, $O_RDONLY, $0    # 
 	cmp $0, %rax                    # Check the return value
 	jge .set_fd                     # If > 0, we have a file descriptor
 
@@ -32,20 +32,19 @@ WLoad:
 
 .set_fd:
 	# Save fd
-	xor %rbx, %rbx                  # Zero out rbx
-	movl G_input_fd, %ebx           # Put fd in 32 bit portion
-	pushq %rbx                      # Push current G_input_fd onto stack
+	xor %rbx, %rbx                  # Put current G_input_fd in rbx...
+	movl G_input_fd, %ebx           # 
+	pushq %rbx                      # ...and push it onto the stack
 
-	movl %eax, G_input_fd           # Set fd to opened file
+	movl %eax, G_input_fd           # Set G_input_fd to newly opened fd
 
 .interpret:
-	call Interpret                  # Interpret next word
+	call Interpret                  # Interpret next word in opened file
 	cmpl $0, RW_is_eof              # If not at the EOF...
 	je .interpret                   # ...loop
 
-	# Close file
-	movq $SYSCALL_CLOSE, %rax       # Indicate that we'll do an "close" syscall
-	MSyscall G_input_fd             # Close the current fd
+	movq $SYSCALL_CLOSE, %rax       # Close file we opened
+	MSyscall G_input_fd             # 
 	cmp $0, %rax                    # Check the return value
 	jge .restore_fd                 # If > 0, we're good
 
