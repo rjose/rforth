@@ -8,6 +8,8 @@
 # string slot. This wraps back to 0 when the maximum number of strings is
 # reached. That means that short strings are temporary in nature and shouldn't
 # be used to hold long term data.
+#
+# After a string is created, its address is pushed onto the forth stack.
 #===============================================================================
 
 #===============================================================================
@@ -40,6 +42,10 @@
 # WDotQuote - Scans a string up to a " char or some max num chars
 #
 # NOTE: We assume cur_string is always valid
+#
+# The following registers are used throughout:
+#   * rdi: Next place to put a character
+#   * rbx: Start of cur string
 #-------------------------------------------------------------------------------
 	.globl WDotQuote
 	.type WDotQuote, @function
@@ -51,6 +57,7 @@ WDotQuote:
 	imul $SHORT_STR_LEN, %rcx, %rdx # to figure out the cur string's offset.
 	movq $G_short_strings, %rdi     # Get start of short strings...
 	addq %rdx, %rdi                 # and add offset to get start of cur string.
+	movq %rdi, %rbx                 # Store start of cur string in rbx for later
 
 .get_char:
 	call Getc                       # Get next character
@@ -67,10 +74,7 @@ WDotQuote:
 
 .done:
 	movb $0, (%rdi)                 # Null out the last char
-	
-	xor %rax, %rax                  # Zero out rax...
-	movl .cur_string, %eax          # ...so we can move .cur_string into it...
-	MPush %rax                      # ...and push it properly onto the forth stack.
+	MPush %rbx                      # Push address of string onto forth stack
 
 	incl .cur_string                # Go to the next string slot
 	cmpl $MAX_SHORT_STRINGS, .cur_string
