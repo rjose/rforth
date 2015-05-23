@@ -26,6 +26,8 @@ Interpret:
 	# Read next word and look it up in the dictionary
 	call Tick
 
+	# TODO: If get EOF, we should indicate this
+
 	# Pop the address of the entry Tick found into %rbx
 	MPop %rbx
 

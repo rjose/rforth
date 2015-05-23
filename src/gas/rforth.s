@@ -5,6 +5,13 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+#-------------------------------------------------------------------------------
+# I/O
+#-------------------------------------------------------------------------------
+	.globl G_input_fd
+
+G_input_fd:                             # Current input file descriptor
+	.int STDIN                      # Default to STDIN
 
 #-------------------------------------------------------------------------------
 # Dictionary pointers

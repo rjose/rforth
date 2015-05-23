@@ -25,7 +25,9 @@ Tick:
 	# Get word to search for
 	call ReadWord
 
-	# Start at most recent dictionary entry
+	# TODO: If EOF, indicate this
+
+	# Start searching at most recent dictionary entry
 	movq G_dp, %rax
 
 .loop:

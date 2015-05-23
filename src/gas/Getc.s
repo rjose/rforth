@@ -6,8 +6,6 @@
 	.include "./src/gas/macros.s"
 
 	.equ	 MAXLINE, 256
-	.equ	 STDIN, 0
-
 
 # Number of chars currently loaded into buffer
 .num_chars_read:
@@ -33,7 +31,7 @@
 	.globl Getc
 
 #-------------------------------------------------------------------------------
-# Returns char read from STDIN and puts it in %rdi
+# Returns char read from G_input_fd and puts it in %rdi
 #
 # Args:
 #   * %rdi: destination for char
@@ -51,7 +49,7 @@ Getc:
 
 	# ...otherwise, we're out of chars and need to read in another line
 	movq $SYSCALL_READ, %rax
-	MSyscall $STDIN, $buffer, $MAXLINE
+	MSyscall G_input_fd, $buffer, $MAXLINE
 
 
 	# Reset buf_index and num_chars_read

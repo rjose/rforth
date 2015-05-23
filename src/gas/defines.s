@@ -5,8 +5,10 @@
 	#-----------------------------------------------------------------------
 	# Global constants
 	#-----------------------------------------------------------------------
-	# Assuming 200 words with an avg of 10 params each
-	.equ	DICT_SIZE, 24576
+	.equ	 STDIN, 0
+
+	# Assuming 400 words with an avg of 10 params each
+	.equ	DICT_SIZE, 49152
 
 	# Parameter stack size (256 8-byte words)
 	.equ	PARAM_STACK_SIZE, 2048
