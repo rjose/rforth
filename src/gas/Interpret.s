@@ -23,26 +23,18 @@
 	.type Interpret, @function
 
 Interpret:
-	# Read next word and look it up in the dictionary
-	call Tick
+	call Tick                       # Read word and search for entry in dictionary
+	MPop %rbx                       # Get entry address
+	cmp $0, %rbx                    # If the address is 0...
+	je .number_runner               # ...see if the word is a number
 
-	# Pop the address of the entry Tick found into %rbx
-	MPop %rbx
-
-	# If the address is 0, then check for a number
-	cmp $0, %rbx
-	je .number_runner
-
-	# Otherwise, call the entry's runtime function
-	MExecuteEntry %rbx
-	jmp 0f
+	MExecuteEntry %rbx              # Otherwise, execute it
+	jmp 0f                          # and then return
 
 
 .number_runner:
-	#------------------------------------------------------------
-	# At this point, the last read word is still in the tib
-	# buffer, and we need to see if this is a number.
-	#------------------------------------------------------------
+	# NOTE: At this point, the last read word is still in the tib
+
 	call ReadNumber                 # Try reading a number
 	cmp $0, RN_status               # Check the read status
 	jg .push_number                 # If OK, push number
@@ -54,9 +46,7 @@ Interpret:
 	call Exit
 
 .push_number:
-	pushq RN_value
-	call PushParam
-	MClearStackArgs 1
+	MPush RN_value                  # Put the parsed number onto the stack
 
 0:	# Return
 	ret
