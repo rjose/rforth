@@ -2,16 +2,14 @@
 
 This adds support for loading and interpreting a forth file.
 
-
-
 == Tasks
 - [x] Implement support for short strings
 - [x] Open and close a file
-- [ ] Interpret words from file
+- [x] Interpret words from file
 
 
 == Status
-- Effort spent: h
+- Effort spent: 3h
 - Effort left: 0h
 - Initial estimate: 3h
 
@@ -73,4 +71,35 @@ Let's give it a try.
 Let's check in. We'll have to modify our read logic to indicate when
 we get an EOF and then have Interpret signal something when that
 happens.
+----
+
+=== Saturday, 05/23/2015
+
+----
+** 06:32 >> Indicate EOF in ReadWord
+Let's add a module variable to indicate EOF. We can call it
+RW_is_eof. We'll clear this at the start of a read and then set it if
+we hit an EOF. Other functions can check this to see if they should
+stop. 
+
+** 06:53 (21 min) Implemented check for EOF
+Also re-commented ReadWord
+
+** 06:58 (26 min) Let's give it a try
+
+** 07:14 (42 min) Looks like we're trying to search for EOF in the dictionary
+Let's see if we can fix this.
+
+** 07:25 (53 min) It worked!
+
+** 07:26 (54 min) Let's see if we can load a file from a file
+
+** 07:28 << (56 min) Works!
+Let's check in. After a break, I want to re-comment Interpret and ReadNumber
+
+** 07:35 >> Recomment Interpret and ReadNumber
+After we do this, let's finish off pass12.
+
+** 08:45 << (70 min) Done.
+Let's check this in and finish pass12.
 ----
