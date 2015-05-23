@@ -19,7 +19,7 @@ functions = rforth \
 	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash \
             WDotS WDotQ WColon WSemicolon WCompile \
             WIf WThen WElse WWhile WRepeat \
-            WDotQuote
+            WDotQuote WLoad
 
 obj_files = $(foreach f, $(functions), src/gas/$(f).o)
 dbg_obj_files = $(foreach f, $(functions), src/gas/$(f)_dbg.o)

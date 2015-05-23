@@ -68,6 +68,10 @@
 	.ascii ".\"\0\0"
 	.equ LEN_DOT_QUOTE, 2
 
+.name_load:
+	.ascii "LOAD"
+	.equ LEN_LOAD, 4
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -103,5 +107,6 @@ DefineBuiltinWords:
 	MDefineImmediateWord .name_repeat, $LEN_REPEAT, WRepeat
 
 	MDefineWord .name_dot_quote, $LEN_DOT_QUOTE, WDotQuote
+	MDefineWord .name_load, $LEN_LOAD, WLoad
 
 	ret
