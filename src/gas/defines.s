@@ -14,6 +14,7 @@
 	.equ	PARAM_STACK_SIZE, 2048
 
 	.equ    WORD_SIZE, 8
+	.equ    INT_SIZE, 4
 
 	# Short string constants
 	.equ	 SHORT_STR_LEN, 128

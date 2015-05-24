@@ -38,6 +38,8 @@ WLoad:
 
 	movl %eax, G_input_fd           # Set G_input_fd to newly opened fd
 
+	call PushBufferSet              # Store previous "buffer set" state
+
 .interpret:
 	call Interpret                  # Interpret next word in opened file
 	cmpl $0, RW_is_eof              # If not at the EOF...
@@ -54,4 +56,6 @@ WLoad:
 .restore_fd:
 	popq %rbx                       # Get previous G_input_fd from stack
 	movl %ebx, G_input_fd           # and restore value.
+	call PopBufferSet               # Restore previous "buffer set" state
+	movl $0, RW_is_eof              # Clear the EOF flag before we return
 	ret
