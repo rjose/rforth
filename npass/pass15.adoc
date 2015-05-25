@@ -1,0 +1,23 @@
+= Pass 15: Add variables and comments
+
+This adds variables (and their associated operations) and comments
+
+
+== Tasks
+- [x] Add variables
+- [x] Add ! and @
+- [ ] Add comments
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+
+=== Monday, 05/25/2015
+----
+
+----

@@ -24,6 +24,10 @@
 	.ascii "@\0\0\0"
 	.equ LEN_AT, 1
 
+.name_HASH:
+	.ascii "#\0\0\0"
+	.equ LEN_HASH, 1
+
 .name_plus:
 	.ascii "+\0\0\0"
 	.equ LEN_PLUS, 1
@@ -123,6 +127,8 @@ DefineBuiltinWords:
 	MDefineWord .name_VARIABLE, $LEN_VARIABLE, WVariable
 	MDefineWord .name_BANG, $LEN_BANG, WBang
 	MDefineWord .name_AT, $LEN_AT, WAt
+
+	MDefineWord .name_HASH, $LEN_HASH, WHash
 
 	MDefineWord .name_dot_s, $LEN_DOT_S, WDotS
 	MDefineWord .name_dot_q, $LEN_DOT_Q, WDotQ

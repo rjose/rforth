@@ -19,7 +19,7 @@ functions = rforth \
 	    DefineBuiltinWords WConstant WVariable WPlus WMinus WStar WSlash \
             WDotS WDotQ WColon WSemicolon WCompile \
             WIf WThen WElse WWhile WRepeat \
-            WDotQuote WLoad \
+            WDotQuote WLoad WHash \
             Print WAbort Reset
 
 obj_files = $(foreach f, $(functions), src/gas/$(f).o)

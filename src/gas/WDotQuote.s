@@ -61,7 +61,7 @@ WDotQuote:
 
 .get_char:
 	call Getc                       # Get next character
-	cmp $ASCII_DQUOTE, (%rdi)       # If it's a double quote...
+	cmpb $ASCII_DQUOTE, (%rdi)       # If it's a double quote...
 	je .done                        # ...we're done
 
 	incl .num_chars_scanned         # Increment the char scanned count

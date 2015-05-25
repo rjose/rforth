@@ -1,13 +1,14 @@
 = rforth development passes
 
 == Passes
-include::pass14.adoc[leveloffset=+2]
+include::pass15.adoc[leveloffset=+2]
 
-* [x] Pass 14: Add ABORT and RESET
 
-* [ ] Pass : Add variables
+* [ ] Pass 15: Add variables and comments
+
 * [ ] Pass : Add stack operations
 * [ ] Pass : Add signal handlers
+* [ ] Pass : Re-commenting pass
 
 
 
@@ -26,3 +27,4 @@ include::pass14.adoc[leveloffset=+2]
 * [x] Pass 11: Add loops
 * [x] Pass 12: Add LOAD
 * [x] Pass 13: Add a control loop
+* [x] Pass 14: Add ABORT and RESET
