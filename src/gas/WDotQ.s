@@ -18,6 +18,6 @@
 	.type WDotQ, @function
 
 WDotQ:
-	pushq $0
+	pushq $0                        # Normal exit
 	call Exit
 	ret

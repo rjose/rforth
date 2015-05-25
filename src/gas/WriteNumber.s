@@ -8,7 +8,9 @@
 	.equ	 MAX_LINE, 32		# Really only need 20 digits
 	.equ	 MAX_NUM_DIGITS, 31	# Save 1 spot for a potential "-"
 	.equ	 BASE, 10
-	.equ	 ERROR_CODE, 9		# TODO: Should do something more
+
+.err_buffer_full:
+	.asciz "ERROR: WriteNumber buffer full"
 
 	#----------------------------------------------------------------------
 	# Globals
@@ -89,8 +91,8 @@ WriteNumber:
 	# If still space, check the dividend; otherwise, error.
 	cmp $MAX_NUM_DIGITS, WN_len
 	jl .check_dividend
-	pushq $ERROR_CODE
-	call Exit
+	MAbort $.err_buffer_full
+	jmp 0f
 
 .check_dividend:
 	cmp $0, %rax

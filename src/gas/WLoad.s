@@ -5,6 +5,12 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+.err_invalid_file:                      # Error string
+	.asciz "ERROR: Cannot LOAD specified file"
+
+.err_cant_close:                        # Error string
+	.asciz "ERROR: Can't close file"
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -26,9 +32,8 @@ WLoad:
 	MSyscall %rdi, $O_RDONLY, $0    # 
 	cmp $0, %rax                    # Check the return value
 	jge .set_fd                     # If > 0, we have a file descriptor
-
-	pushq $19                       # Otherwise, abort
-	call Exit
+	MAbort $.err_invalid_file       # Otherwise, abort
+	jmp 0f
 
 .set_fd:
 	# Save fd
@@ -50,12 +55,15 @@ WLoad:
 	cmp $0, %rax                    # Check the return value
 	jge .restore_fd                 # If > 0, we're good
 
-	pushq $20                       # Otherwise, abort
-	call Exit
+	MPrint $.err_cant_close         # Otherwise, print message
+	pushq $ERRC_CANT_CLOSE          # and exit
+	call Exit                       # .
 
 .restore_fd:
 	popq %rbx                       # Get previous G_input_fd from stack
 	movl %ebx, G_input_fd           # and restore value.
 	call PopBufferSet               # Restore previous "buffer set" state
+
+0:
 	movl $0, RW_is_eof              # Clear the EOF flag before we return
 	ret

@@ -7,6 +7,9 @@
 
 	.equ	 MAXLINE, 256           # Buffer size
 
+.err_buffer_full:                      # Error string
+	.asciz "ERROR: Read word buffer full"
+
 #-------------------------------------------------------------------------------
 # Global variables
 #-------------------------------------------------------------------------------
@@ -62,8 +65,9 @@ ReadWord:
 	cmpl $MAXLINE, RW_tib_count     # Check char count against buffer size
 	jle .get_next_char              # If we have room, get another char
 
-	pushq $1                        # Otherwise, abort
-	call Exit
+	MPrint $.err_buffer_full        # Otherwise, print message
+	pushq $ERRC_WORD_BUFFER_FULL    # and exit
+	call Exit                       # .
 
 .get_next_char:
 	call Getc                       # Get next char from input

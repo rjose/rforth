@@ -5,6 +5,9 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+.err_overflow:
+	.asciz "ERROR: Overflow when doing SLASH"
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -17,23 +20,19 @@
 	.type WSlash, @function
 
 WSlash:
-	MPop %rbx
-	MPop %rax
-	xor %rdx, %rdx
+	MPop %rbx                       # Get second arg
+	MPop %rax                       # Get first arg
+	xor %rdx, %rdx                  # Zero out result register
 
-	# Align decimal points and divide
-	imul $FIXED_POINT_UNITS, %rax
-	idiv %rbx
+	imul $FIXED_POINT_UNITS, %rax   # Align decimal points (fixed point)
+	idiv %rbx                       # and divide first by second
 
-	# Check for overflow
-	jno 0f
-	pushq $8
-	call Exit
+	jno .done                       # If no overflow, we're good
+	MAbort $.err_overflow
+	jmp 0f
+
+.done:
+	MPush %rax                      # Return result on forth stack
 
 0:
-	# Return value
-	pushq %rax
-	call PushParam
-	MClearStackArgs 1
-
 	ret

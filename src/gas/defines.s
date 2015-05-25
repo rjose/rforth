@@ -21,6 +21,14 @@
 	.equ	 MAX_SHORT_STRINGS, 1000
 
 	#-----------------------------------------------------------------------
+	# Exit codes
+	#-----------------------------------------------------------------------
+	.equ	ERRC_OUT_OF_BUFFER_SETS, 2
+	.equ	ERRC_BUFFER_SET_UNDERFLOW, 3
+	.equ	ERRC_WORD_BUFFER_FULL, 4
+	.equ	ERRC_CANT_CLOSE, 5
+
+	#-----------------------------------------------------------------------
 	# Fixed point constants
 	#-----------------------------------------------------------------------
 	# The total num digits is 19 (this is the number of decimal digits

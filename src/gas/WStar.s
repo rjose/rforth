@@ -5,6 +5,9 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+.err_overflow:
+	.asciz "ERROR: Overflow when doing STAR"
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -17,24 +20,19 @@
 	.type WStar, @function
 
 WStar:
-	MPop %rbx
-	MPop %rax
-	xor %rdx, %rdx
-	imul %rbx, %rax
+	MPop %rbx                       # Get second arg
+	MPop %rax                       # Get first arg
+	xor %rdx, %rdx                  # Zero out result register
+	imul %rbx, %rax                 # first * second
 
-	# Realign decimal points
-	movq $FIXED_POINT_UNITS, %rbx
-	idiv %rbx
+	movq $FIXED_POINT_UNITS, %rbx   # Realign decimal points (fixed point)
+	idiv %rbx                       # .
 
-	# Check for overflow
-	jno 0f
-	pushq $8
-	call Exit
+	jno .done                       # If no overflow, we're good
+	MAbort $.err_overflow
+	jmp 0f
 
+.done:
+	MPush %rax                      # Return value on forth stack
 0:
-	# Return value
-	pushq %rax
-	call PushParam
-	MClearStackArgs 1
-
 	ret

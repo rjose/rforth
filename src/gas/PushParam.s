@@ -5,6 +5,9 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+.err_out_of_space:                      # Error string
+	.asciz "ERROR: Forth stack out of space"
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -32,8 +35,8 @@ PushParam:
 	jl .push_arg
 
 	# Otherwise, abort
-	pushq $2
-	call Exit
+	MAbort $.err_out_of_space
+	jmp 0f
 
 .push_arg:
 	movq STACK_ARG_1(%rbp), %rbx

@@ -8,6 +8,12 @@
 	.equ  MAXLINE, 256              # Length of each buffer
 	.equ  NUM_BUFFER_SETS, 16       # Number of each buffer set
 
+.err_out_of_buffer_sets:                # Error string
+	.asciz "ERROR: Ran out of buffer sets"
+
+.err_buffer_set_underflow:              # Error string
+	.asciz "ERROR: Buffer set underflow"
+
 buffer_set_index:
 .buffer_set_index:                      # Index of current buffer set
 	.int  0
@@ -59,8 +65,9 @@ PushBufferSet:
 	incl .buffer_set_index          # Advance buffer set index
 	cmp $NUM_BUFFER_SETS, .buffer_set_index
 	jl .increment_pointers          # If index is still valid, set up new buffer set
-	pushq $21                       # Otherwise, abort
-	call Exit
+	MPrint $.err_out_of_buffer_sets # Otherwise, print a message
+	pushq $ERRC_OUT_OF_BUFFER_SETS  # and exit
+	call Exit                       # .
 
 .increment_pointers:
 	addq $INT_SIZE, .num_chars_read_p  # Go to next element
@@ -84,8 +91,9 @@ PopBufferSet:
 	decl .buffer_set_index          # Go to previous buffer set
 	cmp $0, .buffer_set_index       # Check buffer set index
 	jge .decrement_pointers         # If valid, decrement pointers
-	pushq $22                       # Otherwise, abort
-	call Exit
+	MPrint .err_buffer_set_underflow # Otherwise, print message
+	pushq $ERRC_BUFFER_SET_UNDERFLOW # and exit
+	call Exit                        # .
 
 .decrement_pointers:
 	subq $INT_SIZE, .num_chars_read_p  # Go to previous element
