@@ -1,0 +1,5 @@
+: TRUE   1 ;
+: REPL   TRUE WHILE INTERPRET REPEAT ;
+
+
+: RUN   REPL ;
