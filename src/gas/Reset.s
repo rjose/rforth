@@ -11,26 +11,12 @@
 	.section .text
 
 #-------------------------------------------------------------------------------
-# Prints string whose address is at the top of the forth stack
-#
-# Forth stack:
-#   * string address
+# Resets forth stack and clear G_abort
 #-------------------------------------------------------------------------------
-	.globl Print
-	.type Print, @function
+	.globl Reset
+	.type Reset, @function
 
-Print:
-	MPop %r11                       # Get char* from the forth stack
-
-.loop:
-	cmpb $ASCII_NUL, (%r11)         # If it's NUL, then
-	je 0f                           # we're done
-
-	MPutc (%r11)                    # Otherwise, write the character
-	inc %r11                        # Go to the next char...
-	jmp .loop                       # and repeat
-
-0:
-	MPutc $ASCII_NEWLINE            # Add a newline
-	call Flush                      # Flush the buffer
+Reset:
+	movl $0, G_abort                # Clear the abort flag
+	movq $G_param_stack, G_psp      # Clear the forth stack
 	ret

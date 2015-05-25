@@ -41,8 +41,20 @@ G_psp:                                  # "Parameter stack pointer" (points to
 	.quad G_param_stack             # next available stack element)
 
 
-.main_fth:
+
+#-------------------------------------------------------------------------------
+# Misc
+#-------------------------------------------------------------------------------
+	.globl G_abort
+
+G_abort:                                # 0 if OK; not 0 if cur colon def should stop
+	.int 0
+
+.main_fth:                              # Filename to LOAD when we start
 	.asciz "main.fth"
+
+.run_word:                              # Address of word to run (will be last entry in main.fth)
+	.quad 0
 
 #========================================
 # BSS section
@@ -70,9 +82,21 @@ main:
 	MPush $.main_fth                # ." main.fth" LOAD
 	call WLoad
 
-	pushq G_dp                      # Get latest entry
-	call ExecuteColonDefinition     # And execute
-	MClearStackArgs 1
+	movq G_dp, %rbx                 # Store last entry of main.fth as our run word
+	movq %rbx, .run_word            # . 
+
+	#----------------------------------------------------------------------
+	# The run word in main.fth should be a loop that runs whatever the
+	# rforth application is. We have a containing loop here that resets
+	# the forth interpreter and re-executes the run loop in case one of
+	# the instructions ran into an abort.
+	#----------------------------------------------------------------------
+.loop:
+	call Reset                      # Reset the forth interpreter state
+	pushq .run_word                 # Execute run word
+	call ExecuteColonDefinition     # .
+	MClearStackArgs 1               # .
+	jmp .loop                       # Repeat
 
 done:
 	pushq 	$0                      # Normal exit code is 0

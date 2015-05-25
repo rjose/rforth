@@ -80,6 +80,14 @@
 	.ascii "PRIN"
 	.equ LEN_PRINT, 5
 
+.name_abort:
+	.ascii "ABOR"
+	.equ LEN_ABORT, 5
+
+.name_reset:
+	.ascii "RESE"
+	.equ LEN_RESET, 5
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -120,4 +128,6 @@ DefineBuiltinWords:
 	MDefineWord .name_interpret, $LEN_INTERPRET, Interpret
 
 	MDefineWord .name_print, $LEN_PRINT, Print
+	MDefineWord .name_abort, $LEN_ABORT, Abort
+	MDefineWord .name_reset, $LEN_RESET, Reset
 	ret

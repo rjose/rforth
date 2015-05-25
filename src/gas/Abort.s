@@ -11,26 +11,15 @@
 	.section .text
 
 #-------------------------------------------------------------------------------
-# Prints string whose address is at the top of the forth stack
+# Aborts current colon definition
 #
 # Forth stack:
-#   * string address
+#   * address of string to print
 #-------------------------------------------------------------------------------
-	.globl Print
-	.type Print, @function
+	.globl Abort
+	.type Abort, @function
 
-Print:
-	MPop %r11                       # Get char* from the forth stack
-
-.loop:
-	cmpb $ASCII_NUL, (%r11)         # If it's NUL, then
-	je 0f                           # we're done
-
-	MPutc (%r11)                    # Otherwise, write the character
-	inc %r11                        # Go to the next char...
-	jmp .loop                       # and repeat
-
-0:
-	MPutc $ASCII_NEWLINE            # Add a newline
-	call Flush                      # Flush the buffer
+Abort:
+	call Print
+	movl $1, G_abort
 	ret

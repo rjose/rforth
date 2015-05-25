@@ -54,6 +54,8 @@ ExecuteColonDefinition:
 	je .execute_directly                                     # ...then execute it directly.
 
 	MExecuteEntry %rdx                                       # Otherwise, execute rdx as a normal word
+	cmpl $0, G_abort                                         # If last entry resulted in an abort then
+	jne .done                                                # we're done
 
 	incq (%rsp)                                              # Go to next item in colon definition
 	jmp .loop

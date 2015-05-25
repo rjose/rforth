@@ -20,7 +20,7 @@ functions = rforth \
             WDotS WDotQ WColon WSemicolon WCompile \
             WIf WThen WElse WWhile WRepeat \
             WDotQuote WLoad \
-            Print
+            Print Abort Reset
 
 obj_files = $(foreach f, $(functions), src/gas/$(f).o)
 dbg_obj_files = $(foreach f, $(functions), src/gas/$(f)_dbg.o)

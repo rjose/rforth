@@ -5,6 +5,9 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+.err_invalid_word:
+	.asciz "ERROR: Invalid word"
+
 #===============================================================================
 # BSS section
 #===============================================================================
@@ -42,8 +45,8 @@ Interpret:
 	cmpl $1, RW_is_eof              # If not OK, see if we're at EOF...
 	je 0f                           # ...and just exit if we are
 
-	pushq $5                        # Otherwise, abort
-	call Exit
+	MPush $.err_invalid_word        # Otherwise, abort
+	call Abort
 
 .push_number:
 	MPush RN_value                  # Put the parsed number onto the stack
