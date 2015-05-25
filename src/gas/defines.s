@@ -64,6 +64,7 @@
 	# ASCII codes
 	#-----------------------------------------------------------------------
 	.equ     ASCII_NEWLINE, 10
+	.equ	 ASCII_NUL, 0
 	.equ	 ASCII_EOF, 0
 	.equ     ASCII_SPACE, 32
 	.equ	 ASCII_MINUS, 45

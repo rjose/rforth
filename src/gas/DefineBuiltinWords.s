@@ -76,6 +76,10 @@
 	.ascii "INTE"
 	.equ LEN_INTERPRET, 9
 
+.name_print:
+	.ascii "PRIN"
+	.equ LEN_PRINT, 5
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -114,4 +118,6 @@ DefineBuiltinWords:
 	MDefineWord .name_load, $LEN_LOAD, WLoad
 
 	MDefineWord .name_interpret, $LEN_INTERPRET, Interpret
+
+	MDefineWord .name_print, $LEN_PRINT, Print
 	ret
