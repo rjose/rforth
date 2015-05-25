@@ -15,6 +15,8 @@
 
 #-------------------------------------------------------------------------------
 # WStar - Multiplies top two numbers on stack
+#
+# TODO: Have this handle large numbers properly
 #-------------------------------------------------------------------------------
 	.globl WStar
 	.type WStar, @function
@@ -25,6 +27,11 @@ WStar:
 	xor %rdx, %rdx                  # Zero out result register
 	imul %rbx, %rax                 # first * second
 
+	cmp $0, %rax                    # If product is positive, then
+	jge .realign_decimal            # realign decimal
+	mov $-1, %rdx                   # Otherwise, need to pad rdx with 1s
+
+.realign_decimal:
 	movq $FIXED_POINT_UNITS, %rbx   # Realign decimal points (fixed point)
 	idiv %rbx                       # .
 
