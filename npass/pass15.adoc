@@ -6,11 +6,11 @@ This adds variables (and their associated operations) and comments
 == Tasks
 - [x] Add variables
 - [x] Add ! and @
-- [ ] Add comments
+- [x] Add comments
 
 
 == Status
-- Effort spent: h
+- Effort spent: 1h
 - Effort left: 0h
 - Initial estimate: 3h
 
@@ -19,5 +19,24 @@ This adds variables (and their associated operations) and comments
 
 === Monday, 05/25/2015
 ----
+** 13:05 >> Add VARIABLE
 
+** 13:18 (13 min) Done with implementation
+Let's add ! and @
+
+** 13:26 (21 min) Implemented !
+Now, let's add @
+
+** 13:30 << (25 min) ! and @ look good
+Let's check in.
+
+** 13:31 After a break, let's add comments
+
+** 13:50 >> Add comments
+
+** 13:56 (6 min) Done
+Looks good. Let's add some comments to our main.fth file.
+
+** 14:04 << (14 min) Comments work
+Let's check in
 ----

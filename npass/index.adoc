@@ -4,7 +4,7 @@
 include::pass15.adoc[leveloffset=+2]
 
 
-* [ ] Pass 15: Add variables and comments
+* [x] Pass 15: Add variables and comments
 
 * [ ] Pass : Add stack operations
 * [ ] Pass : Add signal handlers
