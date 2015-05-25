@@ -5,6 +5,12 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+.err_nested_definition:
+	.asciz "ERROR: Nested definitions aren't allowed"
+
+.err_invalid_word:
+	.asciz "ERROR: Trying to compile invalid word"
+
 #-------------------------------------------------------------------------------
 # Global variables
 #-------------------------------------------------------------------------------
@@ -77,58 +83,42 @@ WCompile:
 
 	#----------------------------------------------------------------------
 	# Normal Compile Mode
-	#
-	# If we couldn't find an entry, see if we have a number.
 	#----------------------------------------------------------------------
-	# Get address of next word
-	call Tick
-	MPop %rbx
+	call Tick                       # Get address of next word
+	MPop %rbx                       # and store in rbx
 
-	# If it's not an entry, check if it's a number
-	cmp $0, %rbx
-	je .check_number
+	cmp $0, %rbx                    # If the word address is 0,
+	je .check_number                # check if we have a number
 
-	# If it's not ":", we continue. Otherwise, abort.
-	lea WColon, %rcx
-	cmp %rcx, %rbx
-	jne .check_immediate_byte
+	lea WColon, %rcx                # Else make sure
+	cmp %rcx, %rbx                  # the word
+	jne .check_immediate_byte       # isn't a ":"
+	MAbort $.err_nested_definition  # because we can't have nested definitions
 
-	# Abort
-	pushq $13
-	call Exit
 
-	# If it's an immediate word, execute it now...
 .check_immediate_byte:
-	cmpb $1, ENTRY_IMMEDIATE(%rbx)
-	je .execute_immediately
+	cmpb $1, ENTRY_IMMEDIATE(%rbx)  # If the word is IMMEDIATE, then
+	je .execute_immediately         # execute it right now
 
-	# ...otherwise add the entry's address as the next parameter
-	MAddParameter %rbx
-	jmp .done
-	
+	MAddParameter %rbx              # Otherwise, add word to definition
+	jmp .done                       # and return
+
 
 	#----------------------------------------------------------------------
 	# Check Number Mode
-	#
-	# If we couldn't find an entry, see if we have a number.
 	#----------------------------------------------------------------------
 .check_number:
-	call ReadNumber
+	call ReadNumber                 # Try reading word as a number
 
-	# If we have a number, add Literal_rt and the number's value. Otherwise, abort.
-	cmpb $0, RN_status
-	jge .add_literal_rt
-
-	# Abort
-	pushq $14
-	call Exit
+	cmpb $0, RN_status              # If number, then
+	jge .add_literal_rt             # use Literal_rt as the word for it
+	MAbort $.err_invalid_word       # Otherwise, abort since this is invalid
 
 .add_literal_rt:
-	lea Literal_rt, %rcx
-	MAddParameter %rcx
-	
-	movq RN_value, %rcx
-	MAddParameter %rcx
+	lea Literal_rt, %rcx            # We use Literal_rt
+	MAddParameter %rcx              # in the colon definition
+	movq RN_value, %rcx             # to push the number of the value
+	MAddParameter %rcx              # onto the forth stack
 
 	jmp .done
 

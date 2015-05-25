@@ -15,11 +15,13 @@
 #
 # Forth stack:
 #   * address of string to print
+#
+# NOTE: This is safe to call from forth code
 #-------------------------------------------------------------------------------
-	.globl Abort
-	.type Abort, @function
+	.globl WAbort
+	.type WAbort, @function
 
-Abort:
+WAbort:
 	call Print
 	movl $1, G_abort
 	ret

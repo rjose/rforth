@@ -5,6 +5,9 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
+.err_underflow:
+	.asciz "ERROR: Forth stack underflow"
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -31,8 +34,9 @@ DropParam:
 	cmp $0, %rax
 	jge 0f
 
-	pushq $4
-	call Exit
+	# Need to do a custom print since we're manipulating the forth stack
+	MPrint $.err_underflow
+	movq $1, G_abort
 
 0:	# Return
 	ret

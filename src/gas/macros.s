@@ -85,8 +85,10 @@
 	cmp $DICT_SIZE, \address_reg                   # and compare it to our max dictionary size.
 	jl 777f                                        # If it's less, then we're good
 
-	pushq $7                                       # Otherwise, abort
-	call Exit
+	MPush $G_err_dictionary_exceeded               # Otherwise, print an error
+	call Print                                     # .
+	pushq $7                                       # and exit
+	call Exit                                      # .
 
 777:
 .endm
@@ -146,6 +148,31 @@
 .macro MEpilogue
        movq %rbp, %rsp
        popq %rbp
+.endm
+
+#---------------------------------------------------------------------------
+# Aborts execution of colon definition
+#---------------------------------------------------------------------------
+.macro MAbort msg_address
+	MPrint \msg_address
+	movq $1, G_abort
+.endm
+
+#---------------------------------------------------------------------------
+# Prints a message without the forth stack
+#---------------------------------------------------------------------------
+.macro MPrint msg_address
+       pushq \msg_address
+       call Print
+       MClearStackArgs 1
+.endm
+
+#---------------------------------------------------------------------------
+# Prints a message with the forth stack
+#---------------------------------------------------------------------------
+.macro MForthPrint msg_address
+       MPush \msg_address
+       call ForthPrint
 .endm
 
 #---------------------------------------------------------------------------

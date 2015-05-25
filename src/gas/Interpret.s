@@ -44,9 +44,7 @@ Interpret:
 
 	cmpl $1, RW_is_eof              # If not OK, see if we're at EOF...
 	je 0f                           # ...and just exit if we are
-
-	MPush $.err_invalid_word        # Otherwise, abort
-	call Abort
+	MAbort $.err_invalid_word       # Otherwise, abort
 
 .push_number:
 	MPush RN_value                  # Put the parsed number onto the stack

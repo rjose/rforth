@@ -45,13 +45,17 @@ G_psp:                                  # "Parameter stack pointer" (points to
 #-------------------------------------------------------------------------------
 # Misc
 #-------------------------------------------------------------------------------
-	.globl G_abort
+	.globl G_abort, G_err_dictionary_exceeded
 
 G_abort:                                # 0 if OK; not 0 if cur colon def should stop
 	.int 0
 
+G_err_dictionary_exceeded:              # Out of space error used in a macro
+	.asciz "ERROR: Dictionary out of space"
+
 .main_fth:                              # Filename to LOAD when we start
 	.asciz "main.fth"
+
 
 .run_word:                              # Address of word to run (will be last entry in main.fth)
 	.quad 0

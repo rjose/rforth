@@ -11,16 +11,18 @@
 	.section .text
 
 #-------------------------------------------------------------------------------
-# Prints string whose address is at the top of the forth stack
+# Prints string whose address is at the top of the stack
 #
-# Forth stack:
-#   * string address
+# Stack Args:
+#   * Arg 1: String to print
 #-------------------------------------------------------------------------------
 	.globl Print
 	.type Print, @function
 
 Print:
-	MPop %r11                       # Get char* from the forth stack
+	MPrologue
+
+	movq STACK_ARG_1(%rbp), %r11    # Store address of string in r11
 
 .loop:
 	cmpb $ASCII_NUL, (%r11)         # If it's NUL, then
@@ -33,4 +35,19 @@ Print:
 0:
 	MPutc $ASCII_NEWLINE            # Add a newline
 	call Flush                      # Flush the buffer
+	MEpilogue
+	ret
+
+#-------------------------------------------------------------------------------
+# Prints string whose address is at the top of the forth stack
+#
+# Forth stack:
+#   * string address
+#-------------------------------------------------------------------------------
+	.globl ForthPrint
+	.type Print, @function
+
+ForthPrint:
+	MPop %r11                       # Get char* from the forth stack
+	MPrint %r11
 	ret

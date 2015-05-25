@@ -75,8 +75,9 @@ CreateAfterReadWord:
 	jle 0f
 
 	# Otherwise, abort
-	pushq $1
-	call Exit
+	MPrint $G_err_dictionary_exceeded  # Print error message
+	pushq $1                        # And exit with a code of 1
+	call Exit                       # .
 
 0:	# Return
 	ret
