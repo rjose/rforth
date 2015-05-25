@@ -1,0 +1,67 @@
+= Pass 14: Add ABORT and RESET
+
+These functions are for error handling and recovery
+
+
+== Tasks
+- [x] Add PRINT
+- [x] Add ABORT
+- [x] Add RESET
+- [x] Replace abort messages
+
+
+
+== Status
+- Effort spent: 3h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+
+=== Monday, 05/25/2015
+----
+** 07:01 >> Get Pass14 set up for ABORT and RESET
+
+** 07:06 (5 min) Let's spec out ABORT and RESET
+
+** 07:19 (18 min) It's not much of a spec, but it's enough
+
+** 07:36 << (35 min) Added a PRINT
+Now, we can print our abort messages.
+
+** 07:45 >> Let's add ABORT and RESET next
+
+** 07:52 (7 min) Implemented ABORT
+Let's try one out. Yup, it works.
+
+** 08:01 (16 min) Let's add the ABORT word next
+
+** 08:04 (19 min) Done (and works!)
+Now, let's add RESET
+
+** 08:10 (25 min) Now, let's see if we can insert RESET so it works
+
+** 08:13 (28 min) I think we have to do this at the assembly level
+If we abort, then the whole REPL loop aborts, too. No one can catch in
+the forth layer.
+
+** 08:25 << (41 min) Looks good
+Let's check this in and then replace our current abort calls with the
+new Abort calls.
+
+** 10:19 >> Replace abort messages
+Alright, let's replace our abort messages with Abort calls.
+
+** 11:28 << (69 min) Got some messages switched over
+It's a little delicate since we can't use the forth stack if we're
+manipulating the forth stack.
+
+** 11:30 Let's rename Abort to WAbort
+WAbort should be safe to call from forth without worrying about the
+stack, etc.
+
+** 11:33 Let's check in
+
+** 12:41 Done replacing errors with aborts
+----

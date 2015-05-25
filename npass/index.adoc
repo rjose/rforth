@@ -3,7 +3,7 @@
 == Passes
 include::pass14.adoc[leveloffset=+2]
 
-* [ ] Pass 14: Add ABORT and RESET
+* [x] Pass 14: Add ABORT and RESET
 
 * [ ] Pass : Add variables
 * [ ] Pass : Add stack operations
