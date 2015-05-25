@@ -72,6 +72,10 @@
 	.ascii "LOAD"
 	.equ LEN_LOAD, 4
 
+.name_interpret:
+	.ascii "INTE"
+	.equ LEN_INTERPRET, 9
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -109,4 +113,5 @@ DefineBuiltinWords:
 	MDefineWord .name_dot_quote, $LEN_DOT_QUOTE, WDotQuote
 	MDefineWord .name_load, $LEN_LOAD, WLoad
 
+	MDefineWord .name_interpret, $LEN_INTERPRET, Interpret
 	ret

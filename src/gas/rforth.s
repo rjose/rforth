@@ -41,6 +41,9 @@ G_psp:                                  # "Parameter stack pointer" (points to
 	.quad G_param_stack             # next available stack element)
 
 
+.main_fth:
+	.asciz "main.fth"
+
 #========================================
 # BSS section
 #========================================
@@ -64,9 +67,12 @@ G_psp:                                  # "Parameter stack pointer" (points to
 main:
 	call DefineBuiltinWords         # Define builtin rforth words
 
-.loop:                                  # Continuously interpret words
-	call Interpret
-	jmp .loop
+	MPush $.main_fth                # ." main.fth" LOAD
+	call WLoad
+
+	pushq G_dp                      # Get latest entry
+	call ExecuteColonDefinition     # And execute
+	MClearStackArgs 1
 
 done:
 	pushq 	$0                      # Normal exit code is 0
