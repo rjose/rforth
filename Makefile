@@ -15,8 +15,8 @@ default: help
 # Variables to define obj files for normal and debug targets
 functions = rforth \
             Exit Getc Putc ReadWord ReadNumber WriteNumber Create Tick \
-            PushParam DropParam PushEntryParam1 Interpret ExecuteColonDefinition \
-	    DefineBuiltinWords WConstant WPlus WMinus WStar WSlash \
+            PushParam DropParam PushEntryParam Interpret ExecuteColonDefinition \
+	    DefineBuiltinWords WConstant WVariable WPlus WMinus WStar WSlash \
             WDotS WDotQ WColon WSemicolon WCompile \
             WIf WThen WElse WWhile WRepeat \
             WDotQuote WLoad \

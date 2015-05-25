@@ -12,6 +12,18 @@
 	.ascii "CONS"
 	.equ LEN_CONSTANT, 8
 
+.name_VARIABLE:
+	.ascii "VARI"
+	.equ LEN_VARIABLE, 8
+
+.name_BANG:
+	.ascii "!\0\0\0"
+	.equ LEN_BANG, 1
+
+.name_AT:
+	.ascii "@\0\0\0"
+	.equ LEN_AT, 1
+
 .name_plus:
 	.ascii "+\0\0\0"
 	.equ LEN_PLUS, 1
@@ -108,6 +120,9 @@ DefineBuiltinWords:
 	MDefineWord .name_slash, $LEN_SLASH, WSlash
 
 	MDefineWord .name_CONSTANT, $LEN_CONSTANT, WConstant
+	MDefineWord .name_VARIABLE, $LEN_VARIABLE, WVariable
+	MDefineWord .name_BANG, $LEN_BANG, WBang
+	MDefineWord .name_AT, $LEN_AT, WAt
 
 	MDefineWord .name_dot_s, $LEN_DOT_S, WDotS
 	MDefineWord .name_dot_q, $LEN_DOT_Q, WDotQ
