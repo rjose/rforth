@@ -50,7 +50,7 @@ G_psp:                                  # "Parameter stack pointer" (points to
 G_abort:                                # 0 if OK; not 0 if cur colon def should stop
 	.int 0
 
-G_err_dictionary_exceeded:              # Out of space error used in a macro
+G_err_dictionary_exceeded:
 	.asciz "ERROR: Dictionary out of space"
 
 .main_fth:                              # Filename to LOAD when we start

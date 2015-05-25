@@ -5,7 +5,7 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-.err_out_of_space:                      # Error string
+.err_out_of_space:
 	.asciz "ERROR: Forth stack out of space"
 
 #===============================================================================

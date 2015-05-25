@@ -7,7 +7,7 @@
 
 	.equ	 MAXLINE, 256           # Buffer size
 
-.err_buffer_full:                      # Error string
+.err_buffer_full:
 	.asciz "ERROR: Read word buffer full"
 
 #-------------------------------------------------------------------------------

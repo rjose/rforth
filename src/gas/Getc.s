@@ -8,12 +8,18 @@
 	.equ  MAXLINE, 256              # Length of each buffer
 	.equ  NUM_BUFFER_SETS, 16       # Number of each buffer set
 
-.err_out_of_buffer_sets:                # Error string
+#---------------------------------------
+# Error strings
+#---------------------------------------
+.err_out_of_buffer_sets:
 	.asciz "ERROR: Ran out of buffer sets"
 
-.err_buffer_set_underflow:              # Error string
+.err_buffer_set_underflow:
 	.asciz "ERROR: Buffer set underflow"
 
+#---------------------------------------
+# Buffer set state
+#---------------------------------------
 buffer_set_index:
 .buffer_set_index:                      # Index of current buffer set
 	.int  0

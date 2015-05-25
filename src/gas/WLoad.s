@@ -5,10 +5,10 @@
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-.err_invalid_file:                      # Error string
+.err_invalid_file:
 	.asciz "ERROR: Cannot LOAD specified file"
 
-.err_cant_close:                        # Error string
+.err_cant_close:
 	.asciz "ERROR: Can't close file"
 
 #===============================================================================
