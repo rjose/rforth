@@ -1,0 +1,22 @@
+= Pass 17: Re-comment files
+
+This pass is about cleaning things up
+
+
+== Tasks
+- [ ] Move globals to their own file
+- [ ] Re-comment all files
+
+
+== Status
+- Effort spent: 0h
+- Effort left: 0h
+- Initial estimate: 4h
+
+== Log
+
+
+=== Monday, 05/25/2015
+----
+
+----

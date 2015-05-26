@@ -13,7 +13,7 @@ default: help
 #=======================================
 
 # Variables to define obj files for normal and debug targets
-functions = rforth \
+functions = rforth globals \
             Exit Getc Putc ReadWord ReadNumber WriteNumber Create Tick \
             PushParam DropParam PushEntryParam Interpret ExecuteColonDefinition \
 	    DefineBuiltinWords WConstant WVariable WPlus WMinus WStar WSlash \

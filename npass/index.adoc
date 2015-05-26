@@ -1,12 +1,12 @@
 = rforth development passes
 
 == Passes
-include::pass16.adoc[leveloffset=+2]
+include::pass17.adoc[leveloffset=+2]
 
-
+* [ ] Pass 17: Re-commenting pass
 
 * [ ] Pass : Add signal handlers
-* [ ] Pass : Re-commenting pass
+
 
 
 
