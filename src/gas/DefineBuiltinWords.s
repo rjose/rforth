@@ -104,6 +104,22 @@
 	.ascii "RESE"
 	.equ LEN_RESET, 5
 
+.name_dup:
+	.ascii "DUP\0"
+	.equ LEN_DUP, 3
+
+.name_swap:
+	.ascii "SWAP"
+	.equ LEN_SWAP, 4
+
+.name_drop:
+	.ascii "DROP"
+	.equ LEN_DROP, 4
+
+.name_over:
+	.ascii "OVER"
+	.equ LEN_OVER, 4
+
 #===============================================================================
 # TEXT section
 #===============================================================================
@@ -151,4 +167,9 @@ DefineBuiltinWords:
 	MDefineWord .name_print, $LEN_PRINT, Print
 	MDefineWord .name_abort, $LEN_ABORT, WAbort
 	MDefineWord .name_reset, $LEN_RESET, Reset
+
+	MDefineWord .name_dup, $LEN_DUP, Dup
+	MDefineWord .name_swap, $LEN_SWAP, Swap
+	MDefineWord .name_drop, $LEN_DROP, DropParam
+	MDefineWord .name_over, $LEN_OVER, Over
 	ret
