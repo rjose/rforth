@@ -3,7 +3,6 @@
 == Passes
 include::pass16.adoc[leveloffset=+2]
 
-* [ ] Pass 16: Add stack operations
 
 
 * [ ] Pass : Add signal handlers
@@ -28,3 +27,4 @@ include::pass16.adoc[leveloffset=+2]
 * [x] Pass 13: Add a control loop
 * [x] Pass 14: Add ABORT and RESET
 * [x] Pass 15: Add variables and comments
+* [x] Pass 16: Add stack operations
