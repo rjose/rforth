@@ -1,3 +1,12 @@
+#===============================================================================
+# globals.s
+#
+# Any variables that span multiple modules are defined here. These are
+# primarily things that are core to our interpreter like our
+# dictionary, parameter stack, short string storage, as well as
+# pointers to them.
+#===============================================================================
+
 #========================================
 # DATA section
 #========================================
