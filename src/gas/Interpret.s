@@ -1,6 +1,12 @@
 #===============================================================================
-# DATA section
+# Interpret.s
+#
+# This defines a function that interprets words from an input stream.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
@@ -8,14 +14,14 @@
 .err_invalid_word:
 	.asciz "ERROR: Invalid word"
 
-#===============================================================================
+#========================================
 # BSS section
-#===============================================================================
+#========================================
 	.section .bss
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 
@@ -26,6 +32,8 @@
 	.type Interpret, @function
 
 Interpret:
+	pushq %rbx                      # Save caller's registers
+
 	call Tick                       # Read word and search for entry in dictionary
 	MPop %rbx                       # Get entry address
 	cmp $0, %rbx                    # If the address is 0...
@@ -49,5 +57,6 @@ Interpret:
 .push_number:
 	MPush RN_value                  # Put the parsed number onto the stack
 
-0:	# Return
+0:
+	popq %rbx                       # Restore caller's registers
 	ret
