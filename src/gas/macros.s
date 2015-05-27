@@ -6,8 +6,15 @@
 #   * name: Address to first 4 bytes of word entry
 #   * name_len: Total length of entry name
 #   * rt_func: Runtime function that's run when word is executed
+#
+# The address of the entry is returned in rax.
+#
+# Modifies:
+#   * Registers: rax
 #---------------------------------------------------------------------------
 .macro MDefineWord name, name_len, rt_func
+       pushq %rbx                       # Save caller's registers
+
        # Move 4 bytes of name to RW_tib
        movl \name, %eax
        movl %eax, RW_tib
@@ -20,6 +27,8 @@
        lea \rt_func, %rbx
        movq G_dp, %rax
        movq %rbx, ENTRY_CODE(%rax)
+
+       popq %rbx                        # Restore caller's registers
 .endm
 
 #---------------------------------------------------------------------------
@@ -29,12 +38,13 @@
 #   * name: Address to first 4 bytes of word entry
 #   * name_len: Total length of entry name
 #   * rt_func: Runtime function that's run when word is executed
+#
+# Modifies
+#   * Registers: rax
 #---------------------------------------------------------------------------
 .macro MDefineImmediateWord name, name_len, rt_func
-       MDefineWord \name, \name_len, \rt_func
-
-       # After MDefineWord, the address of the current entry is in %rax
-       movb $1, ENTRY_IMMEDIATE(%rax)
+       MDefineWord \name, \name_len, \rt_func   # puts entry address in rax
+       movb $1, ENTRY_IMMEDIATE(%rax)           # Mark entry as IMMEDIATE
 .endm
 
 #---------------------------------------------------------------------------
@@ -95,6 +105,9 @@
 
 #---------------------------------------------------------------------------
 # Moves stack pointer up num_args entries to clear stack
+#
+# Modifies:
+#   * Registers: rsp
 #---------------------------------------------------------------------------
 .macro MClearStackArgs num_args
        	addq $WORD_SIZE*\num_args, %rsp
@@ -119,6 +132,9 @@
 
 #---------------------------------------------------------------------------
 # Puts a character
+#
+# Modifies:
+#   * al
 #---------------------------------------------------------------------------
 .macro MPutc char
 	movb \char, %al
