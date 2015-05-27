@@ -3,8 +3,7 @@
 #
 # Any variables that span multiple modules are defined here. These are
 # primarily things that are core to our interpreter like our
-# dictionary, parameter stack, short string storage, as well as
-# pointers to them.
+# dictionary, parameter stack, as well as pointers to them.
 #===============================================================================
 
 #========================================
@@ -58,5 +57,3 @@ G_err_dictionary_exceeded:
 	.comm G_dictionary, DICT_SIZE   # Holds all words the rforth interpreter knows about
 	.comm G_param_stack, PARAM_STACK_SIZE
 	                                # Interpreter value stack
-	.comm G_short_strings, SHORT_STR_LEN*MAX_SHORT_STRINGS
-	                                # Memory location of short strings

@@ -28,6 +28,7 @@
 	.equ	ERRC_BUFFER_SET_UNDERFLOW, 3
 	.equ	ERRC_WORD_BUFFER_FULL, 4
 	.equ	ERRC_CANT_CLOSE, 5
+	.equ	ERRC_SHORT_STRING_FULL, 6
 
 	#-----------------------------------------------------------------------
 	# Fixed point constants

@@ -1,5 +1,5 @@
 #===============================================================================
-# OVERVIEW
+# WDotQuote.s
 #
 # There are a fixed number of short strings in rforth. Whenever a new short
 # string is created, it goes into the next string slot indexed by |.cur_string|.
@@ -12,16 +12,17 @@
 # After a string is created, its address is pushed onto the forth stack.
 #===============================================================================
 
-#===============================================================================
+#========================================
 # DATA section
-#===============================================================================
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
 .cur_string:                            # Index of the current string
 	.int 0
-.num_chars_scanned:
+
+.num_chars_scanned:                     # Num chars scanned into buffer
 	.int 0
 
 
@@ -30,11 +31,12 @@
 #========================================
 	.section .bss
 
-	
+	.lcomm .short_strings, SHORT_STR_LEN*MAX_SHORT_STRINGS
+	                                # Memory location of short strings
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 
@@ -51,17 +53,22 @@
 	.type WDotQuote, @function
 
 WDotQuote:
+	pushq %rcx                      # Save caller's registers
+	pushq %rdx                      # .
+	pushq %rdi                      # .
+	pushq %rbx                      # .
+
 	movl $0, .num_chars_scanned     # Reset number of characters scanned
-	
+
 	movq .cur_string, %rcx          # Use current string index...
 	imul $SHORT_STR_LEN, %rcx, %rdx # to figure out the cur string's offset.
-	movq $G_short_strings, %rdi     # Get start of short strings...
+	movq $.short_strings, %rdi      # Get start of short strings...
 	addq %rdx, %rdi                 # and add offset to get start of cur string.
 	movq %rdi, %rbx                 # Store start of cur string in rbx for later
 
 .get_char:
 	call Getc                       # Get next character
-	cmpb $ASCII_DQUOTE, (%rdi)       # If it's a double quote...
+	cmpb $ASCII_DQUOTE, (%rdi)      # If it's a double quote...
 	je .done                        # ...we're done
 
 	incl .num_chars_scanned         # Increment the char scanned count
@@ -69,7 +76,7 @@ WDotQuote:
 	cmpl $MAX_SHORT_STRINGS, .num_chars_scanned
 	jl .get_char                    # If we have space in the string, get another char
 
-	pushq $16                       # Otherwise, we've run out of room, so abort
+	pushq $ERRC_SHORT_STRING_FULL   # Otherwise, we've run out of room, so abort
 	call Exit
 
 .done:
@@ -82,4 +89,8 @@ WDotQuote:
 
 	movl $0, .cur_string            # Otherwise, wrap the cur string back to 0
 0:
+	popq %rbx                       # Restore caller's registers
+	popq %rdi                       # .
+	popq %rdx                       # .
+	popq %rcx                       # .
 	ret
