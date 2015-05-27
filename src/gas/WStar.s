@@ -28,6 +28,10 @@
 	.type WStar, @function
 
 WStar:
+	pushq %rax                      # Save caller's registers
+	pushq %rbx                      # .
+	pushq %rdx                      # .
+
 	MPop %rbx                       # Get second arg
 	MPop %rax                       # Get first arg
 	xor %rdx, %rdx                  # Zero out result register
@@ -47,5 +51,9 @@ WStar:
 
 .done:
 	MPush %rax                      # Return value on forth stack
+
 0:
+	popq %rdx                       # Restore caller's registers
+	popq %rbx                       # .
+	popq %rax                       # .
 	ret
