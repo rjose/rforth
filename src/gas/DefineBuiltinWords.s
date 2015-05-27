@@ -164,7 +164,7 @@ DefineBuiltinWords:
 
 	MDefineWord .name_interpret, $LEN_INTERPRET, Interpret
 
-	MDefineWord .name_print, $LEN_PRINT, Print
+	MDefineWord .name_print, $LEN_PRINT, ForthPrint
 	MDefineWord .name_abort, $LEN_ABORT, WAbort
 	MDefineWord .name_reset, $LEN_RESET, Reset
 

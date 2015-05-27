@@ -1,13 +1,19 @@
 #===============================================================================
-# DATA section
+# Print.s
+#
+# This defines functions for printing things to the console.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -21,6 +27,7 @@
 
 Print:
 	MPrologue
+	pushq %r11                      # Save caller's registers
 
 	movq STACK_ARG_1(%rbp), %r11    # Store address of string in r11
 
@@ -35,6 +42,8 @@ Print:
 0:
 	MPutc $ASCII_NEWLINE            # Add a newline
 	call Flush                      # Flush the buffer
+
+	popq %r11                       # Restore caller's registers
 	MEpilogue
 	ret
 
@@ -48,6 +57,10 @@ Print:
 	.type Print, @function
 
 ForthPrint:
+	pushq %r11                      # Save caller's registers
+	
 	MPop %r11                       # Get char* from the forth stack
-	MPrint %r11
+	MPrint %r11                     # and print it
+	
+	popq %r11                       # Restore caller's registers
 	ret
