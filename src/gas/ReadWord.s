@@ -52,9 +52,14 @@ ReadWord:
 
 .skip_whitespace:
 	call Getc                       # Get the next character from input
+
 	cmp $ASCII_SPACE, (%rdi)        # If it's a space...
 	je .skip_whitespace             # ...check for more whitespace
+
 	cmp $ASCII_NEWLINE, (%rdi)      # If it's a newline...
+	je .skip_whitespace             # ...check for more whitespace
+
+	cmp $ASCII_TAB, (%rdi)          # If it's a tab...
 	je .skip_whitespace             # ...check for more whitespace
 
 	# NOTE: At this point, we have our first char
@@ -74,10 +79,16 @@ ReadWord:
 
 	cmpb $ASCII_SPACE, (%rdi)       # If it's a space...
 	je .null_out_cur_byte           # ...wrap up
+	
 	cmpb $ASCII_NEWLINE, (%rdi)     # If it's a newline...
 	je .null_out_cur_byte           # ...wrap up
+	
+	cmpb $ASCII_TAB, (%rdi)         # If it's a tab...
+	je .null_out_cur_byte           # ...wrap up
+	
 	cmpb $ASCII_EOF, (%rdi)         # If it's an EOF...
 	je .got_eof                     # ...wrap up EOF
+	
 	jmp .loop                       # Otherwise, loop
 
 .got_eof:
