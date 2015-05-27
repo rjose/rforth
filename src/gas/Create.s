@@ -49,12 +49,14 @@ Nop:
 #
 # Modifies:
 #   * G_param_index, G_pfa
-#   * Registers: rax, rbx
 #-------------------------------------------------------------------------------
 	.globl CreateAfterReadWord
 	.type CreateAfterReadWord, @function
 
 CreateAfterReadWord:
+	pushq %rax                      # Save caller's registers
+	pushq %rbx                      # .
+
 	movq $0, G_param_index          # Reset param index for this definition
 
 	movb RW_tib_count, %bl          # Put the word size in bl
@@ -86,7 +88,9 @@ CreateAfterReadWord:
 	pushq $ERRC_OUT_OF_DICTIONARY      # and
 	call Exit                          # exit
 
-0:	# Return
+0:
+	popq %rbx                       # Restore caller's registers
+	popq %rax                       # .
 	ret
 
 
