@@ -1,36 +1,55 @@
 #===============================================================================
-# DATA section
+# Create.s
+#
+# This defines functions for the creation of rforth dictionary words. The
+# |Create| function reads the next word from input and creates a new
+# dictionary entry with that name. The nominal code pointer is set to
+# |Nop| which does nothing.
+#
+# The |CreateAfterReadWord| does all of the work. It's factored out
+# this way to allow the creation of dictionary entries where the entry
+# name is known up front and shouldn't be read from input.
 #===============================================================================
+
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
-# Create_rt - Runtime code for Create
+# Nop - No op
 #-------------------------------------------------------------------------------
-	.globl Create_rt
-	.type Create_rt, @function
-Create_rt:
+	.globl Nop
+	.type Nop, @function
+Nop:
 	nop
 	ret
 
 #-------------------------------------------------------------------------------
-# CreateAfterReadWord - Creates a dictionary entry assuming ReadWord has was called
+# CreateAfterReadWord - Creates a dictionary entry assuming ReadWord was called
 #
 # Assumptions:
 #   * RW_tib: Should have the name of the entry to create
-#   * RW_tib_count: Should have length of name
+#   * RW_tib_count: Should have the length of name
 #
 # On successful execution, a new entry will be added to the
-# dictionary, |G_dp| will point to this latest entry, and |pfa| will point
-# to that entries first parameter cell.
+# dictionary, |G_dp| will point to this latest entry, and |pfa| will
+# point to that entries first parameter cell.
 #
-# If the dictionary entry extends past the dictionary limit, this exits.
+# If the dictionary entry extends past the dictionary limit, this
+# exits.
+#
+# Modifies:
+#   * G_param_index, G_pfa
+#   * Registers: rax, rbx
 #-------------------------------------------------------------------------------
 	.globl CreateAfterReadWord
 	.type CreateAfterReadWord, @function
@@ -38,46 +57,34 @@ Create_rt:
 CreateAfterReadWord:
 	movq $0, G_param_index          # Reset param index for this definition
 
-	# Put count in current count cell (pointed to by G_pfa)
-	movb RW_tib_count, %bl
-	movq G_pfa, %rax
-	movb %bl, (%rax)
+	movb RW_tib_count, %bl          # Put the word size in bl
+	movq G_pfa, %rax                # and write it to the next entry's
+	movb %bl, (%rax)                # COUNT cell (pointed to by G_pfa)
 
-	# Copy first 4 chars from tib to name cells
-	movl RW_tib, %ebx
-	movl %ebx, ENTRY_NAME(%rax)
+	movl RW_tib, %ebx               # Grab the first 4 chars of the word
+	movl %ebx, ENTRY_NAME(%rax)     # and write to the next entry's NAME cell
 
-	# Store link to previous dictionary entry
-	movq G_dp, %rbx
-	movq %rbx, ENTRY_LINK(%rax)
+	movq G_dp, %rbx                 # Put the current entry's address in rbx
+	movq %rbx, ENTRY_LINK(%rax)     # and write to the next entry's LINK cell
 
-	# Store Create_rt in code pointer
-	lea Create_rt, %rbx
-	movq %rbx, ENTRY_CODE(%rax)
+	# Store Nop in code pointer
+	lea Nop, %rbx                   # Put Nop in rbx
+	movq %rbx, ENTRY_CODE(%rax)     # and write to the next entry's CODE cell
 
 	# Increment dictionary pointers
-	
-	# Make G_dp point to the new entry (currently G_pfa)
-	movq G_pfa, %rbx
-	movq $G_dp, %rax
-	movq %rbx, (%rax)
-
-	# Make G_pfa point to the first parameter field of the new entry
-	movq G_dp, %rbx
-	addq $ENTRY_PFA, %rbx
-	movq $G_pfa, %rax
-	movq %rbx, (%rax)
+	movq G_pfa, %rbx                # Put the next entry's address in rbx
+	movq %rbx, G_dp                 # and make it the current entry
+	addq $ENTRY_PFA, %rbx           # Point rbx to the new entry's first param cell
+	movq %rbx, G_pfa                # and write to G_pfa
 
 	# Check that we haven't exceeded the dictionary size
-	movq G_pfa, %rax
-	subq $G_dictionary, %rax
-	cmp $DICT_SIZE, %rax
-	jle 0f
+	subq $G_dictionary, %rbx        # Compute dictionary size
+	cmp $DICT_SIZE, %rbx            # If it's within bounds then
+	jle 0f                          # we're good
 
-	# Otherwise, abort
-	MPrint $G_err_dictionary_exceeded  # Print error message
-	pushq $1                        # And exit with a code of 1
-	call Exit                       # .
+	MPrint $G_err_dictionary_exceeded  # Otherwise, print error message
+	pushq $ERRC_OUT_OF_DICTIONARY      # and
+	call Exit                          # exit
 
 0:	# Return
 	ret
@@ -92,6 +99,6 @@ CreateAfterReadWord:
 	.globl Create
 	.type Create, @function
 Create:
-	call ReadWord
-	call CreateAfterReadWord
+	call ReadWord                   # The next word is the entry's name
+	call CreateAfterReadWord        # Create an entry with that name
 	ret

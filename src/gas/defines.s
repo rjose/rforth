@@ -23,6 +23,7 @@
 	#-----------------------------------------------------------------------
 	# Exit codes
 	#-----------------------------------------------------------------------
+	.equ	ERRC_OUT_OF_DICTIONARY, 1
 	.equ	ERRC_OUT_OF_BUFFER_SETS, 2
 	.equ	ERRC_BUFFER_SET_UNDERFLOW, 3
 	.equ	ERRC_WORD_BUFFER_FULL, 4
