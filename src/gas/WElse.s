@@ -1,13 +1,25 @@
 #===============================================================================
-# DATA section
+# WElse.s
+#
+# This is like a combination of THEN and IF. It ties up the most recent
+# dangling address, and then creates another one.
+#
+# This also defines an unconditional jump to a param index in the cell
+# following the jump param.
+#
+# Please see: https://docs.google.com/document/d/1AXHA4-Bf8tWSeP_3dzgZy5ZHuLQbiQnGWITbi9xSvHs
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -32,6 +44,10 @@
 	.type Jmp_rt, @function
 Jmp_rt:
 	MPrologue
+
+	pushq %rbx                      # Save caller's registers
+	pushq %rcx                      # .
+	pushq %rax                      # .
 	
 	movq STACK_ARG_1(%rbp), %rbx    # Get the instruction's parameter index..
 	inc %rbx                        # ..and add 1 to get the jmp index cell
@@ -41,6 +57,10 @@ Jmp_rt:
 	movq ENTRY_PFA(%rcx, %rbx, WORD_SIZE), %rax
 	                                # Get the jump index value
 	movq %rax, STACK_ARG_1(%rbp)    # and update next param index
+
+	popq %rax                       # Restore caller's registers
+	popq %rcx                       # .
+	popq %rbx                       # .
 
 	MEpilogue
 	ret
@@ -53,14 +73,17 @@ Jmp_rt:
 # with a new dangling instruction.
 #
 # Forth Stack:
-#   Top: index of param to fill out
-#
-# Spec: https://docs.google.com/document/d/1AXHA4-Bf8tWSeP_3dzgZy5ZHuLQbiQnGWITbi9xSvHs
+#   * index of param to fill out
 #-------------------------------------------------------------------------------
 	.globl WElse
 	.type WElse, @function
 
 WElse:
+	pushq %rbx                      # Save caller's registers
+	pushq %rcx                      # .
+	pushq %rax                      # .
+	pushq %rdx                      # .
+
 	MPop %rdx                       # Get index of the param to fill out
 
 	# Add Jmp_rt instruction with a placeholder
@@ -75,5 +98,9 @@ WElse:
 	movq %rcx, ENTRY_PFA(%rax, %rdx, WORD_SIZE)
 
 .done:
+	popq %rdx                       # Restore caller's registers
+	popq %rax                       # .
+	popq %rcx                       # .
+	popq %rbx                       # .
 	ret
 
