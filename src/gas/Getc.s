@@ -154,7 +154,7 @@ PopBufferSet:
 
 
 #-------------------------------------------------------------------------------
-# Returns char read from the current file descriptor and puts it in %rdi
+# Returns char read from the current file descriptor and puts it in (%rdi)
 #
 # Args:
 #   * %rdi: destination for char
