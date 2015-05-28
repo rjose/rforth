@@ -4,12 +4,13 @@ This pass is about cleaning things up
 
 
 == Tasks
-- [ ] Move globals to their own file
-- [ ] Re-comment all files
+- [x] Move globals to their own file
+- [x] Re-comment all files
 
+WriteNumber.s
 
 == Status
-- Effort spent: 0h
+- Effort spent: 6h
 - Effort left: 0h
 - Initial estimate: 4h
 

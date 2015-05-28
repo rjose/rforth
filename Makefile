@@ -18,7 +18,7 @@ functions = rforth globals \
             PushParam DropParam PushEntryParam Interpret ExecuteColonDefinition \
 	    DefineBuiltinWords WConstant WVariable WPlus WMinus WStar WSlash \
             WDotS WDotQ WColon WSemicolon WCompile \
-            WIf WThen WElse WWhile WRepeat \
+            WIf WThen WElse WRepeat \
             WDotQuote WLoad WHash StackWords \
             Print WAbort Reset
 

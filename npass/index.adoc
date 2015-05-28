@@ -3,12 +3,8 @@
 == Passes
 include::pass17.adoc[leveloffset=+2]
 
-* [ ] Pass 17: Re-commenting pass
 
 * [ ] Pass : Add signal handlers
-
-
-
 
 === Completed Passes
 * [x] Pass 1: Build an empty rforth program
@@ -28,3 +24,4 @@ include::pass17.adoc[leveloffset=+2]
 * [x] Pass 14: Add ABORT and RESET
 * [x] Pass 15: Add variables and comments
 * [x] Pass 16: Add stack operations
+* [x] Pass 17: Re-commenting pass
