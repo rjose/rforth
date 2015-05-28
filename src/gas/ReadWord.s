@@ -1,6 +1,13 @@
 #===============================================================================
-# DATA section
+# ReadWord.s
+#
+# This reads a word character-by-character using Getc. Leading whitespace
+# is skipped. This stops when we encounter whitespace or an EOF.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
@@ -22,29 +29,31 @@ RW_tib_count:                           # Size of the last word read
 RW_is_eof:                              # 1 if at EOF
 	.int  0
 
-#===============================================================================
+#========================================
 # BSS section
-#===============================================================================
+#========================================
 	.section .bss
 
 	.comm RW_tib, MAXLINE           # "Text input buffer" holding last read
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
 # ReadWord - Reads word via Getc and stores in RW_tib buffer
 #
 # Reads characters into start of Tib buffer.  If the word fits in RW_tib,
-# the number of characters read is TibCount. Otherwise, it exits with
-# a code of 1.
+# the number of characters read is TibCount. Otherwise, we exit with an
+# ERRC_WORD_BUFFER_FULL code since there's not a good way to recover.
 #-------------------------------------------------------------------------------
 	.globl ReadWord
 	.type ReadWord, @function
 
 ReadWord:
+	pushq %rdi                      # Save caller's registers
+	
 	movl $0, RW_tib_count           # Reset num chars read
 	movq $RW_tib, %rdi              # Set rdi to start of buffer for Getc
 	movl $0, (%rdi)		        # Zero first 4 chars to pad short words with \0
@@ -97,5 +106,6 @@ ReadWord:
 .null_out_cur_byte:
 	movb $0, (%rdi)
 
-0:	# Return
+0:
+	popq %rdi                       # Restore caller's registers
 	ret
