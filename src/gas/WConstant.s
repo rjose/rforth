@@ -1,14 +1,25 @@
 #===============================================================================
-# DATA section
+# WConstant.s
+#
+# This defines the runtime code for the CONSTANT word. It creates a new
+# dictionary entry and then puts the top value of the forth stack into
+# its first parameter.
+#
+# This entry's code is |PushEntryParam1| which pushes the value of this
+# constant onto the forth stack when the constant is executed.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -26,6 +37,9 @@
 	.type WConstant, @function
 
 WConstant:
+	pushq %rax                      # Save caller's registers
+	pushq %rbx                      # .
+	
 	# Create new dictionary entry
 	call Create
 
@@ -37,4 +51,7 @@ WConstant:
 	# Pop a value off the forth stack and put it into the next parameter field slot
 	MPop %rbx
 	MAddParameter %rbx
+
+	popq %rbx                       # Restore caller's registers
+	popq %rax                       # .
 	ret
