@@ -1,13 +1,22 @@
 #===============================================================================
-# DATA section
+# WRepeat.s
+#
+# The REPEAT word is an immediate word that fills out dangling jump targets
+# and creates a jump instruction back to the top of the loop.
+#
+# Please see: https://docs.google.com/document/d/1Tu2-x21rT4Sd8nqLZH4OOzDggb9pPFKl7Iw3dp3Q3J0
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 
