@@ -1,13 +1,22 @@
 #===============================================================================
-# DATA section
+# WIf.s
+#
+# This defines the IF word as well as the |Jmp_false_rt| function that gets
+# compiled into a definition because of it.
+#
+# Please see: https://docs.google.com/document/d/1AXHA4-Bf8tWSeP_3dzgZy5ZHuLQbiQnGWITbi9xSvHs
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -37,6 +46,11 @@
 Jmp_false_rt:
 	MPrologue
 	
+	pushq %rax                     # Save caller's registers
+	pushq %rbx                     # .
+	pushq %rcx                     # .
+	pushq %rdx                     # .
+	
 	movq STACK_ARG_1(%rbp), %rbx    # Get the current parameter index
 	movq STACK_ARG_2(%rbp), %rcx    # rcx has address of colon definition
 
@@ -56,6 +70,11 @@ Jmp_false_rt:
 	movq %rax, STACK_ARG_1(%rbp)    # and update next param index
 
 0:
+	popq %rdx                       # Restore caller's registers
+	popq %rcx                       # .
+	popq %rbx                       # .
+	popq %rax                       # .
+	
 	MEpilogue
 	ret
 
@@ -75,11 +94,15 @@ Jmp_false_rt:
 	.type WIf, @function
 
 WIf:
+	pushq %rbx                              # Save caller's registers
+	
 	lea Jmp_false_rt, %rbx                  # Get a pointer to Jmp_false_rt,
 	MAddParameter %rbx                      # and add it as the next colon def param
 
 	MPush G_param_index                     # Note cur param index to fill out later...
 	MAddParameter $0                        # ...and hold a placeholder for it
+
 .done:
+	popq %rbx                               # Restore caller's registers
 	ret
 
