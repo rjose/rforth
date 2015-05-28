@@ -36,6 +36,11 @@
 	.type WRepeat, @function
 
 WRepeat:
+	pushq %rdx                      # Save caller's registers
+	pushq %rbx                      # .
+	pushq %rcx                      # .
+	pushq %rax                      # .
+
 	MPop %rdx                       # Get index of the param to fill out
 
 	# Add Jmp_rt instruction with a placeholder
@@ -50,6 +55,11 @@ WRepeat:
 	movq G_dp, %rax                 # G_dp is the colon def we're currently in
 	movq G_param_index, %rcx        # Cur param index ties up the dangling index
 	movq %rcx, ENTRY_PFA(%rax, %rdx, WORD_SIZE)
+
 .done:
+	popq %rax                       # Restore caller's registers
+	popq %rcx                       # .
+	popq %rbx                       # .
+	popq %rdx                       # .
 	ret
 

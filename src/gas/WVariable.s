@@ -1,14 +1,20 @@
 #===============================================================================
-# DATA section
+# WVariable.s
+#
+# This defines functions for creating and manipulating variables.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -22,13 +28,18 @@
 	.type WVariable, @function
 
 WVariable:
-	# Create new dictionary entry
-	call Create
+	pushq %rax                      # Save caller's registers
+	pushq %rbx                      # .
+
+	call Create                     # Create new dictionary entry
 
 	lea PushEntryParam1Addr, %rbx   # Get address of function that pushes param1 address
 	movq G_dp, %rax                 # Store this function...
 	movq %rbx, ENTRY_CODE(%rax)     # ...in the entry's code cell
 	MAddParameter $0                # Add parameter and set to 0
+
+	popq %rbx                       # Restore caller's registers
+	popq %rax                       # .
 	ret
 
 #-------------------------------------------------------------------------------
@@ -42,9 +53,18 @@ WVariable:
 	.type WBang, @function
 
 WBang:
+	pushq %rbx                      # Save caller's registers
+	pushq %rcx                      # .
+
 	MPop %rbx                       # Get variable address
 	MPop %rcx                       # Get variable value
 	movq %rcx, (%rbx)               # Store value
+	                                #
+	                                # NOTE: Forth logic errors can lead to
+					#       segfaults here.
+
+	popq %rcx                       # Restore caller's registers
+	popq %rbx                       # .
 	ret
 
 #-------------------------------------------------------------------------------
@@ -59,7 +79,18 @@ WBang:
 	.type WAt, @function
 
 WAt:
+	pushq %rbx                      # Save caller's registers
+	pushq %rcx                      # .
+	
 	MPop %rbx                       # Get variable address
 	movq (%rbx), %rcx               # Get value
+	                                #
+	                                # NOTE: Forth logic errors can lead to
+					#       segfaults here.
+
 	MPush %rcx                      # and push onto forth stack
+
+0:
+	popq %rcx                       # Restore caller's registers
+	popq %rbx                       # .
 	ret
