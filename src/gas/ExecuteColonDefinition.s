@@ -1,13 +1,19 @@
 #===============================================================================
-# DATA section
+# ExecuteColonDefinition.s
+#
+# Defines how colon definitions are executed.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 
@@ -23,41 +29,46 @@
 ExecuteColonDefinition:
 	MPrologue
 
+	pushq %rax                      # Save caller's registers
+	pushq %rbx                      # .
+	pushq %rcx                      # .
+	pushq %rdx                      # .
+
 	# Add stack args for special functions
-	pushq STACK_ARG_1(%rbp)                                  # Push address of the colon definition
-	pushq $0                                                 # Push starting param index
+	pushq STACK_ARG_1(%rbp)         # Push address of the colon definition
+	pushq $0                        # Push starting param index
 
 .loop:
 	# Get current colon def parameter
-	movq STACK_ARG_1(%rbp), %rbx              		 # rbx holds the colon definition's entry address
-	movq (%rsp), %rcx                         		 # rcx holds current parameter index
-	movq ENTRY_PFA(%rbx, %rcx, WORD_SIZE), %rdx              # rdx holds address of parameter's entry
+	movq STACK_ARG_1(%rbp), %rbx    # rbx holds the colon definition's entry address
+	movq (%rsp), %rcx               # rcx holds current parameter index
+	movq ENTRY_PFA(%rbx, %rcx, WORD_SIZE), %rdx  # rdx holds address of parameter's entry
 
 	# Check if parameter is Exit_rt
-	lea Exit_rt, %rax                                        # rax holds address of Exit_rt
-	cmp %rax, %rdx                                           # If current parameter is an Exit_rt, we're done
+	lea Exit_rt, %rax               # rax holds address of Exit_rt
+	cmp %rax, %rdx                  # If current parameter is an Exit_rt, we're done
 	je .done
 
 	# Check if parameter is Literal_rt
-	lea Literal_rt, %rax                                     # If the entry points directly to Literal_rt...
+	lea Literal_rt, %rax            # If the entry points directly to Literal_rt...
 	cmp %rax, %rdx
-	je .execute_directly                                     # ...then execute it directly.
+	je .execute_directly            # ...then execute it directly.
 
 	# Check if parameter is Jmp_false_rt
-	lea Jmp_false_rt, %rax                                   # If the entry points directly to Jmp_false_rt...
+	lea Jmp_false_rt, %rax          # If the entry points directly to Jmp_false_rt...
 	cmp %rax, %rdx
-	je .execute_directly                                     # ...then execute it directly.
+	je .execute_directly            # ...then execute it directly.
 
 	# Check if parameter is Jmp_rt
-	lea Jmp_rt, %rax                                         # If the entry points directly to Jmp_rt...
+	lea Jmp_rt, %rax                # If the entry points directly to Jmp_rt...
 	cmp %rax, %rdx
-	je .execute_directly                                     # ...then execute it directly.
+	je .execute_directly            # ...then execute it directly.
 
-	MExecuteEntry %rdx                                       # Otherwise, execute rdx as a normal word
-	cmpl $0, G_abort                                         # If last entry resulted in an abort then
-	jne .done                                                # we're done
+	MExecuteEntry %rdx              # Otherwise, execute rdx as a normal word
+	cmpl $0, G_abort                # If last entry resulted in an abort then
+	jne .done                       # we're done
 
-	incq (%rsp)                                              # Go to next item in colon definition
+	incq (%rsp)                     # Go to next item in colon definition
 	jmp .loop
 
 	#--------------------------------------------------
@@ -70,11 +81,16 @@ ExecuteColonDefinition:
 	#    * Arg 2: address of colon def being executed
 	#--------------------------------------------------
 .execute_directly:
-	call *%rdx                                               # rdx has the address of a special function
-	jmp .loop                                                # NOTE: special function will update param index
-
+	call *%rdx                      # rdx has the address of a special function
+	jmp .loop                       # NOTE: special function will update param index
 
 .done:
-	MClearStackArgs 2                                        # Remove pushed stack args
+	MClearStackArgs 2               # Remove pushed stack args
+
+	pushq %rdx                      # Restore caller's registers
+	pushq %rcx                      # .
+	pushq %rbx                      # .
+	pushq %rax                      # .
+
 	MEpilogue
 	ret
