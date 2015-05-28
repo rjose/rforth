@@ -1,6 +1,12 @@
 #===============================================================================
-# DATA section
+# WPlus.s
+#
+# Defines word to add two numbers from the forth stack.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
@@ -8,9 +14,9 @@
 .err_overflow:
 	.asciz "ERROR: Overflow when doing PLUS"
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -20,6 +26,9 @@
 	.type WPlus, @function
 
 WPlus:
+	pushq %rbx                      # Save caller's registers
+	pushq %rcx                      # .
+	
 	MPop %rbx                       # Get second arg
 	MPop %rcx                       # Get first arg
 	addq %rbx, %rcx                 # first + second
@@ -30,4 +39,6 @@ WPlus:
 .done:
 	MPush %rcx                      # Return value on forth stack
 0:
+	popq %rcx                       # Restore caller's registers
+	popq %rbx                       # .
 	ret
