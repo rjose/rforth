@@ -169,7 +169,7 @@ DefineBuiltinWords:
 	MDefineImmediateWord .name_else, $LEN_ELSE, WElse
 
 	# Define "WHILE", "REPEAT"
-	MDefineImmediateWord .name_while, $LEN_WHILE, WWhile
+	MDefineImmediateWord .name_while, $LEN_WHILE, WIf  # WHILE has the exact same semantics as IF
 	MDefineImmediateWord .name_repeat, $LEN_REPEAT, WRepeat
 
 	# Define '."', "LOAD"
