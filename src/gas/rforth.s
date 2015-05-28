@@ -1,3 +1,14 @@
+#===============================================================================
+# rforth.s
+#
+# This is the main entry point for rforth. This defines our builtin words,
+# loads a "main.fth" file, and runs the last entry defined in it.
+#
+# This entry is run in a loop that resets the interpreter state if
+# execution is aborted. Typically though, this main entry is itself a
+# loop that returns on an abort or an exit.
+#===============================================================================
+
 #========================================
 # DATA section
 #========================================
