@@ -1,6 +1,14 @@
 #===============================================================================
-# DATA section
+# WCompile.s
+#
+# During the compilation of a colon definition, this function does the
+# work of getting the next word and compiling it into the next parameter
+# slot of the current definition.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
@@ -21,15 +29,15 @@ WC_macro_mode:
 	.byte	0
 
 
-#===============================================================================
+#========================================
 # BSS section
-#===============================================================================
+#========================================
 	.section .bss
 
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -53,17 +61,25 @@ WC_macro_mode:
 Literal_rt:
 	MPrologue
 
-	movq STACK_ARG_1(%rbp), %rbx                             # Get the current parameter index
-	addq $1, %rbx                                            # The next cell holds the literal's value
+	pushq %rax                      # Save caller's registers
+	pushq %rbx                      # .
+	pushq %rcx                      # .
 
-	movq STACK_ARG_2(%rbp), %rcx                             # rcx has address of colon definition
+	movq STACK_ARG_1(%rbp), %rbx    # Get the current parameter index
+	addq $1, %rbx                   # The next cell holds the literal's value
 
-	movq ENTRY_PFA(%rcx, %rbx, WORD_SIZE), %rax              # Get the literal value...
-	MPush %rax                                               # ...and push it onto the forth stack
+	movq STACK_ARG_2(%rbp), %rcx    # rcx has address of colon definition
+
+	movq ENTRY_PFA(%rcx, %rbx, WORD_SIZE), %rax  # Get the literal value...
+	MPush %rax                                   # ...and push it onto the forth stack
 
 	# NOTE: We update the param index directly so it points
 	#       to the next instruction in the colon definition.
-	addq $2, STACK_ARG_1(%rbp)                               # Next instr is after value cell
+	addq $2, STACK_ARG_1(%rbp)      # Next instr is after value cell
+
+	popq %rcx                       # Restore caller's registers
+	popq %rbx                       # .
+	popq %rax                       # .
 
 	MEpilogue
 	ret
@@ -78,6 +94,9 @@ Literal_rt:
 	.type WCompile, @function
 
 WCompile:
+	pushq %rbx                      # Save caller's registers
+	pushq %rcx                      # .
+
 	cmpb $1, WC_macro_mode
 	je .macro_mode
 
@@ -132,5 +151,7 @@ WCompile:
 	MExecuteEntry %rbx
 
 .done:
+	popq %rcx                       # Restore caller's registers
+	popq %rbx                       # .
 	ret
 
