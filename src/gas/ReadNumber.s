@@ -1,6 +1,13 @@
 #===============================================================================
-# DATA section
+# ReadNumber.s
+#
+# This attempts to parse a number from the RW_tib buffer and converts
+# it into a fixed point representation.
 #===============================================================================
+
+#========================================
+# DATA section
+#========================================
 	.section .data
 	.include "./src/gas/defines.s"
 	.include "./src/gas/macros.s"
@@ -33,15 +40,15 @@ RN_status:                              # Read status (one of Status codes)
 .num_digits_left:                       # Max num digits left in number
 	.int NUM_DIGITS
 
-#===============================================================================
-# BSS section
-#===============================================================================
+#========================================
+# DATA section
+#========================================
 	.section .bss
 
 
-#===============================================================================
+#========================================
 # TEXT section
-#===============================================================================
+#========================================
 	.section .text
 
 #-------------------------------------------------------------------------------
@@ -59,6 +66,12 @@ RN_status:                              # Read status (one of Status codes)
 	.type ReadNumber, @function
 
 ReadNumber:
+	pushq %rax                      # Save caller's registers
+	pushq %rsi                      # .
+	pushq %rbx                      # .
+	pushq %rcx                      # .
+	pushq %rdx                      # .
+	
 	# Initialize variables
 	movl $0, .is_negative           # Start with no "-"
 	movl $0, .have_decimal          # Start with no "."
@@ -93,9 +106,9 @@ ReadNumber:
 	jmp .check_flags                # ...and see if the number is still valid
 
 .check_for_digit:
-	cmpb $ASCII_0, (%rsi)           # If char < 0
+	cmpb $ASCII_0, (%rsi)           # If char < '0'
 	jl .invalid_number              # then number is invalid
-	cmpb $ASCII_9, (%rsi)           # If char > 9
+	cmpb $ASCII_9, (%rsi)           # If char > '9'
 	jg .invalid_number              # then number is invalid
 
 	decl .num_digits_left           # Decrement the number of digits left
@@ -183,4 +196,9 @@ ReadNumber:
 	movq %rdx, RN_value             # Store result in RN_value
 
 0:
+	popq %rdx                       # Restore caller's registers
+	popq %rcx                       # .
+	popq %rbx                       # .
+	popq %rsi                       # .
+	popq %rax                       # .
 	ret
