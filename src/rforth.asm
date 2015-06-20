@@ -14,8 +14,8 @@ MessageLen:	equ $ - Message
 
 main:
 	nop
-	MSyscall SYSCALL_WRITE, \ 		; Write message
-	         STDOUT, Message, MessageLen	; .
+	MSyscall SYSCALL_WRITE, \
+	         STDOUT, Message, MessageLen 	; Write message
 
 	MSyscall SYSCALL_EXIT, 42               ; Exit with status code 42
 	nop

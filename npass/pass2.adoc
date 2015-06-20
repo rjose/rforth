@@ -2,7 +2,7 @@
 
 == Tasks
 - [x] Print a message
-- [ ] Add macros to clean up constants
+- [x] Add macros to clean up constants
 - [ ] Add a signal handler to handle CTRL-C
 - [ ] Listen to a port
 - [ ] Handle new data on port
