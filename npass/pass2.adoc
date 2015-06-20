@@ -1,0 +1,18 @@
+= Pass 2: React to an HTTP request
+
+== Tasks
+- [x] Print a message
+- [ ] Add macros to clean up constants
+- [ ] Add a signal handler to handle CTRL-C
+- [ ] Listen to a port
+- [ ] Handle new data on port
+- [ ] Look for particular string on port (like "STARTFORTH")
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 10h
+
+== Log
+
+=== Saturday, 04/25/2015
