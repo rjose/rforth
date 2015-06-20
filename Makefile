@@ -21,8 +21,7 @@ help:
 	@echo
 	@echo "MISC"
 	@echo "        help:          Shows this message"
-	@echo "        doc:           Builds ssk documentation (npass and spec)"
-	@echo "        clean-doc:     Removes generated doc files"
+	@echo "        clean:         Removes built files"
 
 #=======================================
 # Build Targets
@@ -31,6 +30,13 @@ source_files = rforth
 obj_files = $(foreach f, $(source_files), src/$(f).o)
 dbg_obj_files = $(foreach f, $(source_files), src/$(f)_dbg.o)
 
+
+#-------------------------------------------------------------------------------
+# Assemble code
+#-------------------------------------------------------------------------------
+%.o:%.asm
+	nasm -f elf64 -o $@ $<
+
 #-------------------------------------------------------------------------------
 # Assemble debug code
 #-------------------------------------------------------------------------------
@@ -38,7 +44,19 @@ dbg_obj_files = $(foreach f, $(source_files), src/$(f)_dbg.o)
 	nasm -f elf64 -g -F dwarf -o $@ $<
 
 #-------------------------------------------------------------------------------
+# Builds main rforth app
+#-------------------------------------------------------------------------------
+rforth: $(obj_files)
+	ld -e main -s -o $@ $^
+
+#-------------------------------------------------------------------------------
 # Builds debuggable rforth app
 #-------------------------------------------------------------------------------
 rforth_dbg: $(dbg_obj_files)
 	gcc -g -o $@ $^
+
+#-------------------------------------------------------------------------------
+# Removes program files and obj files
+#-------------------------------------------------------------------------------
+clean:
+	rm -f rforth rforth_dbg $(obj_files) $(dbg_obj_files)
