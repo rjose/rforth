@@ -4,8 +4,9 @@
 
 	SECTION .data
 	%include "./src/defines.asm"
+	%include "./src/macros.asm"
 
-Message:	db "Howdy", 10  ; Message + newline
+Message:	db "Howdy", 10  		; Message + newline
 MessageLen:	equ $ - Message
 	
 	SECTION .text
@@ -13,15 +14,10 @@ MessageLen:	equ $ - Message
 
 main:
 	nop
-	mov rax, SYSCALL_WRITE  ; Instruction: WRITE
-	mov rdi, STDOUT         ; Output file descriptor
-	mov rsi, Message        ; Address of message
-	mov rdx, MessageLen     ; Length of message
-	syscall                 ; Call WRITE
+	MSyscall SYSCALL_WRITE, \ 		; Write message
+	         STDOUT, Message, MessageLen	; .
 
-	mov rax, SYSCALL_EXIT	; Instruction: EXIT
-	mov rdi, 42             ; Status code
-	syscall                 ; Call EXIT
+	MSyscall SYSCALL_EXIT, 42               ; Exit with status code 42
 	nop
 
 	SECTION .bss
