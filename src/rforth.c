@@ -6,12 +6,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <strings.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/epoll.h>
+#include <fcntl.h>
+
+static int m_listening_fd = -1;
 
 static void
 handler(int sig) {
     printf("Got signal %d\n", sig);
+    close(m_listening_fd);
     exit(0);
 }
 
@@ -30,19 +35,36 @@ main(int argc, char* argv[]) {
     }
 
     // Open a socket, listen, and accept
-    int listening_fd = socket(AF_INET, SOCK_STREAM, 0);
+    m_listening_fd = socket(AF_INET, SOCK_STREAM, 0);
+    int enable = 1;
+    if (setsockopt(m_listening_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+        printf("Ugh. setsockopt failed\n");
+        exit(3);
+    }
+
+    // Make nonblocking
+    int flags;
+    if ( (flags = fcntl(m_listening_fd, F_GETFL, 0)) < 0) {
+        printf("Ugh. fcntl failed\n");
+        exit(7);
+    }
+    flags |= O_NONBLOCK;
+    if (fcntl(m_listening_fd, F_SETFL, flags) < 0) {
+        printf("Ugh. fcntl failed\n");
+        exit(8);
+    }
 
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     server_addr.sin_port = htons(9876);
     
-    if (bind(listening_fd, (struct sockaddr*) &server_addr, sizeof(server_addr)) == -1) {
-        printf("Ugh. bind failed\n");
+    if (bind(m_listening_fd, (struct sockaddr*) &server_addr, sizeof(server_addr)) == -1) {
+        printf("Ugh. bind failed: %s\n", strerror(errno));
         exit(3);
     }
 
-    if (listen(listening_fd, 1024) == -1) {
+    if (listen(m_listening_fd, 1024) == -1) {
         printf("Ugh. listen failed\n");
         exit(4);
     }
@@ -54,9 +76,9 @@ main(int argc, char* argv[]) {
         printf("Ugh. epoll_create failed\n");
         exit(5);
     }
-    ev.data.fd = listening_fd;
+    ev.data.fd = m_listening_fd;
     ev.events = EPOLLIN | EPOLLET;      // TODO: Figure out what this should be
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listening_fd, &ev) == -1) {
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, m_listening_fd, &ev) == -1) {
         printf("Ugh. epoll_ctl failed\n");
         exit(6);
     }
@@ -82,12 +104,26 @@ main(int argc, char* argv[]) {
         }
         printf("Num descriptors: %d\n", num_descriptors);
         for (int i=0; i < num_descriptors; i++) {
-            if (evlist[i].events & EPOLLIN && evlist[i].data.fd == listening_fd) {
-                int connected_fd = accept(listening_fd, (struct sockaddr*) &client_addr, &client_len);
-                printf("Connected with %d\n", connected_fd);
-                if (close(connected_fd) == -1) {
-                    printf("Ugh. close failed\n");
-                    exit(5);
+            if (evlist[i].events & EPOLLIN && evlist[i].data.fd == m_listening_fd) {
+                while(1) {
+                    // TODO: Continue accepting connections until would block
+                    int connected_fd = accept(m_listening_fd, (struct sockaddr*) &client_addr, &client_len);
+                    if (connected_fd == -1) {
+                        if (errno & (EWOULDBLOCK | ECONNABORTED | EPROTO | EINTR)) {
+                            printf("Ignoring error: %d\n", errno);
+                            break;
+                        }
+                        else {
+                            printf("Ugh. Connect failed\n");
+                            exit(8);
+                        }
+                    }
+                    
+                    printf("Connected with %d\n", connected_fd);
+                    if (close(connected_fd) == -1) {
+                        printf("Ugh. close failed\n");
+                        exit(5);
+                    }
                 }
             }
         }
