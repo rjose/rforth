@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <strings.h>
 #include <unistd.h>
+#include <sys/epoll.h>
 
 static void
 handler(int sig) {
@@ -46,18 +47,52 @@ main(int argc, char* argv[]) {
         exit(4);
     }
 
+    // Set up epoll
+    struct epoll_event ev;
+    int epoll_fd = epoll_create(5);
+    if (epoll_fd == -1) {
+        printf("Ugh. epoll_create failed\n");
+        exit(5);
+    }
+    ev.data.fd = listening_fd;
+    ev.events = EPOLLIN | EPOLLET;      // TODO: Figure out what this should be
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listening_fd, &ev) == -1) {
+        printf("Ugh. epoll_ctl failed\n");
+        exit(6);
+    }
+
+
+#define MAX_EVENTS   5
+    struct epoll_event evlist[MAX_EVENTS];
+    
     struct timespec requested;
     while(1) {
         printf("Howdy!\n");
 
-        // TODO: Don't block while waiting for a connection
-        int connected_fd = accept(listening_fd, (struct sockaddr*) &client_addr, &client_len);
-        printf("Connected with %d\n", connected_fd);
-        if (close(connected_fd) == -1) {
-            printf("Ugh. close failed\n");
-            exit(5);
+        // Check for ready file descriptors
+        int num_descriptors = epoll_wait(epoll_fd, evlist, MAX_EVENTS, 0);
+        if (num_descriptors == -1) {
+            if (errno == EINTR) {
+                continue;
+            }
+            else {
+                printf("Ugh. epoll_wait failed\n");
+                exit(7);
+            }
         }
-        
+        printf("Num descriptors: %d\n", num_descriptors);
+        for (int i=0; i < num_descriptors; i++) {
+            if (evlist[i].events & EPOLLIN && evlist[i].data.fd == listening_fd) {
+                int connected_fd = accept(listening_fd, (struct sockaddr*) &client_addr, &client_len);
+                printf("Connected with %d\n", connected_fd);
+                if (close(connected_fd) == -1) {
+                    printf("Ugh. close failed\n");
+                    exit(5);
+                }
+            }
+        }
+
+
         requested.tv_sec = 0;
         requested.tv_nsec = 500000000; // 500 ms
         status = nanosleep(&requested, NULL);
