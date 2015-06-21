@@ -177,6 +177,13 @@ void update_connections(int epoll_fd, int http_fd) {
 }
 
 //------------------------------------------------------------------------------
+// For each forth machine, execute its next instruction
+//------------------------------------------------------------------------------
+void update_forth_machines() {
+    printf("TODO: Execute next forth instruction\n");
+}
+
+//------------------------------------------------------------------------------
 // Main function
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
@@ -187,7 +194,7 @@ int main(int argc, char* argv[]) {
     // Main event loop
     while (1) {
         update_connections(epoll_fd, http_fd);              // Updates any sockets that have changed
-        printf("Howdy\n");
+        update_forth_machines();
         wait_ms(10);
     }
     return 0;
