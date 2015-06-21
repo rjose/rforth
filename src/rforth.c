@@ -1,140 +1,194 @@
-#include <time.h>
 #include <stdio.h>
+#include <time.h>
 #include <errno.h>
-#include <signal.h>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <strings.h>
-#include <string.h>
 #include <unistd.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
 
-static int m_listening_fd = -1;
+#include "defines.h"
 
-static void
-handler(int sig) {
-    printf("Got signal %d\n", sig);
-    close(m_listening_fd);
-    exit(0);
+//------------------------------------------------------------------------------
+// Delays by specified number of ms
+//------------------------------------------------------------------------------
+void wait_ms(int ms_delay) {
+    struct timespec requested;
+
+    requested.tv_sec = 0;
+    requested.tv_nsec = ms_delay * NS_PER_MS;
+    if (nanosleep(&requested, NULL) == -1) {
+        printf("Ugh. nanosleep failed: %s\n", strerror(errno));
+        exit(ERR_NANOSLEEP);
+    }
 }
 
-int
-main(int argc, char* argv[]) {
-    int status = 0;
-    struct sigaction sa;
-    socklen_t client_len;
-    struct sockaddr_in client_addr, server_addr;
-    
-    sigemptyset(&sa.sa_mask);
-    sa.sa_handler = handler;
-    if(sigaction(SIGINT, &sa, NULL) == -1) {
-        printf("Ugh. sigaction failed\n");
-        exit(2);
-    }
 
-    // Open a socket, listen, and accept
-    m_listening_fd = socket(AF_INET, SOCK_STREAM, 0);
+//------------------------------------------------------------------------------
+// Creates a nonblocking socket and listens on it
+//
+// Returns fd of socket
+//------------------------------------------------------------------------------
+int make_http_socket(int port) {
+    struct sockaddr_in server_addr;
+
+    // Create socket
+    int result = socket(AF_INET, SOCK_STREAM, 0);
+
+    // Reuse address so we can restart quickly
     int enable = 1;
-    if (setsockopt(m_listening_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+    if (setsockopt(result, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
         printf("Ugh. setsockopt failed\n");
-        exit(3);
+        exit(ERR_SET_SOCK_OPT);
     }
 
-    // Make nonblocking
+    // Make socket nonblocking
     int flags;
-    if ( (flags = fcntl(m_listening_fd, F_GETFL, 0)) < 0) {
+    if ( (flags = fcntl(result, F_GETFL, 0)) < 0) {
         printf("Ugh. fcntl failed\n");
-        exit(7);
+        exit(ERR_FCNTL);
     }
     flags |= O_NONBLOCK;
-    if (fcntl(m_listening_fd, F_SETFL, flags) < 0) {
+    if (fcntl(result, F_SETFL, flags) < 0) {
         printf("Ugh. fcntl failed\n");
-        exit(8);
+        exit(ERR_FCNTL);
     }
 
+    // Bind to port on 0.0.0.0
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_addr.sin_port = htons(9876);
-    
-    if (bind(m_listening_fd, (struct sockaddr*) &server_addr, sizeof(server_addr)) == -1) {
+    server_addr.sin_port = htons(port);
+    if (bind(result, (struct sockaddr*) &server_addr, sizeof(server_addr)) == -1) {
         printf("Ugh. bind failed: %s\n", strerror(errno));
-        exit(3);
+        exit(ERR_BIND);
     }
 
-    if (listen(m_listening_fd, 1024) == -1) {
+    // Start listening
+    if (listen(result, LISTEN_BACKLOG) == -1) {
         printf("Ugh. listen failed\n");
-        exit(4);
+        exit(ERR_LISTEN);
     }
+    return result;
+}
 
-    // Set up epoll
+//------------------------------------------------------------------------------
+// Uses epoll to monitor state of socket
+//
+// Returns fd to use for interactint with epoll
+//------------------------------------------------------------------------------
+int monitor_fd(int new_fd) {
     struct epoll_event ev;
-    int epoll_fd = epoll_create(5);
-    if (epoll_fd == -1) {
+
+    // Set up epoll in kernel
+    int result = epoll_create(INITIAL_NUM_SOCKETS);
+    if (result == -1) {
         printf("Ugh. epoll_create failed\n");
-        exit(5);
+        exit(ERR_EPOLL_CREATE);
     }
-    ev.data.fd = m_listening_fd;
-    ev.events = EPOLLIN | EPOLLET;      // TODO: Figure out what this should be
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, m_listening_fd, &ev) == -1) {
+
+    // Listen to file descriptor
+    ev.data.fd = new_fd;
+    ev.events = EPOLLIN | EPOLLOUT | EPOLLET;               // Wait for edge triggered read/write
+    if (epoll_ctl(result, EPOLL_CTL_ADD, new_fd, &ev) == -1) {
         printf("Ugh. epoll_ctl failed\n");
-        exit(6);
+        exit(ERR_EPOLL_CTL);
+    }
+    return result;
+}
+
+
+//------------------------------------------------------------------------------
+// Establishes new http connections
+//
+// TODO: Does an initial read of data as well
+//
+// Returns:
+//   *  0 if OK
+//   * -1 if would block (i.e., no more outstanding connection requests).
+//   * -2 if there was a genuine problem
+//------------------------------------------------------------------------------
+int establish_http_connection(int http_fd) {
+    socklen_t client_len;
+    struct sockaddr_in client_addr;
+
+    int connected_fd = accept(http_fd, (struct sockaddr*) &client_addr, &client_len);
+    if (connected_fd == -1) {
+        if (errno & (EWOULDBLOCK | ECONNABORTED | EPROTO | EINTR)) {
+            printf("Ignoring error: %d\n", errno);
+            return -1;
+        }
+        else {
+            printf("Ugh. Connect failed\n");
+            return -2;
+        }
+    }
+                    
+    printf("Connected with %d\n", connected_fd);
+    // TODO: Monitor this connection as well
+    // TODO: Read initial HTTP request
+    if (close(connected_fd) == -1) {
+        printf("Ugh. close failed\n");
+        exit(ERR_CLOSE);
+    }
+}
+
+//------------------------------------------------------------------------------
+// Establishes connections for all pending HTTP client requests
+//------------------------------------------------------------------------------
+void establish_all_pending_connections(int http_fd) {
+    while(1) {
+        if (establish_http_connection(http_fd) < 0) {
+            break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// Updates any sockets requiring attention
+//
+// Args:
+//   * epoll_fd: fd used to get epoll info from kernel
+//   * http_fd: fd used for HTTP connection requests
+//------------------------------------------------------------------------------
+void update_connections(int epoll_fd, int http_fd) {
+    struct epoll_event evlist[MAX_EPOLL_EVENTS];
+
+    int num_descriptors = epoll_wait(epoll_fd, evlist, MAX_EPOLL_EVENTS, 0);
+    if (num_descriptors == -1) {
+        if (errno != EINTR) {
+            printf("Ugh. epoll_wait failed\n");
+            exit(ERR_EPOLL_WAIT);
+        }
     }
 
-
-#define MAX_EVENTS   5
-    struct epoll_event evlist[MAX_EVENTS];
-    
-    struct timespec requested;
-    while(1) {
-        printf("Howdy!\n");
-
-        // Check for ready file descriptors
-        int num_descriptors = epoll_wait(epoll_fd, evlist, MAX_EVENTS, 0);
-        if (num_descriptors == -1) {
-            if (errno == EINTR) {
-                continue;
-            }
-            else {
-                printf("Ugh. epoll_wait failed\n");
-                exit(7);
-            }
+    printf("Num descriptors: %d\n", num_descriptors);
+    for (int i=0; i < num_descriptors; i++) {
+        if (evlist[i].data.fd == http_fd) {
+            establish_all_pending_connections(http_fd);
         }
-        printf("Num descriptors: %d\n", num_descriptors);
-        for (int i=0; i < num_descriptors; i++) {
-            if (evlist[i].events & EPOLLIN && evlist[i].data.fd == m_listening_fd) {
-                while(1) {
-                    // TODO: Continue accepting connections until would block
-                    int connected_fd = accept(m_listening_fd, (struct sockaddr*) &client_addr, &client_len);
-                    if (connected_fd == -1) {
-                        if (errno & (EWOULDBLOCK | ECONNABORTED | EPROTO | EINTR)) {
-                            printf("Ignoring error: %d\n", errno);
-                            break;
-                        }
-                        else {
-                            printf("Ugh. Connect failed\n");
-                            exit(8);
-                        }
-                    }
-                    
-                    printf("Connected with %d\n", connected_fd);
-                    if (close(connected_fd) == -1) {
-                        printf("Ugh. close failed\n");
-                        exit(5);
-                    }
-                }
-            }
+        else {
+            // TODO: Handle reads/writes
         }
+    }
+}
 
+//------------------------------------------------------------------------------
+// Main function
+//------------------------------------------------------------------------------
+int main(int argc, char* argv[]) {
+    int http_port = 9876;                                   // TODO: Read this from the command line
+    int http_fd = make_http_socket(http_port);              // Create socket for http
+    int epoll_fd = monitor_fd(http_fd);                     // Use epoll to monitor client connections
 
-        requested.tv_sec = 0;
-        requested.tv_nsec = 500000000; // 500 ms
-        status = nanosleep(&requested, NULL);
-        if (status == -1) {
-            printf("Interrupted by %d\n", errno);
-        }
+    // Main event loop
+    while (1) {
+        update_connections(epoll_fd, http_fd);              // Updates any sockets that have changed
+        printf("Howdy\n");
+        wait_ms(10);
     }
     return 0;
 }
