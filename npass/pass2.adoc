@@ -5,9 +5,7 @@
 - [x] Add macros to clean up constants
 - [x] Add a signal handler to handle CTRL-C
 - [x] Listen to a port
-- [ ] Handle new data on port
-- [ ] Look for particular string on port (like "STARTFORTH")
-
+- [x] Print data from port
 
 
 == Status

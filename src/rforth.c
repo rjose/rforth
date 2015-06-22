@@ -126,8 +126,16 @@ int establish_http_connection(int http_fd) {
             return -2;
         }
     }
-                    
+
     printf("Connected with %d\n", connected_fd);
+    // TODO: Do something better here
+#define MAXLINE 256
+    char buf[MAXLINE];
+    int n = read(connected_fd, buf, MAXLINE-1);
+    printf("Read %d chars\n", n);
+    buf[n] = '\0';
+    printf("=====\n%s\n=====", buf);
+
     // TODO: Monitor this connection as well
     // TODO: Read initial HTTP request
     if (close(connected_fd) == -1) {
@@ -195,7 +203,7 @@ int main(int argc, char* argv[]) {
     while (1) {
         update_connections(epoll_fd, http_fd);              // Updates any sockets that have changed
         update_forth_machines();
-        wait_ms(10);
+        wait_ms(900);
     }
     return 0;
 }
