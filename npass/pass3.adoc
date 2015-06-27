@@ -3,8 +3,8 @@
 
 == Tasks
 - [x] Create data structures for forth machine
-- [ ] Create an emtpy forth machine
-- [ ] Read a word into the buffer
+- [x] Create an emtpy forth machine
+- [x] Read a word into the buffer
 
 
 == Status
