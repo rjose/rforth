@@ -1,8 +1,9 @@
 = rforth2 development passes
 
-* [ ] Pass 3: Stub out all parts of handling a request
+* [ ] Pass 4: Add word to dictionary
 
 
 === Completed Passes
 * [x] Pass 1: Build an empty rforth program
 * [x] Pass 2: React to an HTTP request
+* [x] Pass 3: Stub out all parts of handling a request
