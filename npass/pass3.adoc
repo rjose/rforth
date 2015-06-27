@@ -1,0 +1,17 @@
+= Pass 3: Read a forth word
+
+
+== Tasks
+- [x] Create data structures for forth machine
+- [ ] Create an emtpy forth machine
+- [ ] Read a word into the buffer
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: h
+
+== Log
+
+=== Saturday, 04/25/2015

@@ -1,7 +1,8 @@
 = rforth2 development passes
 
-* [ ] Pass 2: React to an HTTP request
+* [ ] Pass 3: Stub out all parts of handling a request
 
 
 === Completed Passes
 * [x] Pass 1: Build an empty rforth program
+* [x] Pass 2: React to an HTTP request

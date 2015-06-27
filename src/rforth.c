@@ -11,6 +11,7 @@
 #include <fcntl.h>
 
 #include "defines.h"
+#include "ForthMachine.h"
 
 //------------------------------------------------------------------------------
 // Delays by specified number of ms
@@ -127,6 +128,10 @@ int establish_http_connection(int http_fd) {
         }
     }
 
+
+    //    RR_Create(connected_fd);
+    
+
     printf("Connected with %d\n", connected_fd);
     // TODO: Do something better here
 #define MAXLINE 256
@@ -163,7 +168,7 @@ void establish_all_pending_connections(int http_fd) {
 //   * http_fd: fd used for HTTP connection requests
 //------------------------------------------------------------------------------
 void update_connections(int epoll_fd, int http_fd) {
-    struct epoll_event evlist[MAX_EPOLL_EVENTS];
+    static struct epoll_event evlist[MAX_EPOLL_EVENTS];
 
     int num_descriptors = epoll_wait(epoll_fd, evlist, MAX_EPOLL_EVENTS, 0);
     if (num_descriptors == -1) {
@@ -184,26 +189,110 @@ void update_connections(int epoll_fd, int http_fd) {
     }
 }
 
+
 //------------------------------------------------------------------------------
-// For each forth machine, execute its next instruction
+// Ensure cycle period is no less than CYCLE_PERIOD_MS
+//------------------------------------------------------------------------------
+void wait_if_needed(long cycle_duration_ms) {
+    long additional_delay = CYCLE_PERIOD_MS - cycle_duration_ms;
+    if (additional_delay > 0) {
+        wait_ms(additional_delay);
+    }
+}
+
+//------------------------------------------------------------------------------
+// Returns current time in ms from some reference
+//------------------------------------------------------------------------------
+long get_time() {
+    // TODO: Implement this
+    return 0l;
+}
+
+//------------------------------------------------------------------------------
+// Parse requests for all Responses with state HAVE_REQUEST
+//
+// For invalid requests, this constructs a 400 response and sets Response state
+// to HAVE_RESPONSE.
+//
+// Otherwise, this constructs a Forth string and adds it to the Handler queue.
+//------------------------------------------------------------------------------
+void parse_requests() {
+    printf("TODO: Implement parse_requests\n");
+}
+
+//------------------------------------------------------------------------------
+// Pulls items off of queue and executes on appropriate forth machine
+//
+// This claims/creates a forth machine, resets its state, and then gives it
+// a forth string to execute.
+//------------------------------------------------------------------------------
+void update_handler() {
+    printf("TODO: Implement update_handler\n");
+}
+
+//------------------------------------------------------------------------------
+// Runs forth machines until quiescent or until they're waiting for something
 //------------------------------------------------------------------------------
 void update_forth_machines() {
-    printf("TODO: Execute next forth instruction\n");
+    printf("TODO: Implement update_forth_machines\n");
 }
+
+
+//------------------------------------------------------------------------------
+// Routes messages between forth machines
+//------------------------------------------------------------------------------
+void update_mailer() {
+    printf("TODO: Implement update_mailer\n");
+}
+
+
+//------------------------------------------------------------------------------
+// Sends any completed responses
+//------------------------------------------------------------------------------
+void send_responses() {
+    printf("TODO: Implement send_responses\n");
+}
+
 
 //------------------------------------------------------------------------------
 // Main function
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+    struct FMState fm1 = FMCreateState();
+    char *sample_input = "   HOWDY   EVERYONE";
+    FMSetInput(&fm1, sample_input);
+    int status = FMReadWord(&fm1);
+    status = FMReadWord(&fm1);
+    
+    /*
+    forth_machine forth_server = create_forth_server();
+    if (Interpret(&forth_server, "9876 RUN") < 0) { 
+        printf("Ugh. RUN failed\n");
+        exit(ERR_FORTH_SERVER);
+    }
+    */
+
+    // The RUN word does the following:
+    /*
     int http_port = 9876;                                   // TODO: Read this from the command line
     int http_fd = make_http_socket(http_port);              // Create socket for http
     int epoll_fd = monitor_fd(http_fd);                     // Use epoll to monitor client connections
+    long start_time, end_time;
 
     // Main event loop
     while (1) {
+        start_time = get_time();
+
         update_connections(epoll_fd, http_fd);              // Updates any sockets that have changed
-        update_forth_machines();
-        wait_ms(900);
+        parse_requests();                                   // Parse newly-read requests
+        update_handler();                                   // Handles forth requests
+        update_forth_machines();                            // Runs forth machines until quiescent
+        update_mailer();
+        send_responses();
+
+        end_time = get_time();
+        wait_if_needed(end_time - start_time);
     }
+    */
     return 0;
 }

@@ -26,7 +26,7 @@ help:
 #=======================================
 # Build Targets
 #======================================
-source_files = rforth
+source_files = rforth ForthMachine
 obj_files = $(foreach f, $(source_files), src/$(f).o)
 dbg_obj_files = $(foreach f, $(source_files), src/$(f)_dbg.o)
 

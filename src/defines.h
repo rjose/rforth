@@ -5,8 +5,11 @@
 #define LISTEN_BACKLOG        1024
 #define INITIAL_NUM_SOCKETS   5
 #define MAX_EPOLL_EVENTS      5
+#define CYCLE_PERIOD_MS       50             // Minimum event loop period
+#define NUL                   '\0'
 
 // Error codes
+#define ERR_FORTH_SERVER      1
 #define ERR_NANOSLEEP         10
 #define ERR_SET_SOCK_OPT      11
 #define ERR_FCNTL             12
