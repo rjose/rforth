@@ -269,6 +269,12 @@ int main(int argc, char* argv[]) {
     FMSetInput(&fm1, sample_input);
     FMTick(&fm1);
 
+    // Induce a stack overflow
+    for (int i=0; i < MAX_STACK; i++) {
+        FMSetInput(&fm1, sample_input);
+        FMTick(&fm1);
+    }
+
 
     /*
     forth_machine forth_server = create_forth_server();
