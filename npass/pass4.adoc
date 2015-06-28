@@ -1,0 +1,18 @@
+= Pass 4: Add word to dictionary
+
+
+== Tasks
+- [x] Create a nop function
+- [x] Create an entry by reading the next word
+- [x] Handle no next word
+- [x] Add entry to FMState structure
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: h
+
+== Log
+
+=== Saturday, 04/25/2015
