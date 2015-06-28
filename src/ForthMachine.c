@@ -18,6 +18,14 @@ static int is_whitespace(char c) {
     }
 }
 
+
+//---------------------------------------------------------------------------
+// Do nothing
+//---------------------------------------------------------------------------
+void nop() {
+}
+
+
 //---------------------------------------------------------------------------
 // Creates an empty FMState object
 //
@@ -27,6 +35,7 @@ struct FMState FMCreateState() {
     struct FMState result;
 
     strncpy(result.type, TYPE_GENERIC, TYPE_LEN);      // GENERIC type
+    result.last_entry_index = -1;                      // No entries
     result.stack_top = -1;                             // Nothing in stack
     result.return_stack_top = -1;                      // Nothing in return stack
     result.word_len = 0;                               // No word has been read
@@ -52,9 +61,9 @@ void FMSetInput(struct FMState *state, const char *string) {
 // Word is stored in state.word_buffer and its length in state.word_len
 //
 // Return value:
-//   *  0: No word
-//   *  1: Read successful
-//   * -1: Word is longer than MAX_WORD_LEN
+//   *  0: Success
+//   * -1: No word
+//   * -2: Word is longer than MAX_WORD_LEN
 //---------------------------------------------------------------------------
 #define M_cur_char(state)    ((state)->input_string[(state)->input_index])
 
@@ -62,14 +71,14 @@ int FMReadWord(struct FMState *state) {
     state->word_len = 0;                               // Reset word
 
     if (state->input_string == NULL) {                 // If no input string, no word
-        return 0;
+        return -1;
     }
     while (M_cur_char(state) != NUL &&                 // Skip whitespace
            is_whitespace(M_cur_char(state))) {
         state->input_index++;
     }
     if (M_cur_char(state) == NUL) {                    // If at end of string, no word
-        return 0;
+        return -1;
     }
 
     while(state->word_len < MAX_WORD_LEN) {            // Copy word into buffer
@@ -81,7 +90,7 @@ int FMReadWord(struct FMState *state) {
 
         if (state->word_len == MAX_WORD_LEN) {         // If we'll exceed word_buffer...
             state->word_len = 0;                       // reset word and
-            return -1;                                 // indicate error
+            return -2;                                 // indicate error
         }
         
         state->word_buffer[state->word_len++] =        // Store next character
@@ -90,4 +99,34 @@ int FMReadWord(struct FMState *state) {
     }
 
     return 0;                                          // Everything is good
+}
+
+
+//---------------------------------------------------------------------------
+// Creates new entry using next word in input as a name
+//
+// Return value:
+//   *  0: Success
+//   * -1: No next word from input
+//   * -2: Dictionary full
+//---------------------------------------------------------------------------
+int FMCreateEntry(struct FMState *state) {
+    if (FMReadWord(state) != 0) {                      // If no next word, return -1
+        return -1;
+    }
+
+    if (state->last_entry_index == MAX_ENTRIES-1) {    // If dictonary full, return -2
+        return -2;
+    }
+
+    state->last_entry_index++;                         // Go to next empty entry
+    struct FMEntry *cur_entry =
+        &(state->dictionary[state->last_entry_index]); // Get pointer to new entry
+
+    strncpy(cur_entry->name,
+            state->word_buffer, state->word_len);      // Entry name is last word read
+    cur_entry->immediate = 0;                          // Default to not "immediate"
+    cur_entry->code = nop;                             // Default code to do nothing
+
+    return 0;
 }

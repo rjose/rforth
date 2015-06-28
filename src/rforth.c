@@ -260,10 +260,15 @@ void send_responses() {
 int main(int argc, char* argv[]) {
     struct FMState fm1 = FMCreateState();
     char *sample_input = "   HOWDY   EVERYONE";
-    FMSetInput(&fm1, sample_input);
-    int status = FMReadWord(&fm1);
-    status = FMReadWord(&fm1);
-    
+    while (1) {
+        FMSetInput(&fm1, sample_input);
+        int status = FMCreateEntry(&fm1);
+        if (status < 0) {
+            printf("Status: %d, %d\n", status, fm1.last_entry_index);
+            break;
+        }
+    }
+
     /*
     forth_machine forth_server = create_forth_server();
     if (Interpret(&forth_server, "9876 RUN") < 0) { 

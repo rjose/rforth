@@ -56,6 +56,7 @@ struct FMState {
     char type[TYPE_LEN];                          // Type of forth machine (i.e., vocabulary)
 
     struct FMEntry dictionary[MAX_ENTRIES];       // Forth dictionary
+    int last_entry_index;                         // Index of most recently created entry
 
     stack_val stack[MAX_STACK];                   // Forth value stack
     int stack_top;                                // Index of top of value stack (-1 if empty)
@@ -98,6 +99,17 @@ void FMSetInput(struct FMState *state, const char *string);
 //   * -1: Word is longer than MAX_WORD_LEN
 //---------------------------------------------------------------------------
 int FMReadWord(struct FMState *state);
+
+
+//---------------------------------------------------------------------------
+// Creates new entry using next word in input as a name
+//
+// Return value:
+//   *  0: Success
+//   * -1: No next word from input
+//   * -2: Dictionary full
+//---------------------------------------------------------------------------
+int FMCreateEntry(struct FMState *state);
 
 
 #endif
