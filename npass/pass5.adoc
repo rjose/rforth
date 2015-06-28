@@ -1,0 +1,16 @@
+= Pass 5: Search for words in dictionary
+
+
+== Tasks
+- [ ] Create a find entry function
+- [ ] Create a Tick function to find next word and put address on stack
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015
