@@ -10,7 +10,6 @@
 #define MAX_STACK             128                 // Max forth stack depth
 #define MAX_RETURN_STACK      128                 // Max return stack depth
 #define MAX_WORD_LEN          128                 // Max forth word length
-#define PARAM_TYPE_LEN        16                  // Max length of a paramter type name
 #define NAME_LEN              64                  // Max length of an entry name
 
 
@@ -22,7 +21,7 @@
 // A parameter in a dictionary entry
 //---------------------------------------------------------------------------
 struct FMParameter {
-    char type[PARAM_TYPE_LEN];                    // "int", "double", "string", "pointer"
+    char *type;                                   // "int", "double", "string", "pointer"
     union {                                       // Param value
         long int_param;
         double double_param;
@@ -35,7 +34,9 @@ struct FMParameter {
 //---------------------------------------------------------------------------
 // Dictionary entry
 //---------------------------------------------------------------------------
-typedef void (*code_p)();                         // Function pointer for entry
+struct FMState;                                   // Predeclare FMState
+
+typedef void (*code_p)(struct FMState *state);    // Function pointer for entry
 
 struct FMEntry {
     char name[NAME_LEN];                          // Name of entry (like "SWAP")
@@ -88,18 +89,6 @@ struct FMState FMCreateState();
 //---------------------------------------------------------------------------
 void FMSetInput(struct FMState *state, const char *string);
 
-//---------------------------------------------------------------------------
-// Reads next word from input string
-//
-// Word is stored in state.word_buffer and its length in state.word_len
-//
-// Return value:
-//   *  0: No word
-//   *  1: Read successful
-//   * -1: Word is longer than MAX_WORD_LEN
-//---------------------------------------------------------------------------
-int FMReadWord(struct FMState *state);
-
 
 //---------------------------------------------------------------------------
 // Creates new entry using next word in input as a name
@@ -110,6 +99,14 @@ int FMReadWord(struct FMState *state);
 //   * -2: Dictionary full
 //---------------------------------------------------------------------------
 int FMCreateEntry(struct FMState *state);
+
+
+//---------------------------------------------------------------------------
+// Gets next word, looks it up in the dictionary, and puts its address on the stack
+//
+// If can't find word, puts a 0 on the stack
+//---------------------------------------------------------------------------
+void FMTick(struct FMState *state);
 
 
 #endif

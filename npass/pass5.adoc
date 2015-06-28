@@ -2,8 +2,8 @@
 
 
 == Tasks
-- [ ] Create a find entry function
-- [ ] Create a Tick function to find next word and put address on stack
+- [x] Create a find entry function
+- [x] Create a Tick function to find next word and put address on stack
 
 
 == Status

@@ -259,15 +259,16 @@ void send_responses() {
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     struct FMState fm1 = FMCreateState();
-    char *sample_input = "   HOWDY   EVERYONE";
-    while (1) {
-        FMSetInput(&fm1, sample_input);
-        int status = FMCreateEntry(&fm1);
-        if (status < 0) {
-            printf("Status: %d, %d\n", status, fm1.last_entry_index);
-            break;
-        }
-    }
+    char *sample_input = "HOWDY";
+
+    // Create HOWDY entry
+    FMSetInput(&fm1, sample_input);
+    FMCreateEntry(&fm1);
+
+    // Look HOWDY up
+    FMSetInput(&fm1, sample_input);
+    FMTick(&fm1);
+
 
     /*
     forth_machine forth_server = create_forth_server();

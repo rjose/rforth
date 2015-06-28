@@ -3,8 +3,18 @@
 #include "defines.h"
 
 #include <string.h>
+#include <stdio.h>
 
+//=======================================================
+// Internal functions
+//=======================================================
+
+//---------------------------------------------------------------------------
+// String constants
+//---------------------------------------------------------------------------
 static char *TYPE_GENERIC = "GENERIC";
+static char *POINTER_TYPE = "pointer";
+
 
 //---------------------------------------------------------------------------
 // Returns 1 if c is whitespace; 0 otherwise
@@ -18,40 +28,59 @@ static int is_whitespace(char c) {
     }
 }
 
-
 //---------------------------------------------------------------------------
-// Do nothing
+// Clears stack states, word state, and instruction pointer
+//
+// NOTE: This does *not* clear the dictionary
 //---------------------------------------------------------------------------
-void nop() {
+static void clear_state(struct FMState *state) {
+    state->stack_top = -1;                             // Nothing in stack
+    state->return_stack_top = -1;                      // Nothing in return stack
+    state->word_len = 0;                               // No word has been read
+    state->input_string = NULL;                        // No input has been set
+    state->input_index = 0;                            // Input index is at the beginning
+    state->i_pointer = NULL;                           // No instruction to execute next
 }
 
 
 //---------------------------------------------------------------------------
-// Creates an empty FMState object
-//
-// Also initializes data structures where appropriate
+// Prints message to STDOUT and resets forth machine state
 //---------------------------------------------------------------------------
-struct FMState FMCreateState() {
-    struct FMState result;
+static void fm_abort(struct FMState *state, const char *message, const char *file, int line) {
+    printf("ABORT: %s (at %s:%d)\n", message, file, line);
+    clear_state(state);
+}
 
-    strncpy(result.type, TYPE_GENERIC, TYPE_LEN);      // GENERIC type
-    result.last_entry_index = -1;                      // No entries
-    result.stack_top = -1;                             // Nothing in stack
-    result.return_stack_top = -1;                      // Nothing in return stack
-    result.word_len = 0;                               // No word has been read
-    result.input_string = NULL;                        // No input has been set
-    result.input_index = 0;                            // Input index is at the beginning
-    result.i_pointer = NULL;                           // No instruction to execute next
-    
+
+//---------------------------------------------------------------------------
+// Looks up name in dictionary
+//
+// Returns pointer to entry or NULL if not found.
+//---------------------------------------------------------------------------
+static struct FMEntry *find_entry(struct FMState *state, const char *name) {
+    int cur_index = state->last_entry_index;
+
+    struct FMEntry *result = NULL;
+    while (cur_index >= 0) {                           // Start from last entry and go backwards
+        if (strncmp(state->dictionary[cur_index].name,
+                    name, NAME_LEN) == 0) {            // If names match...
+            result = &(state->dictionary[cur_index]);  // result is address of matching entry...
+            break;                                     // and we're done with this loop.
+        }
+        cur_index--;
+    }
     return result;
 }
 
+
 //---------------------------------------------------------------------------
-// Sets input string of an FMState
+// Creates an FMParameter of "pointer" type
 //---------------------------------------------------------------------------
-void FMSetInput(struct FMState *state, const char *string) {
-    state->input_string = string;                      // Set input string
-    state->input_index = 0;                            // Start at beginning of input
+struct FMParameter make_pointer_param(void * pointer) {
+    struct FMParameter result;
+    result.type = POINTER_TYPE;
+    result.value.pointer_param = pointer;
+    return result;
 }
 
 
@@ -67,7 +96,7 @@ void FMSetInput(struct FMState *state, const char *string) {
 //---------------------------------------------------------------------------
 #define M_cur_char(state)    ((state)->input_string[(state)->input_index])
 
-int FMReadWord(struct FMState *state) {
+static int read_word(struct FMState *state) {
     state->word_len = 0;                               // Reset word
 
     if (state->input_string == NULL) {                 // If no input string, no word
@@ -92,13 +121,63 @@ int FMReadWord(struct FMState *state) {
             state->word_len = 0;                       // reset word and
             return -2;                                 // indicate error
         }
-        
+
         state->word_buffer[state->word_len++] =        // Store next character
             M_cur_char(state);
         state->input_index++;                          // Go to next char in input
     }
 
     return 0;                                          // Everything is good
+}
+
+
+//---------------------------------------------------------------------------
+// Pushes value onto forth stack
+//
+// NOTE: If stack is full, this aborts
+//---------------------------------------------------------------------------
+void fs_push(struct FMState *state, struct FMParameter value) {
+    if (state->stack_top == MAX_STACK - 1) {           // Abort if stack is full
+        fm_abort(state, "Stack overflow", __FILE__, __LINE__);
+        return;
+    }
+
+    state->stack[++state->stack_top] = value;
+}
+
+
+//---------------------------------------------------------------------------
+// Do nothing
+//---------------------------------------------------------------------------
+void nop(struct FMState *state) {
+}
+
+
+//=======================================================
+// Public functions
+//=======================================================
+
+
+//---------------------------------------------------------------------------
+// Creates an empty FMState object
+//
+// Also initializes data structures where appropriate
+//---------------------------------------------------------------------------
+struct FMState FMCreateState() {
+    struct FMState result;
+
+    strncpy(result.type, TYPE_GENERIC, TYPE_LEN);      // GENERIC type
+    result.last_entry_index = -1;                      // No entries
+    clear_state(&result);
+    return result;
+}
+
+//---------------------------------------------------------------------------
+// Sets input string of an FMState
+//---------------------------------------------------------------------------
+void FMSetInput(struct FMState *state, const char *string) {
+    state->input_string = string;                      // Set input string
+    state->input_index = 0;                            // Start at beginning of input
 }
 
 
@@ -111,7 +190,7 @@ int FMReadWord(struct FMState *state) {
 //   * -2: Dictionary full
 //---------------------------------------------------------------------------
 int FMCreateEntry(struct FMState *state) {
-    if (FMReadWord(state) != 0) {                      // If no next word, return -1
+    if (read_word(state) != 0) {                      // If no next word, return -1
         return -1;
     }
 
@@ -129,4 +208,21 @@ int FMCreateEntry(struct FMState *state) {
     cur_entry->code = nop;                             // Default code to do nothing
 
     return 0;
+}
+
+
+//---------------------------------------------------------------------------
+// Gets next word, looks it up in the dictionary, and puts its address on the stack
+//
+// If can't find word, puts a 0 on the stack
+//---------------------------------------------------------------------------
+void FMTick(struct FMState *state) {
+    if (read_word(state) != 0) {
+        fm_abort(state, "read_word in FMTick failed", __FILE__, __LINE__);
+        return;
+    }
+
+    struct FMEntry *entry = find_entry(state, state->word_buffer);
+    struct FMParameter result = make_pointer_param((void *) entry);
+    fs_push(state, result);
 }
