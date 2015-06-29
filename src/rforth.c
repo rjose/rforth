@@ -265,16 +265,9 @@ int main(int argc, char* argv[]) {
     FMSetInput(&fm1, sample_input);
     FMCreateEntry(&fm1);
 
-    // Look HOWDY up
-    FMSetInput(&fm1, sample_input);
-    FMTick(&fm1);
 
-    // Induce a stack overflow
-    for (int i=0; i < MAX_STACK; i++) {
-        FMSetInput(&fm1, sample_input);
-        FMTick(&fm1);
-    }
-
+    char *sample2 = "1.5 42";
+    FMInterpretString(&fm1, sample2);
 
     /*
     forth_machine forth_server = create_forth_server();

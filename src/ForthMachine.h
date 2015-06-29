@@ -34,9 +34,11 @@ struct FMParameter {
 //---------------------------------------------------------------------------
 // Dictionary entry
 //---------------------------------------------------------------------------
-struct FMState;                                   // Predeclare FMState
+struct FMState;                                   // Predeclare
+struct FMEntry;                                   // Predeclare
 
-typedef void (*code_p)(struct FMState *state);    // Function pointer for entry
+typedef void (*code_p)(struct FMState *state,
+                       struct FMEntry *entry);    // Function pointer for entry
 
 struct FMEntry {
     char name[NAME_LEN];                          // Name of entry (like "SWAP")
@@ -107,6 +109,12 @@ int FMCreateEntry(struct FMState *state);
 // If can't find word, puts a 0 on the stack
 //---------------------------------------------------------------------------
 void FMTick(struct FMState *state);
+
+
+//---------------------------------------------------------------------------
+// Interprets each word in a string
+//---------------------------------------------------------------------------
+void FMInterpretString(struct FMState *state, const char *string);
 
 
 #endif

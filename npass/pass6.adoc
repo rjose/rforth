@@ -1,0 +1,19 @@
+= Pass 6: Execute code from a dictionary entry
+
+
+== Tasks
+- [x] Create an Interpret function
+- [x] Create interpret_next_word
+- [x] Create interpret_word
+- [x] Execute a word
+- [x] Push a number onto the stack
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015

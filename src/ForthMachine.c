@@ -13,7 +13,10 @@
 // String constants
 //---------------------------------------------------------------------------
 static char *TYPE_GENERIC = "GENERIC";
+
 static char *POINTER_TYPE = "pointer";
+static char *INT_TYPE = "int";
+static char *DOUBLE_TYPE = "double";
 
 
 //---------------------------------------------------------------------------
@@ -91,7 +94,7 @@ struct FMParameter make_pointer_param(void * pointer) {
 //
 // Return value:
 //   *  0: Success
-//   * -1: No word
+//   * -1: No wordick
 //   * -2: Word is longer than MAX_WORD_LEN
 //---------------------------------------------------------------------------
 #define M_cur_char(state)    ((state)->input_string[(state)->input_index])
@@ -147,9 +150,65 @@ void fs_push(struct FMState *state, struct FMParameter value) {
 
 
 //---------------------------------------------------------------------------
+// Interprets specified word
+//
+// Return value:
+//   *  0: Success
+//   * -1: ...
+//---------------------------------------------------------------------------
+int interpret_word(struct FMState *state, const char *word) {
+    int result = 0;
+    double double_val;
+    int int_val;
+    
+    struct FMEntry *entry = find_entry(state, word);
+
+    // Handle an entry
+    if (entry != NULL) {                               // If entry in dictionary...
+        (entry->code)(state, entry);                   // execute its code
+        return 0;
+    }
+
+    // Handle a number
+    struct FMParameter value;
+    if (sscanf(word, "%lf", &double_val) == 1) {       // If was a number
+        int_val = double_val;                          // Get int truncation
+        if (double_val - (double) int_val == 0) {      // If num is int...
+            value.type = INT_TYPE;                     // store value as int
+            value.value.int_param = int_val;
+        }
+        else {
+            value.type = DOUBLE_TYPE;                  // Otherwise, store value as double
+            value.value.double_param = double_val;
+        }
+        fs_push(state, value);                         // Push number onto stack
+    }
+
+    return result;
+}
+
+
+//---------------------------------------------------------------------------
+// Reads next word and interprets it
+//
+// Return value:
+//   *  0: Success
+//   * -1: No more words
+//---------------------------------------------------------------------------
+int interpret_next_word(struct FMState *state) {
+    if (read_word(state) < 0) {
+        return -1;
+    }
+
+    return interpret_word(state, state->word_buffer);
+}
+
+
+//---------------------------------------------------------------------------
 // Do nothing
 //---------------------------------------------------------------------------
-void nop(struct FMState *state) {
+void nop(struct FMState *state, struct FMEntry *entry) {
+    printf("NOP\n");
 }
 
 
@@ -225,4 +284,13 @@ void FMTick(struct FMState *state) {
     struct FMEntry *entry = find_entry(state, state->word_buffer);
     struct FMParameter result = make_pointer_param((void *) entry);
     fs_push(state, result);
+}
+
+
+//---------------------------------------------------------------------------
+// Interprets each word in a string
+//---------------------------------------------------------------------------
+void FMInterpretString(struct FMState *state, const char *string) {
+    FMSetInput(state, string);
+    while (interpret_next_word(state) == 0) {};
 }

@@ -1,6 +1,8 @@
 = rforth2 development passes
 
-* [ ] Pass 5: Search for words in dictionary
+* [ ] Pass 6: Execute code from a dictionary entry
+* [ ] Pass 7: Push a string onto a stack
+* [ ] Pass 8: Push a list onto a stack
 
 
 === Completed Passes
@@ -8,3 +10,4 @@
 * [x] Pass 2: React to an HTTP request
 * [x] Pass 3: Stub out all parts of handling a request
 * [x] Pass 4: Add word to dictionary
+* [x] Pass 5: Search for words in dictionary
