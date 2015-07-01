@@ -1,9 +1,9 @@
 = rforth2 development passes
 
-* [ ] Pass 6: Execute code from a dictionary entry
 * [ ] Pass 7: Push a string onto a stack
-* [ ] Pass 8: Push a list onto a stack
+* [ ] Pass 8: Create colon definitions
 
+* [ ] Pass : Push a list onto a stack
 
 === Completed Passes
 * [x] Pass 1: Build an empty rforth program
@@ -11,3 +11,4 @@
 * [x] Pass 3: Stub out all parts of handling a request
 * [x] Pass 4: Add word to dictionary
 * [x] Pass 5: Search for words in dictionary
+* [x] Pass 6: Execute code from a dictionary entr

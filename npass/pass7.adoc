@@ -1,0 +1,23 @@
+= Pass 7: Push string onto stack
+
+
+== Tasks
+- [x] Spec out rforth string
+- [x] Create "dot quote" word
+- [x] Pop string off stack and free string
+- [x] Create a DROP word to test popping string
+- [x] Abort frees all strings on the stack
+
+
+NOTE: When putting a string into a variable, we need to NULL out the
+string on the stack before popping the item.
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015

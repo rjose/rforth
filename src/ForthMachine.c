@@ -4,10 +4,13 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 //=======================================================
 // Internal functions
 //=======================================================
+#define M_is_dictionary_full(state)   ((state)->last_entry_index >= MAX_ENTRIES - 1)
+#define M_cur_entry(state)   (&((state)->dictionary[(state)->last_entry_index]))
 
 //---------------------------------------------------------------------------
 // String constants
@@ -17,12 +20,14 @@ static char *TYPE_GENERIC = "GENERIC";
 static char *POINTER_TYPE = "pointer";
 static char *INT_TYPE = "int";
 static char *DOUBLE_TYPE = "double";
+static char *STRING_TYPE = "string";
 
 
 //---------------------------------------------------------------------------
 // Returns 1 if c is whitespace; 0 otherwise
 //---------------------------------------------------------------------------
-static int is_whitespace(char c) {
+static
+int is_whitespace(char c) {
     if (c == ' ' || c == '\t' || c == '\n') {
         return 1;
     }
@@ -36,7 +41,8 @@ static int is_whitespace(char c) {
 //
 // NOTE: This does *not* clear the dictionary
 //---------------------------------------------------------------------------
-static void clear_state(struct FMState *state) {
+static
+void clear_state(struct FMState *state) {
     state->stack_top = -1;                             // Nothing in stack
     state->return_stack_top = -1;                      // Nothing in return stack
     state->word_len = 0;                               // No word has been read
@@ -49,8 +55,19 @@ static void clear_state(struct FMState *state) {
 //---------------------------------------------------------------------------
 // Prints message to STDOUT and resets forth machine state
 //---------------------------------------------------------------------------
-static void fm_abort(struct FMState *state, const char *message, const char *file, int line) {
+static
+void fm_abort(struct FMState *state, const char *message, const char *file, int line) {
     printf("ABORT: %s (at %s:%d)\n", message, file, line);
+
+    // Free all strings on stack
+    for (int i=0; i <= state->stack_top; i++) {
+        struct FMParameter *item = &state->stack[i];
+        if (item->type == STRING_TYPE) {
+            free(item->value.string_param);
+            item->value.string_param = NULL;
+        }
+    }
+
     clear_state(state);
 }
 
@@ -60,7 +77,8 @@ static void fm_abort(struct FMState *state, const char *message, const char *fil
 //
 // Returns pointer to entry or NULL if not found.
 //---------------------------------------------------------------------------
-static struct FMEntry *find_entry(struct FMState *state, const char *name) {
+static
+struct FMEntry *find_entry(struct FMState *state, const char *name) {
     int cur_index = state->last_entry_index;
 
     struct FMEntry *result = NULL;
@@ -99,7 +117,8 @@ struct FMParameter make_pointer_param(void * pointer) {
 //---------------------------------------------------------------------------
 #define M_cur_char(state)    ((state)->input_string[(state)->input_index])
 
-static int read_word(struct FMState *state) {
+static
+int read_word(struct FMState *state) {
     state->word_len = 0;                               // Reset word
 
     if (state->input_string == NULL) {                 // If no input string, no word
@@ -113,10 +132,14 @@ static int read_word(struct FMState *state) {
         return -1;
     }
 
-    while(state->word_len < MAX_WORD_LEN) {            // Copy word into buffer
-        if (is_whitespace(M_cur_char(state)) ||        // Stop when hit whitespace or EOS
-            M_cur_char(state) == NUL) {
-            state->word_buffer[state->word_len] = NUL; // Add NUL to end of word
+    // Copy word into buffer
+    while(state->word_len < MAX_WORD_LEN) {
+        if (is_whitespace(M_cur_char(state))) {        // Stop when hit whitespace...
+            state->input_index++;                      // ...but advance past whitespace char first
+            break;
+        }
+
+        if (M_cur_char(state) == NUL) {                // Stop when hit EOS
             break;
         }
 
@@ -127,9 +150,11 @@ static int read_word(struct FMState *state) {
 
         state->word_buffer[state->word_len++] =        // Store next character
             M_cur_char(state);
+
         state->input_index++;                          // Go to next char in input
     }
 
+    state->word_buffer[state->word_len] = NUL;         // NUL terminate word
     return 0;                                          // Everything is good
 }
 
@@ -139,6 +164,7 @@ static int read_word(struct FMState *state) {
 //
 // NOTE: If stack is full, this aborts
 //---------------------------------------------------------------------------
+static
 void fs_push(struct FMState *state, struct FMParameter value) {
     if (state->stack_top == MAX_STACK - 1) {           // Abort if stack is full
         fm_abort(state, "Stack overflow", __FILE__, __LINE__);
@@ -150,12 +176,36 @@ void fs_push(struct FMState *state, struct FMParameter value) {
 
 
 //---------------------------------------------------------------------------
+// Drops top of stack
+//---------------------------------------------------------------------------
+#define M_top(state)   &((state)->stack[(state)->stack_top])
+
+static
+void fs_drop(struct FMState *state) {
+    if (state->stack_top == -1) {                      // Abort if stack is empty
+        fm_abort(state, "Stack underflow", __FILE__, __LINE__);
+        return;
+    }
+
+    // If top of stack is a string, then free it
+    struct FMParameter *top = M_top(state);
+    if (top->type == STRING_TYPE) {
+        free(top->value.string_param);                 // Free the string memory
+        top->value.string_param = NULL;                // NULL out pointer
+    }
+
+    state->stack_top--;                                // Drop the item
+}
+
+
+//---------------------------------------------------------------------------
 // Interprets specified word
 //
 // Return value:
 //   *  0: Success
 //   * -1: ...
 //---------------------------------------------------------------------------
+static
 int interpret_word(struct FMState *state, const char *word) {
     int result = 0;
     double double_val;
@@ -195,6 +245,7 @@ int interpret_word(struct FMState *state, const char *word) {
 //   *  0: Success
 //   * -1: No more words
 //---------------------------------------------------------------------------
+static
 int interpret_next_word(struct FMState *state) {
     if (read_word(state) < 0) {
         return -1;
@@ -207,8 +258,92 @@ int interpret_next_word(struct FMState *state) {
 //---------------------------------------------------------------------------
 // Do nothing
 //---------------------------------------------------------------------------
-void nop(struct FMState *state, struct FMEntry *entry) {
+void nop_code(struct FMState *state, struct FMEntry *entry) {
     printf("NOP\n");
+}
+
+
+//---------------------------------------------------------------------------
+// Create a string and put it on the stack
+//---------------------------------------------------------------------------
+static
+void dot_quote_code(struct FMState *state, struct FMEntry *entry) {
+    int start_index = state->input_index;
+    int cur_index = start_index;
+    char cur_char;
+    char *new_string;
+    size_t string_len;
+    struct FMParameter value;
+
+    // Search for ending '"'
+    while(1) {
+        cur_char = state->input_string[cur_index];
+        if (cur_char == '"') {                         // If found end quote, break out of loop
+            state->input_index = cur_index+1;          // Advance input to next char
+            break;
+        }
+
+        if (cur_char == NUL) {                         // If reached end of string, abort
+            fm_abort(state, "Couldn't find end '\"'", __FILE__, __LINE__);
+            return;
+        }
+
+        cur_index++;                                   // Go to next char in input
+    }
+
+    // Allocate memory for string
+    string_len = cur_index - start_index;
+    if ((new_string=malloc(string_len+1)) == NULL) {   // need 1 for the NUL
+        fm_abort(state, "malloc failure",__FILE__, __LINE__);
+        return;
+    }
+
+    // Copy string from input to new string
+    strncpy(new_string, state->input_string + start_index, string_len);
+    new_string[string_len] = NUL;
+
+    // Package string into a value and push onto stack
+    value.type = STRING_TYPE;                          // New stack value is a string
+    value.value.string_param = new_string;             // This is its pointer
+    fs_push(state, value);                             // Push onto stack
+}
+
+
+
+//---------------------------------------------------------------------------
+// Drops top of stack
+//---------------------------------------------------------------------------
+static
+void dot_drop_code(struct FMState *state, struct FMEntry *entry) {
+    fs_drop(state);
+}
+
+
+
+//---------------------------------------------------------------------------
+// Defines a new word in the dictionary
+//---------------------------------------------------------------------------
+static
+void define_word(struct FMState *state, const char* name, int immediate, code_p code) {
+    if (M_is_dictionary_full(state)) {
+        fm_abort(state, "Dictionary full", __FILE__, __LINE__);
+        return;
+    }
+    state->last_entry_index++;                         // Claim next empty entry
+    struct FMEntry *cur_entry = M_cur_entry(state);
+    strncpy(cur_entry->name, name, NAME_LEN);
+    cur_entry->immediate = immediate;
+    cur_entry->code = code;
+}
+
+
+//---------------------------------------------------------------------------
+// Creates the builtins for a generic interpreter
+//---------------------------------------------------------------------------
+static
+void add_builtin_words(struct FMState *state) {
+    define_word(state, ".\"", 0, dot_quote_code);
+    define_word(state, "DROP", 0, dot_drop_code);
 }
 
 
@@ -228,6 +363,10 @@ struct FMState FMCreateState() {
     strncpy(result.type, TYPE_GENERIC, TYPE_LEN);      // GENERIC type
     result.last_entry_index = -1;                      // No entries
     clear_state(&result);
+
+    // Add builtin words
+    add_builtin_words(&result);
+
     return result;
 }
 
@@ -253,18 +392,17 @@ int FMCreateEntry(struct FMState *state) {
         return -1;
     }
 
-    if (state->last_entry_index == MAX_ENTRIES-1) {    // If dictonary full, return -2
+    if (M_is_dictionary_full(state)) {                // If dictonary full, return -2
         return -2;
     }
 
     state->last_entry_index++;                         // Go to next empty entry
-    struct FMEntry *cur_entry =
-        &(state->dictionary[state->last_entry_index]); // Get pointer to new entry
+    struct FMEntry *cur_entry = M_cur_entry(state);
 
     strncpy(cur_entry->name,
             state->word_buffer, state->word_len);      // Entry name is last word read
     cur_entry->immediate = 0;                          // Default to not "immediate"
-    cur_entry->code = nop;                             // Default code to do nothing
+    cur_entry->code = nop_code;                        // Default code to do nothing
 
     return 0;
 }

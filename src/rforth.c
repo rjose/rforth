@@ -259,15 +259,14 @@ void send_responses() {
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     struct FMState fm1 = FMCreateState();
-    char *sample_input = "HOWDY";
 
-    // Create HOWDY entry
-    FMSetInput(&fm1, sample_input);
+    // Create "HOWDY" entry
+    FMSetInput(&fm1, "HOWDY");
     FMCreateEntry(&fm1);
-
-
-    char *sample2 = "1.5 42";
-    FMInterpretString(&fm1, sample2);
+    
+    FMInterpretString(&fm1, "1.5 42");
+    FMInterpretString(&fm1, ".\" Howdy, everyone!\"");
+    FMInterpretString(&fm1, "DROP DROP DROP DROP");
 
     /*
     forth_machine forth_server = create_forth_server();
