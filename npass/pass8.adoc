@@ -1,0 +1,19 @@
+= Pass 8: Create colon definition
+
+
+== Tasks
+- [x] Study colon definitions in jsforth
+- [x] Create ":" word and ";" word
+- [x] Create a compile function
+- [ ] Decide on use of pseudo-entries for numbers
+
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015

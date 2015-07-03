@@ -16,34 +16,34 @@
 //===============================================
 // Forth Machine structs
 //===============================================
+struct FMState;                                   // Predeclare
+struct FMEntry;                                   // Predeclare
 
 //---------------------------------------------------------------------------
 // A parameter in a dictionary entry
 //---------------------------------------------------------------------------
 struct FMParameter {
-    char *type;                                   // "int", "double", "string", "pointer"
+    char *type;                                   // "int", "double", "string", "entry"
     union {                                       // Param value
         long int_param;
         double double_param;
         char *string_param;
-        void *pointer_param;
+        struct FMEntry *entry_param;
     } value;
 };
 
-    
+
 //---------------------------------------------------------------------------
 // Dictionary entry
 //---------------------------------------------------------------------------
-struct FMState;                                   // Predeclare
-struct FMEntry;                                   // Predeclare
-
-typedef void (*code_p)(struct FMState *state,
+typedef int (*code_p)(struct FMState *state,
                        struct FMEntry *entry);    // Function pointer for entry
 
 struct FMEntry {
     char name[NAME_LEN];                          // Name of entry (like "SWAP")
     code_p code;                                  // Pointer to associated code to execute
     struct FMParameter *params;                   // Param array for entry
+    int num_params;                               // Number of parameters in params
     int immediate;                                // non-zero if "immediate" word
 };
 

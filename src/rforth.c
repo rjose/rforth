@@ -264,9 +264,10 @@ int main(int argc, char* argv[]) {
     FMSetInput(&fm1, "HOWDY");
     FMCreateEntry(&fm1);
     
-    FMInterpretString(&fm1, "1.5 42");
-    FMInterpretString(&fm1, ".\" Howdy, everyone!\"");
-    FMInterpretString(&fm1, "DROP DROP DROP DROP");
+    //FMInterpretString(&fm1, "1.5 42");
+    //FMInterpretString(&fm1, ".\" Howdy, everyone!\"");
+    //FMInterpretString(&fm1, "DROP DROP DROP DROP");
+    FMInterpretString(&fm1, ": ONE 1 ;");
 
     /*
     forth_machine forth_server = create_forth_server();

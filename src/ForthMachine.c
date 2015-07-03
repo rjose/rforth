@@ -17,11 +17,13 @@
 //---------------------------------------------------------------------------
 static char *TYPE_GENERIC = "GENERIC";
 
-static char *POINTER_TYPE = "pointer";
 static char *INT_TYPE = "int";
 static char *DOUBLE_TYPE = "double";
 static char *STRING_TYPE = "string";
+static char *ENTRY_TYPE = "entry";
 
+#define ERR_MESSAGE_LEN  256
+static char M_err_message[ERR_MESSAGE_LEN];
 
 //---------------------------------------------------------------------------
 // Returns 1 if c is whitespace; 0 otherwise
@@ -95,12 +97,22 @@ struct FMEntry *find_entry(struct FMState *state, const char *name) {
 
 
 //---------------------------------------------------------------------------
-// Creates an FMParameter of "pointer" type
+// Creates an FMParameter of "entry" type (pointer to a dictionary entry)
 //---------------------------------------------------------------------------
-struct FMParameter make_pointer_param(void * pointer) {
+struct FMParameter make_entry_param(struct FMEntry *entry) {
     struct FMParameter result;
-    result.type = POINTER_TYPE;
-    result.value.pointer_param = pointer;
+    result.type = ENTRY_TYPE;
+    result.value.entry_param = entry;
+    return result;
+}
+
+//---------------------------------------------------------------------------
+// Creates an FMParameter of "string" type
+//---------------------------------------------------------------------------
+struct FMParameter make_string_param(char *string) {
+    struct FMParameter result;
+    result.type = STRING_TYPE;
+    result.value.string_param = string;
     return result;
 }
 
@@ -112,34 +124,34 @@ struct FMParameter make_pointer_param(void * pointer) {
 //
 // Return value:
 //   *  0: Success
-//   * -1: No wordick
+//   * -1: No word
 //   * -2: Word is longer than MAX_WORD_LEN
 //---------------------------------------------------------------------------
-#define M_cur_char(state)    ((state)->input_string[(state)->input_index])
-
 static
 int read_word(struct FMState *state) {
+#define M_cur_char()    (state->input_string[state->input_index])
+    
     state->word_len = 0;                               // Reset word
 
     if (state->input_string == NULL) {                 // If no input string, no word
         return -1;
     }
-    while (M_cur_char(state) != NUL &&                 // Skip whitespace
-           is_whitespace(M_cur_char(state))) {
+    while (M_cur_char() != NUL &&                      // Skip whitespace
+           is_whitespace(M_cur_char())) {
         state->input_index++;
     }
-    if (M_cur_char(state) == NUL) {                    // If at end of string, no word
+    if (M_cur_char() == NUL) {                         // If at end of string, no word
         return -1;
     }
 
     // Copy word into buffer
     while(state->word_len < MAX_WORD_LEN) {
-        if (is_whitespace(M_cur_char(state))) {        // Stop when hit whitespace...
+        if (is_whitespace(M_cur_char())) {             // Stop when hit whitespace...
             state->input_index++;                      // ...but advance past whitespace char first
             break;
         }
 
-        if (M_cur_char(state) == NUL) {                // Stop when hit EOS
+        if (M_cur_char() == NUL) {                     // Stop when hit EOS
             break;
         }
 
@@ -149,7 +161,7 @@ int read_word(struct FMState *state) {
         }
 
         state->word_buffer[state->word_len++] =        // Store next character
-            M_cur_char(state);
+            M_cur_char();
 
         state->input_index++;                          // Go to next char in input
     }
@@ -162,29 +174,38 @@ int read_word(struct FMState *state) {
 //---------------------------------------------------------------------------
 // Pushes value onto forth stack
 //
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
 // NOTE: If stack is full, this aborts
 //---------------------------------------------------------------------------
 static
-void fs_push(struct FMState *state, struct FMParameter value) {
+int fs_push(struct FMState *state, struct FMParameter value) {
     if (state->stack_top == MAX_STACK - 1) {           // Abort if stack is full
         fm_abort(state, "Stack overflow", __FILE__, __LINE__);
-        return;
+        return -1;
     }
 
     state->stack[++state->stack_top] = value;
+    return 0;
 }
 
 
 //---------------------------------------------------------------------------
 // Drops top of stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
 //---------------------------------------------------------------------------
-#define M_top(state)   &((state)->stack[(state)->stack_top])
-
 static
-void fs_drop(struct FMState *state) {
+int fs_drop(struct FMState *state) {
+#define M_top(state)   &((state)->stack[(state)->stack_top])
+    
     if (state->stack_top == -1) {                      // Abort if stack is empty
         fm_abort(state, "Stack underflow", __FILE__, __LINE__);
-        return;
+        return -1;
     }
 
     // If top of stack is a string, then free it
@@ -195,6 +216,48 @@ void fs_drop(struct FMState *state) {
     }
 
     state->stack_top--;                                // Drop the item
+    return 0;
+}
+
+
+//---------------------------------------------------------------------------
+// Loads a param with an entry value
+//---------------------------------------------------------------------------
+static
+void load_entry_param(struct FMEntry *entry_val, struct FMParameter *param) {
+    param->type = ENTRY_TYPE;
+    param->value.entry_param = entry_val;
+}
+
+
+//---------------------------------------------------------------------------
+// Tries to convert a word into a number param.
+//
+// Return value:
+//   *  0: Success
+//   * -1: Unable to parse word as a number
+//
+// This updates the fields in param.
+//---------------------------------------------------------------------------
+static
+int load_number_param(const char *word, struct FMParameter *param) {
+    double double_val;
+    int int_val;
+
+    int result = -1;
+    if (sscanf(word, "%lf", &double_val) == 1) {       // If was a number
+        int_val = double_val;                          // Get int truncation
+        if (double_val - (double) int_val == 0) {      // If num is int...
+            param->type = INT_TYPE;                    // store value as int
+            param->value.int_param = int_val;
+        }
+        else {
+            param->type = DOUBLE_TYPE;                 // Otherwise, store value as double
+            param->value.double_param = double_val;
+        }
+        result = 0;
+    }
+    return result;
 }
 
 
@@ -208,9 +271,7 @@ void fs_drop(struct FMState *state) {
 static
 int interpret_word(struct FMState *state, const char *word) {
     int result = 0;
-    double double_val;
-    int int_val;
-    
+
     struct FMEntry *entry = find_entry(state, word);
 
     // Handle an entry
@@ -221,17 +282,13 @@ int interpret_word(struct FMState *state, const char *word) {
 
     // Handle a number
     struct FMParameter value;
-    if (sscanf(word, "%lf", &double_val) == 1) {       // If was a number
-        int_val = double_val;                          // Get int truncation
-        if (double_val - (double) int_val == 0) {      // If num is int...
-            value.type = INT_TYPE;                     // store value as int
-            value.value.int_param = int_val;
-        }
-        else {
-            value.type = DOUBLE_TYPE;                  // Otherwise, store value as double
-            value.value.double_param = double_val;
-        }
+    if (load_number_param(word, &value) == 0) {
         fs_push(state, value);                         // Push number onto stack
+        result = 0;
+    }
+    else {
+        // TODO: Finish this
+        result = -1;                                   // Invalid
     }
 
     return result;
@@ -257,67 +314,256 @@ int interpret_next_word(struct FMState *state) {
 
 //---------------------------------------------------------------------------
 // Do nothing
+//
+// Return value:
+//   *  0: Success
 //---------------------------------------------------------------------------
-void nop_code(struct FMState *state, struct FMEntry *entry) {
+int nop_code(struct FMState *state, struct FMEntry *entry) {
     printf("NOP\n");
+    return 0;
 }
 
 
 //---------------------------------------------------------------------------
 // Create a string and put it on the stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
 //---------------------------------------------------------------------------
 static
-void dot_quote_code(struct FMState *state, struct FMEntry *entry) {
-    int start_index = state->input_index;
-    int cur_index = start_index;
-    char cur_char;
-    char *new_string;
-    size_t string_len;
-    struct FMParameter value;
+int dot_quote_code(struct FMState *state, struct FMEntry *entry) {
+    int start_index = state->input_index;              // Start of string
+    int cur_index = start_index;                       // Index of char we're looking at
+    char cur_char;                                     // Holds char we're looking at
+    size_t string_len;                                 // Size of string to allocate
+    char *new_string;                                  // Points to newly allocated string
 
     // Search for ending '"'
     while(1) {
-        cur_char = state->input_string[cur_index];
-        if (cur_char == '"') {                         // If found end quote, break out of loop
-            state->input_index = cur_index+1;          // Advance input to next char
-            break;
+        cur_char = state->input_string[cur_index];     // Look at current char
+        if (cur_char == '"') {                         // If it's a '"',
+            state->input_index = cur_index+1;          // go to next char,
+            break;                                     // and break out of loop
         }
-
-        if (cur_char == NUL) {                         // If reached end of string, abort
-            fm_abort(state, "Couldn't find end '\"'", __FILE__, __LINE__);
-            return;
+        if (cur_char == NUL) {                         // If reached end of string,
+            fm_abort(state, "Couldn't find end '\"'",  // abort,
+                     __FILE__, __LINE__);
+            return -1;                                 // and indicate abort.
         }
-
-        cur_index++;                                   // Go to next char in input
+        cur_index++;                                   // Go to next char
     }
 
-    // Allocate memory for string
-    string_len = cur_index - start_index;
-    if ((new_string=malloc(string_len+1)) == NULL) {   // need 1 for the NUL
-        fm_abort(state, "malloc failure",__FILE__, __LINE__);
-        return;
+    // Copy string and push onto stack
+    string_len = cur_index - start_index;              // Figure out length of string,
+    if ((new_string=malloc(string_len+1)) == NULL) {   // allocate some memory for it...
+        fm_abort(state, "malloc failure",
+                 __FILE__, __LINE__);                  // (on failure, abort
+        return -1;                                     // and indicate it)
     }
 
-    // Copy string from input to new string
-    strncpy(new_string, state->input_string + start_index, string_len);
-    new_string[string_len] = NUL;
+    strncpy(new_string, state->input_string + start_index,
+            string_len);                               // Copy string to new string,
+    new_string[string_len] = NUL;                      // and NUL terminate
 
-    // Package string into a value and push onto stack
-    value.type = STRING_TYPE;                          // New stack value is a string
-    value.value.string_param = new_string;             // This is its pointer
-    fs_push(state, value);                             // Push onto stack
+    
+    return fs_push(state,
+                   make_string_param(new_string));     // Put string in a param and push onto stack
 }
 
 
 
 //---------------------------------------------------------------------------
 // Drops top of stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
 //---------------------------------------------------------------------------
 static
-void dot_drop_code(struct FMState *state, struct FMEntry *entry) {
-    fs_drop(state);
+int drop_code(struct FMState *state, struct FMEntry *entry) {
+    return fs_drop(state);
 }
 
+
+//---------------------------------------------------------------------------
+// Executes a colon definition
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+static
+int execute_definition_code(struct FMState *state, struct FMEntry *entry) {
+    printf("TODO: Implement execute_colon_definition\n");
+    return 0;
+}
+
+
+
+//---------------------------------------------------------------------------
+// Exits a definition
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+static
+int exit_code(struct FMState *state, struct FMEntry *entry) {
+    // TODO: This should pop an address off the return stack
+    printf("TODO: Implement exit code\n");
+    return 0;
+}
+
+
+//---------------------------------------------------------------------------
+// Frees all memory in param
+//
+// NOTE: Only strings are allocated
+//---------------------------------------------------------------------------
+static
+void delete_param(struct FMParameter *param) {
+    if (param->type == STRING_TYPE) {
+        free(param->value.string_param);
+    }
+}
+
+//---------------------------------------------------------------------------
+// Frees all memory in entry
+//---------------------------------------------------------------------------
+static
+void delete_entry(struct FMEntry *entry) {
+    for (int i=0; i < entry->num_params; i++) {        // Free any allocated params
+        delete_param(&entry->params[i]);
+    }
+    free(entry->params);                               // Free allocated params array
+}
+
+
+//---------------------------------------------------------------------------
+// Compiles next word in a colon definition to |entry->params|
+//
+// Args:
+//   * state:  Forth machine state
+//   * entry:  Entry whose definition is being compiled
+//
+// Return value:
+//   *  0: Successfully compiled word
+//   *  1: Compiled the ";" word, meaning the definition is complete
+//   * -1: Aborted
+//
+// NOTE: This updates entry->num_params on success
+// ALSO: We assume that entry->params has enough space for one more entry
+//---------------------------------------------------------------------------
+static
+int compile_word(struct FMState *state, struct FMEntry *entry) {
+    if (read_word(state) != 0) {                      // If no next word, return -1
+        fm_abort(state, "Incomplete definition",
+                 __FILE__, __LINE__);
+        return -1;
+    }
+
+    struct FMParameter *param_p =
+        entry->params + entry->num_params;            // Compiled word goes here
+
+    struct FMEntry *word_entry =
+        find_entry(state, state->word_buffer);        // Look up word entry
+
+    int result = 0;
+
+    if (word_entry && word_entry->immediate) {        // If an immediate word, execute it
+        return word_entry->code(state, word_entry);
+    }
+    else if (word_entry) {                             // If it's just a word,
+        load_entry_param(word_entry, param_p);         // store it in the next parameter,
+        entry->num_params++;                           // increment the param count,
+        result = 0;                                    // and indicate successful compile
+        
+        if (word_entry->code == exit_code) {           // If the entry is a "exit" (i.e., ";"),
+            result = 1;                                // indicate definition is complete
+        }
+    }
+    else {                                             // If not an entry,
+        if (load_number_param(state->word_buffer, param_p) == 0) {
+                                                       // try word as a number.
+            entry->num_params++;                       // On success, increment param count
+            result = 0;                                // and indicate that word was compiled.
+        }
+        else {                                         // Otherwise, abort compilation
+            snprintf(M_err_message, ERR_MESSAGE_LEN,
+                     "%s '%s'", "Unable to compile:",state->word_buffer);
+            fm_abort(state, M_err_message, __FILE__, __LINE__);
+            return -1;
+        }
+    }
+
+    return result;
+}
+
+
+//---------------------------------------------------------------------------
+// Compiles a definition
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+static
+int colon_code(struct FMState *state, struct FMEntry *entry) {
+#define M_delete_entry()   delete_entry(cur_entry); \
+                           state->last_entry_index--;
+
+#define NUM_ALLOCATED_PARAMS   10
+    
+    if (FMCreateEntry(state) != 0) {
+        fm_abort(state, "Unable to create entry for colon definition", __FILE__, __LINE__);
+        return -1;
+    }
+    struct FMEntry *cur_entry = M_cur_entry(state);    // Get a pointer to newly created entry
+    cur_entry->code = execute_definition_code;
+
+    // Compile each word of the definition
+    int params_left = 0;
+    size_t param_size = sizeof(struct FMParameter);
+
+    while(1) {
+        if (params_left == 0) {                        // If no more space for parameters...
+            cur_entry->params = realloc(cur_entry->params,
+                                        param_size * (cur_entry->num_params + NUM_ALLOCATED_PARAMS));
+                                                       // ...allocate space for more parameters
+
+            if (cur_entry->params == NULL) {           // If something went wrong with alloc,
+                fm_abort(state, "Unable to realloc",
+                         __FILE__, __LINE__);          // abort,
+                M_delete_entry();                      // delete the entry we're working on,
+                return -1;                             // and indicate abort
+            }
+            params_left = NUM_ALLOCATED_PARAMS;
+        }
+
+        // Have space to add another parameter
+        int status = compile_word(state, cur_entry);   // Compile next word into entry's params
+
+        if (status == 1) {                             // If last compiled word was an exit, we're done.
+            break;
+        }
+        if (status == -1) {                            // If something went wrong with compile,
+            M_delete_entry();                          // delete the entry we're working on,
+            return -1;                                 // and indicate an abort
+        }
+
+        params_left--;                                 // Otherwise, we've just used a parameter slot
+    }
+
+    // Resize memory to number of params
+    if ((cur_entry->params = realloc(cur_entry->params, param_size * cur_entry->num_params)) == NULL) {
+        fm_abort(state, "Unable to realloc", __FILE__, __LINE__);
+        M_delete_entry();
+        return -1;
+    }
+
+    return 0;
+}
 
 
 //---------------------------------------------------------------------------
@@ -342,8 +588,10 @@ void define_word(struct FMState *state, const char* name, int immediate, code_p 
 //---------------------------------------------------------------------------
 static
 void add_builtin_words(struct FMState *state) {
-    define_word(state, ".\"", 0, dot_quote_code);
-    define_word(state, "DROP", 0, dot_drop_code);
+    define_word(state, ".\"", 1, dot_quote_code);
+    define_word(state, "DROP", 0, drop_code);
+    define_word(state, ":", 0, colon_code);
+    define_word(state, ";", 0, exit_code);
 }
 
 
@@ -404,6 +652,9 @@ int FMCreateEntry(struct FMState *state) {
     cur_entry->immediate = 0;                          // Default to not "immediate"
     cur_entry->code = nop_code;                        // Default code to do nothing
 
+    cur_entry->params = NULL;
+    cur_entry->num_params = 0;                         // Start with no params
+
     return 0;
 }
 
@@ -420,7 +671,7 @@ void FMTick(struct FMState *state) {
     }
 
     struct FMEntry *entry = find_entry(state, state->word_buffer);
-    struct FMParameter result = make_pointer_param((void *) entry);
+    struct FMParameter result = make_entry_param(entry);
     fs_push(state, result);
 }
 
