@@ -5,7 +5,7 @@
 - [x] Study colon definitions in jsforth
 - [x] Create ":" word and ";" word
 - [x] Create a compile function
-- [ ] Decide on use of pseudo-entries for numbers
+- [x] Decide on use of pseudo-entries for numbers
 
 
 

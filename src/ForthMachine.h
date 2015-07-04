@@ -45,6 +45,7 @@ struct FMEntry {
     struct FMParameter *params;                   // Param array for entry
     int num_params;                               // Number of parameters in params
     int immediate;                                // non-zero if "immediate" word
+    int pseudo_entry;                             // non-zero if a pseudo_entry
 };
 
 //---------------------------------------------------------------------------
@@ -57,6 +58,8 @@ typedef struct FMParameter stack_val;             // Stack values are the same a
 
 struct FMState {
     char type[TYPE_LEN];                          // Type of forth machine (i.e., vocabulary)
+
+    int compile;                                  // 1 if compiling a definition; 0 otherwise
 
     struct FMEntry dictionary[MAX_ENTRIES];       // Forth dictionary
     int last_entry_index;                         // Index of most recently created entry

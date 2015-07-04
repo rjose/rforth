@@ -51,6 +51,7 @@ void clear_state(struct FMState *state) {
     state->input_string = NULL;                        // No input has been set
     state->input_index = 0;                            // Input index is at the beginning
     state->i_pointer = NULL;                           // No instruction to execute next
+    state->compile = 0;                                // Not in compile mode
 }
 
 
@@ -333,42 +334,52 @@ int nop_code(struct FMState *state, struct FMEntry *entry) {
 //---------------------------------------------------------------------------
 static
 int dot_quote_code(struct FMState *state, struct FMEntry *entry) {
-    int start_index = state->input_index;              // Start of string
-    int cur_index = start_index;                       // Index of char we're looking at
-    char cur_char;                                     // Holds char we're looking at
-    size_t string_len;                                 // Size of string to allocate
-    char *new_string;                                  // Points to newly allocated string
+    int start_index = state->input_index;                   // Start of string
+    int cur_index = start_index;                            // Index of char we're looking at
+    char cur_char;                                          // Holds char we're looking at
+    size_t string_len;                                      // Size of string to allocate
+    char *new_string;                                       // Points to newly allocated string
 
     // Search for ending '"'
     while(1) {
-        cur_char = state->input_string[cur_index];     // Look at current char
-        if (cur_char == '"') {                         // If it's a '"',
-            state->input_index = cur_index+1;          // go to next char,
-            break;                                     // and break out of loop
+        cur_char = state->input_string[cur_index];          // Look at current char
+        if (cur_char == '"') {                              // If it's a '"',
+            state->input_index = cur_index+1;               // go to next char,
+            break;                                          // and break out of loop
         }
-        if (cur_char == NUL) {                         // If reached end of string,
-            fm_abort(state, "Couldn't find end '\"'",  // abort,
+        if (cur_char == NUL) {                              // If reached end of string,
+            fm_abort(state, "Couldn't find end '\"'",       // abort,
                      __FILE__, __LINE__);
-            return -1;                                 // and indicate abort.
+            return -1;                                      // and indicate abort.
         }
-        cur_index++;                                   // Go to next char
+        cur_index++;                                        // Go to next char
     }
 
-    // Copy string and push onto stack
-    string_len = cur_index - start_index;              // Figure out length of string,
-    if ((new_string=malloc(string_len+1)) == NULL) {   // allocate some memory for it...
+    // Copy string to a freshly allocated string
+    string_len = cur_index - start_index;                   // Figure out length of string,
+    if ((new_string=malloc(string_len+1)) == NULL) {        // allocate some memory for it...
         fm_abort(state, "malloc failure",
-                 __FILE__, __LINE__);                  // (on failure, abort
-        return -1;                                     // and indicate it)
+                 __FILE__, __LINE__);                       // (on failure, abort
+        return -1;                                          // and indicate it)
     }
-
     strncpy(new_string, state->input_string + start_index,
-            string_len);                               // Copy string to new string,
-    new_string[string_len] = NUL;                      // and NUL terminate
+            string_len);                                    // Copy string to new string,
+    new_string[string_len] = NUL;                           // and NUL terminate
 
-    
-    return fs_push(state,
-                   make_string_param(new_string));     // Put string in a param and push onto stack
+    struct FMParameter string_param =
+        make_string_param(new_string);                      // Package string into a param
+
+    int result = 0;
+    if (state->compile == 1) {                              // If in compile mode,
+        entry->params[entry->num_params] = string_param;    // copy string param to entry
+        entry->num_params++;                                // and advance param count
+        result = 0;
+    }
+    else {
+        result = fs_push(state,
+                         make_string_param(new_string));    // Otherwise, push param onto stack
+    }
+    return result;
 }
 
 
@@ -437,6 +448,7 @@ void delete_entry(struct FMEntry *entry) {
         delete_param(&entry->params[i]);
     }
     free(entry->params);                               // Free allocated params array
+    // TODO: If pseudo_entry, delete entry, too.
 }
 
 
@@ -457,10 +469,14 @@ void delete_entry(struct FMEntry *entry) {
 //---------------------------------------------------------------------------
 static
 int compile_word(struct FMState *state, struct FMEntry *entry) {
+#define  RETURN_FROM_COMPILE(status)   state->compile = 0; return status;
+
+    state->compile = 1;                               // Put forth machine in compile mode
+
     if (read_word(state) != 0) {                      // If no next word, return -1
         fm_abort(state, "Incomplete definition",
                  __FILE__, __LINE__);
-        return -1;
+        RETURN_FROM_COMPILE(-1);
     }
 
     struct FMParameter *param_p =
@@ -471,8 +487,9 @@ int compile_word(struct FMState *state, struct FMEntry *entry) {
 
     int result = 0;
 
-    if (word_entry && word_entry->immediate) {        // If an immediate word, execute it
-        return word_entry->code(state, word_entry);
+    if (word_entry && word_entry->immediate) {        // If an immediate word,
+        result = word_entry->code(state, entry);      // execute it with entry being compiled
+        RETURN_FROM_COMPILE(result);
     }
     else if (word_entry) {                             // If it's just a word,
         load_entry_param(word_entry, param_p);         // store it in the next parameter,
@@ -483,9 +500,8 @@ int compile_word(struct FMState *state, struct FMEntry *entry) {
             result = 1;                                // indicate definition is complete
         }
     }
-    else {                                             // If not an entry,
+    else {                                             // If not an entry, try word as number
         if (load_number_param(state->word_buffer, param_p) == 0) {
-                                                       // try word as a number.
             entry->num_params++;                       // On success, increment param count
             result = 0;                                // and indicate that word was compiled.
         }
@@ -493,11 +509,11 @@ int compile_word(struct FMState *state, struct FMEntry *entry) {
             snprintf(M_err_message, ERR_MESSAGE_LEN,
                      "%s '%s'", "Unable to compile:",state->word_buffer);
             fm_abort(state, M_err_message, __FILE__, __LINE__);
-            return -1;
+            RETURN_FROM_COMPILE(-1);
         }
     }
 
-    return result;
+    RETURN_FROM_COMPILE(result);
 }
 
 
@@ -647,9 +663,15 @@ int FMCreateEntry(struct FMState *state) {
     state->last_entry_index++;                         // Go to next empty entry
     struct FMEntry *cur_entry = M_cur_entry(state);
 
+    int name_len = NAME_LEN;                           // Default name_len to max name length
+    if (state->word_len < NAME_LEN) {                  // If length is actually smaller,
+        name_len = state->word_len;                    // use that instead.
+    }
+
     strncpy(cur_entry->name,
-            state->word_buffer, state->word_len);      // Entry name is last word read
+            state->word_buffer, name_len);             // Entry name is last word read
     cur_entry->immediate = 0;                          // Default to not "immediate"
+    cur_entry->pseudo_entry = 0;                       // Entries in dictionary aren't pseudo entries
     cur_entry->code = nop_code;                        // Default code to do nothing
 
     cur_entry->params = NULL;
