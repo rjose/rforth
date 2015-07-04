@@ -277,8 +277,8 @@ int interpret_word(struct FMState *state, const char *word) {
 
     // Handle an entry
     if (entry != NULL) {                               // If entry in dictionary...
-        (entry->code)(state, entry);                   // execute its code
-        return 0;
+        result = (entry->code)(state, entry);          // execute its code
+        return result;
     }
 
     // Handle a number
@@ -400,13 +400,41 @@ int drop_code(struct FMState *state, struct FMEntry *entry) {
 //---------------------------------------------------------------------------
 // Executes a colon definition
 //
+// Args:
+//   * entry: colon definition to execute
+//
 // Return value:
 //   *  0: Success
 //   * -1: Abort
 //---------------------------------------------------------------------------
 static
 int execute_definition_code(struct FMState *state, struct FMEntry *entry) {
-    printf("TODO: Implement execute_colon_definition\n");
+    state->i_pointer = entry->params;                       // Start at first param of entry
+
+    while(state->i_pointer) {                               // While next instruction
+        if (state->i_pointer->type == INT_TYPE ||
+            state->i_pointer->type == DOUBLE_TYPE) {        // If an int or double,
+            fs_push(state, *state->i_pointer);              // just push param onto stack,
+            state->i_pointer++;                             // and go to next instruction
+        }
+        else if (state->i_pointer->type == STRING_TYPE) {   // If a string,
+            printf("TODO: Handle strings\n");               // TODO: Make a copy and push that
+            state->i_pointer++;                             // and go to next instruction
+        }
+        else if (state->i_pointer->type == ENTRY_TYPE) {    // If an entry,
+            printf("TODO: Handle entries\n");               // NOTE: Entry will update i_pointer
+            // TODO: Remove this
+            state->i_pointer = NULL;
+        }
+        else {
+            snprintf(M_err_message, ERR_MESSAGE_LEN,
+                     "Unknown param type: %s",
+                     state->i_pointer->type);               // Construct error message,
+            fm_abort(state,
+                     M_err_message,__FILE__, __LINE__);     // abort,
+            return -1;                                      // and indicate abort
+        }
+    }
     return 0;
 }
 

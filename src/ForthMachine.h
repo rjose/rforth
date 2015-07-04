@@ -59,7 +59,7 @@ typedef struct FMParameter stack_val;             // Stack values are the same a
 struct FMState {
     char type[TYPE_LEN];                          // Type of forth machine (i.e., vocabulary)
 
-    int compile;                                  // 1 if compiling a definition; 0 otherwise
+    int compile;                                  // 1 if compiling a definition
 
     struct FMEntry dictionary[MAX_ENTRIES];       // Forth dictionary
     int last_entry_index;                         // Index of most recently created entry
