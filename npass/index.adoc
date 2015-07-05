@@ -2,6 +2,7 @@
 
 
 * [ ] Pass 9: Execute a colon definition
+
 * [ ] Pass : Store data in variable/constant
 * [ ] Pass : Fetch data from variable/constant
 * [ ] Pass : Implement IF, THEN, ELSE
