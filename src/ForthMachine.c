@@ -413,7 +413,7 @@ int dot_quote_code(struct FMState *state, struct FMEntry *entry) {
 
     // Copy string to a freshly allocated string
     string_len = cur_index - start_index;                   // Figure out length of string,
-    if ((new_string=malloc(string_len+1)) == NULL) {        // allocate some memory for it...
+    if ((new_string = malloc(string_len+1)) == NULL) {      // allocate some memory for it...
         fm_abort(state, "malloc failure",
                  __FILE__, __LINE__);                       // (on failure, abort
         return -1;                                          // and indicate it)
@@ -676,6 +676,39 @@ int colon_code(struct FMState *state, struct FMEntry *entry) {
 
 
 //---------------------------------------------------------------------------
+// Clones a string parameter from src and stores in dest
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+int clone_string_param(struct FMState *state, struct FMParameter *src, struct FMParameter *dest) {
+    if (src->type != STRING_PARAM) {                        // If not a STRING_PARAM..
+        fm_abort(state, "Can only clone string params",
+                 __FILE__, __LINE__);                       // ..abort
+        return -1;
+    }
+
+    // Copy string
+    size_t len = strlen(src->value.string_param);           // Get string length,
+    char *new_string;
+    if ((new_string = malloc(len+1)) == NULL) {             // allocate space for it,
+        fm_abort(state, "malloc failure",                   // (aborting on failure)
+                 __FILE__, __LINE__);
+        return -1;
+    }
+    strncpy(new_string, src->value.string_param, len);      // Copy string
+    new_string[len] = NUL;                                  // (NUL terminating it, too)
+
+    // Store in destination
+    dest->type = STRING_PARAM;
+    dest->value.string_param = new_string;
+
+    return 0;                                               // Success
+}
+
+
+//---------------------------------------------------------------------------
 // If next instruction, execute it
 //
 // Return value:
@@ -688,14 +721,23 @@ int step_colon_def(struct FMState *state) {
     }
     struct FMEntry *def_entry = state->next_instruction.entry;
     struct FMParameter *cur_instruction = &def_entry->params[state->next_instruction.index];
+    struct FMParameter tmp_param;                           // Used in case we need to clone a param
 
     if (cur_instruction->type == INT_PARAM ||
         cur_instruction->type == DOUBLE_PARAM) {            // If an int or double,
-        fs_push(state, *cur_instruction);                   // just push param onto stack,
+        if (fs_push(state, *cur_instruction) < 0) {         // push param itself onto stack,
+            return 0;
+        }
         state->next_instruction.index++;                    // and go to next instruction.
     }
-    else if (cur_instruction->type == STRING_PARAM) {       // If a string,
-        printf("TODO: Handle strings\n");                   // TODO: Make a copy and push that
+    else if (cur_instruction->type == STRING_PARAM) {       // If a string param,
+        if (clone_string_param(state, cur_instruction,
+                               &tmp_param) == -1) {         // clone it,
+            return 0;
+        }
+        if (fs_push(state, tmp_param) < 0) {                // push clone onto stack,
+            return 0;
+        }
         state->next_instruction.index++;                    // and go to next instruction.
     }
     else if (cur_instruction->type == ENTRY_PARAM) {        // If an entry,

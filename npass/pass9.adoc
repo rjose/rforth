@@ -1,0 +1,23 @@
+= Pass 9: Execute a colon definition
+
+
+== Tasks
+- [x] Push numbers onto stack
+- [x] Push strings onto stack
+- [x] Execute entries
+- [x] Handle aborts
+- [x] Advance to next instruction
+- [x] Handle exit
+- [x] Handle execution of colon def from colon def
+- [x] Handle yield back to event loop
+
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015
