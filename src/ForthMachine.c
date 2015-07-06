@@ -200,9 +200,21 @@ struct FMEntry *find_entry(struct FMState *state, const char *name) {
 // Return value:
 //   *  0: Success
 //---------------------------------------------------------------------------
+static
 int nop_code(struct FMState *state, struct FMEntry *entry) {
     printf("NOP\n");
     return 0;
+}
+
+
+//---------------------------------------------------------------------------
+// Creates an FMParameter of "string" type
+//---------------------------------------------------------------------------
+struct FMParameter make_string_param(char *string) {
+    struct FMParameter result;
+    result.type = STRING_PARAM;
+    result.value.string_param = string;
+    return result;
 }
 
 
@@ -283,6 +295,35 @@ int fs_push(struct FMState *state, struct FMParameter value) {
 
 
 //---------------------------------------------------------------------------
+// Drops top of stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+static
+int fs_drop(struct FMState *state) {
+#define M_top(state)   &((state)->stack[(state)->stack_top])
+    
+    if (state->stack_top == -1) {                      // Abort if stack is empty
+        fm_abort(state, "Stack underflow", __FILE__, __LINE__);
+        return -1;
+    }
+
+    // If top of stack is a string, then free it
+    struct FMParameter *top = M_top(state);
+    if (top->type == STRING_PARAM) {
+        free(top->value.string_param);                 // Free the string memory
+        top->value.string_param = NULL;                // NULL out pointer
+    }
+
+    state->stack_top--;                                // Drop the item
+    return 0;
+}
+
+
+
+//---------------------------------------------------------------------------
 // Pushes value onto return stack
 //
 // Return value:
@@ -324,6 +365,77 @@ int rs_pop(struct FMState *state, struct FMInstruction *res) {
     *res = state->return_stack[state->return_stack_top];    // Otherwise, set res to top of return stack,
     state->return_stack_top--;                              // drop the top of return stack,
     return 0;                                               // and indicate success
+}
+
+
+//---------------------------------------------------------------------------
+// Drops top of stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+static
+int drop_code(struct FMState *state, struct FMEntry *entry) {
+    return fs_drop(state);
+}
+
+
+//---------------------------------------------------------------------------
+// Create a string and put it on the stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+static
+int dot_quote_code(struct FMState *state, struct FMEntry *entry) {
+    int start_index = state->input_index;                   // Start of string
+    int cur_index = start_index;                            // Index of char we're looking at
+    char cur_char;                                          // Holds char we're looking at
+    size_t string_len;                                      // Size of string to allocate
+    char *new_string;                                       // Points to newly allocated string
+
+    // Search for ending '"'
+    while(1) {
+        cur_char = state->input_string[cur_index];          // Look at current char
+        if (cur_char == '"') {                              // If it's a '"',
+            state->input_index = cur_index+1;               // advance input_index past it
+            break;                                          // and break out of loop
+        }
+        if (cur_char == NUL) {                              // If reached end of string,
+            fm_abort(state, "Couldn't find end '\"'",       // abort,
+                     __FILE__, __LINE__);
+            return -1;                                      // and indicate abort.
+        }
+        cur_index++;                                        // Go to next char
+    }
+
+    // Copy string to a freshly allocated string
+    string_len = cur_index - start_index;                   // Figure out length of string,
+    if ((new_string=malloc(string_len+1)) == NULL) {        // allocate some memory for it...
+        fm_abort(state, "malloc failure",
+                 __FILE__, __LINE__);                       // (on failure, abort
+        return -1;                                          // and indicate it)
+    }
+    strncpy(new_string, state->input_string + start_index,
+            string_len);                                    // Copy string to new string,
+    new_string[string_len] = NUL;                           // and NUL terminate
+
+    struct FMParameter string_param =
+        make_string_param(new_string);                      // Package string into a param
+
+    int result = 0;
+    if (state->compile == 1) {                              // If in compile mode,
+        entry->params[entry->num_params] = string_param;    // copy string param to entry
+        entry->num_params++;                                // and advance param count
+        result = 0;
+    }
+    else {
+        result = fs_push(state,
+                         make_string_param(new_string));    // Otherwise, push param onto stack
+    }
+    return result;
 }
 
 
@@ -588,9 +700,9 @@ int step_colon_def(struct FMState *state) {
     }
     else if (cur_instruction->type == ENTRY_PARAM) {        // If an entry,
         state->next_instruction.index++;                    // advance to next instruction,
-        return cur_instruction->value.entry_param->
-            code(state,
-                 cur_instruction->value.entry_param);       // and then execute entry's code.
+        struct FMEntry *word =
+            cur_instruction->value.entry_param;             // Get pointer to instruction's word,
+        return (word->code(state, word) == 0);              // and execute, returning 1 if OK
     }
     else {
         snprintf(M_err_message, ERR_MESSAGE_LEN,
@@ -612,11 +724,8 @@ static
 void add_builtin_words(struct FMState *state) {
     define_word(state, ":", 0, colon_code);
     define_word(state, ";", 0, exit_code);
-
-    /*
     define_word(state, ".\"", 1, dot_quote_code);
     define_word(state, "DROP", 0, drop_code);
-    */
 }
 
 

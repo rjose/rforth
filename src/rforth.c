@@ -255,13 +255,22 @@ void send_responses() {
 
 
 //------------------------------------------------------------------------------
+// Runs a string using forth machine
+//------------------------------------------------------------------------------
+void run_string(struct FMState *machine, const char *input) {
+    FM_SetInput(machine, input);                            // Set input to machine
+    while (FM_Step(machine)) {};                            // Step through input until done
+}
+
+
+//------------------------------------------------------------------------------
 // Main function
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
     struct FMState fm1 = FM_CreateState();
 
-    FM_SetInput(&fm1, ": ONE   1 ;  ONE");
-    while (FM_Step(&fm1)) {};
+    run_string(&fm1, ": ONE   1 ;  : TWO ONE ONE ;");
+    run_string(&fm1, "TWO");
 
     /*
     forth_machine forth_server = create_forth_server();
