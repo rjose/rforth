@@ -76,7 +76,7 @@ struct FMState {
 
     struct FMInstruction return_stack[MAX_RETURN_STACK];    // Forth return stack
     int return_stack_top;                                   // Index of top of return stack (-1 if empty)
-    struct FMInstruction *next_instruction;                 // Address of next instruction to execute
+    struct FMInstruction next_instruction;                  // Address of next instruction to execute
 };
 
 
