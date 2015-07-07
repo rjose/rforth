@@ -148,7 +148,7 @@ int read_word(struct FMState *state) {
     }
 
     // Copy word into buffer
-    while(state->word_len < MAX_WORD_LEN) {
+    while(state->word_len <= MAX_WORD_LEN) {
         if (is_whitespace(M_cur_char())) {                  // Stop if hit whitespace,
             state->input_index++;                           // but advance past whitespace char first
             break;
@@ -300,8 +300,9 @@ int fs_push(struct FMState *state, struct FMParameter value) {
 // Return value:
 //   *  0: Success
 //   * -1: Abort
+//
+// NOTE: Other forth machines use this
 //---------------------------------------------------------------------------
-static
 int fs_drop(struct FMState *state) {
 #define M_top(state)   &((state)->stack[(state)->stack_top])
     
@@ -365,19 +366,6 @@ int rs_pop(struct FMState *state, struct FMInstruction *res) {
     *res = state->return_stack[state->return_stack_top];    // Otherwise, set res to top of return stack,
     state->return_stack_top--;                              // drop the top of return stack,
     return 0;                                               // and indicate success
-}
-
-
-//---------------------------------------------------------------------------
-// Drops top of stack
-//
-// Return value:
-//   *  0: Success
-//   * -1: Abort
-//---------------------------------------------------------------------------
-static
-int drop_code(struct FMState *state, struct FMEntry *entry) {
-    return fs_drop(state);
 }
 
 
@@ -591,8 +579,9 @@ int interpret_next_word(struct FMState *state) {
 
 //---------------------------------------------------------------------------
 // Defines a new word in the dictionary
+//
+// NOTE: Other forth machines use this function, too.
 //---------------------------------------------------------------------------
-static
 void define_word(struct FMState *state, const char* name, int immediate, code_p code) {
     if (M_is_dictionary_full(state)) {
         fm_abort(state, "Dictionary full", __FILE__, __LINE__);
@@ -767,7 +756,6 @@ void add_builtin_words(struct FMState *state) {
     define_word(state, ":", 0, colon_code);
     define_word(state, ";", 0, exit_code);
     define_word(state, ".\"", 1, dot_quote_code);
-    define_word(state, "DROP", 0, drop_code);
 }
 
 

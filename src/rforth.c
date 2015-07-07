@@ -11,7 +11,7 @@
 #include <fcntl.h>
 
 #include "defines.h"
-#include "ForthMachine.h"
+#include "GenericForthMachine.h"
 
 //------------------------------------------------------------------------------
 // Delays by specified number of ms
@@ -267,7 +267,7 @@ void run_string(struct FMState *machine, const char *input) {
 // Main function
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-    struct FMState fm1 = FM_CreateState();
+    struct FMState fm1 = CreateGenericFM();
 
     //run_string(&fm1, ": ONE   1 ;  : TWO ONE ONE ;");
     //run_string(&fm1, "TWO");

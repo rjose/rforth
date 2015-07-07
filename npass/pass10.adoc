@@ -1,0 +1,18 @@
+= Pass 10: Store data in variable/constant
+
+
+== Tasks
+- [ ] Create VARIABLE word
+- [ ] Create CONSTANT word
+- [ ] Create ! and @ words
+
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015
