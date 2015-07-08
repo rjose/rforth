@@ -1,6 +1,7 @@
 #include "GenericForthMachine.h"
 
 #include "Drop.h"
+#include "Variable.h"
 
 extern void define_word(struct FMState *state, const char* name, int immediate, code_p code);
 
@@ -8,8 +9,12 @@ extern void define_word(struct FMState *state, const char* name, int immediate, 
 // Creates a generic forth machine
 //---------------------------------------------------------------------------
 struct FMState CreateGenericFM() {
-    struct FMState result = FM_CreateState();               // Create base state
+    // Create base state
+    struct FMState result = FM_CreateState();
 
-    define_word(&result, "DROP", 0, Drop_code);             // Define generically useful words
+    // Define generically useful words
+    define_word(&result, "DROP", 0, Drop_code);
+    define_word(&result, "VARIABLE", 0, Variable_code);
+
     return result;
 }

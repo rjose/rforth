@@ -10,10 +10,10 @@
 //---------------------------------------------------------------------------
 static char *GENERIC_FM = "GENERIC";
 
-static char *INT_PARAM = "int";
-static char *DOUBLE_PARAM = "double";
-static char *STRING_PARAM = "string";
-static char *ENTRY_PARAM = "entry";
+char *INT_PARAM = "int";
+char *DOUBLE_PARAM = "double";
+char *STRING_PARAM = "string";
+char *ENTRY_PARAM = "entry";
 
 #define ERR_MESSAGE_LEN  256
 static char M_err_message[ERR_MESSAGE_LEN];
@@ -60,7 +60,6 @@ void clear_state(struct FMState *state) {
 //---------------------------------------------------------------------------
 // Prints message to STDERR and resets forth machine state
 //---------------------------------------------------------------------------
-static
 void fm_abort(struct FMState *state, const char *message, const char *file, int line) {
     fprintf(stderr, "ABORT: %s (at %s:%d)\n", message, file, line);
 
@@ -128,7 +127,6 @@ void load_entry_param(struct FMEntry *entry_val, struct FMParameter *param) {
 //   * -1: No word
 //   * -2: Word is longer than MAX_WORD_LEN
 //---------------------------------------------------------------------------
-static
 int read_word(struct FMState *state) {
 #define M_cur_char()    (state->input_string[state->input_index])
     
@@ -177,7 +175,6 @@ int read_word(struct FMState *state) {
 //
 // Returns pointer to entry or NULL if not found.
 //---------------------------------------------------------------------------
-static
 struct FMEntry *find_entry(struct FMState *state, const char *name) {
     int cur_index = state->last_entry_index;
 
@@ -225,7 +222,6 @@ struct FMParameter make_string_param(char *string) {
 //   *  0: Success
 //   * -2: Dictionary full
 //---------------------------------------------------------------------------
-static
 int create_entry(struct FMState *state, const char *name) {
     if (M_is_dictionary_full(state)) {                // If dictonary full, return -2
         return -2;
@@ -263,7 +259,6 @@ void delete_param(struct FMParameter *param) {
 //---------------------------------------------------------------------------
 // Frees all memory in entry
 //---------------------------------------------------------------------------
-static
 void delete_entry(struct FMEntry *entry) {
     for (int i=0; i < entry->num_params; i++) {        // Free any allocated params
         delete_param(&entry->params[i]);
@@ -282,7 +277,6 @@ void delete_entry(struct FMEntry *entry) {
 //
 // NOTE: If stack is full, this aborts
 //---------------------------------------------------------------------------
-static
 int fs_push(struct FMState *state, struct FMParameter value) {
     if (state->stack_top == MAX_STACK - 1) {           // Abort if stack is full
         fm_abort(state, "Stack overflow", __FILE__, __LINE__);
@@ -396,7 +390,7 @@ int dot_quote_code(struct FMState *state, struct FMEntry *entry) {
                      __FILE__, __LINE__);
             return -1;                                      // and indicate abort.
         }
-        cur_index++;                                        // Go to next char
+        cur_index++;                                        // Otherwise, go to next char
     }
 
     // Copy string to a freshly allocated string
@@ -506,7 +500,7 @@ int compile_word(struct FMState *state, struct FMEntry *entry) {
     }
     else if (word_entry) {                             // If it's just a word,
         load_entry_param(word_entry, param_p);         // store it in the next parameter,
-        entry->num_params++;                           // increment the param count,
+        entry->num_params++;                           //
         result = 0;                                    // and indicate successful compile
         
         if (word_entry->code == exit_code) {           // If the entry is an "exit" (i.e., ";"),
@@ -564,6 +558,7 @@ int interpret_next_word(struct FMState *state) {
     // Handle a number
     struct FMParameter value;
     if (load_number_param(word, &value) == 0) {
+        // TODO: Check return value
         fs_push(state, value);                              // Push number onto stack,
         return 1;                                           // and indicate success
     }
