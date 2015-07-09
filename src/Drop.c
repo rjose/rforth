@@ -1,6 +1,4 @@
-#include "Drop.h"
-
-extern int fs_drop(struct FMState *state);
+#include "FMCore.h"
 
 //---------------------------------------------------------------------------
 // Drops top of stack
@@ -9,6 +7,6 @@ extern int fs_drop(struct FMState *state);
 //   *  0: Success
 //   * -1: Abort
 //---------------------------------------------------------------------------
-int Drop_code(struct FMState *state, struct FMEntry *entry) {
-    return fs_drop(state);
+int DROP_code(struct FMState *state, struct FMEntry *entry) {
+    return FMC_drop(state);
 }

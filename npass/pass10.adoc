@@ -2,9 +2,10 @@
 
 
 == Tasks
-- [ ] Create VARIABLE word
-- [ ] Create CONSTANT word
+- [x] Create VARIABLE word
+- [ ] Reorganize code to create an FMTools.h file
 - [ ] Create ! and @ words
+- [ ] Create CONSTANT word
 
 
 

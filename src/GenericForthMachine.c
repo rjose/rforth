@@ -1,9 +1,9 @@
 #include "GenericForthMachine.h"
 
-#include "Drop.h"
-#include "Variable.h"
-
-extern void define_word(struct FMState *state, const char* name, int immediate, code_p code);
+// Declare code for words
+extern int DROP_code(struct FMState *state, struct FMEntry *entry);
+extern int VARIABLE_code(struct FMState *state, struct FMEntry *entry);
+extern int dot_quote_code(struct FMState *state, struct FMEntry *entry);
 
 //---------------------------------------------------------------------------
 // Creates a generic forth machine
@@ -13,8 +13,9 @@ struct FMState CreateGenericFM() {
     struct FMState result = FM_CreateState();
 
     // Define generically useful words
-    define_word(&result, "DROP", 0, Drop_code);
-    define_word(&result, "VARIABLE", 0, Variable_code);
+    FMC_define_word(&result, ".\"", 1, dot_quote_code);
+    FMC_define_word(&result, "DROP", 0, DROP_code);
+    FMC_define_word(&result, "VARIABLE", 0, VARIABLE_code);
 
     return result;
 }
