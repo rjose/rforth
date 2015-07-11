@@ -161,22 +161,26 @@ int FMC_create_entry(struct FMState *state, const char *name);
 //---------------------------------------------------------------------------
 void FMC_delete_param(struct FMParameter *param);
 
+//---------------------------------------------------------------------------
+// Sets value to NULL if memory for it was allocated
+//---------------------------------------------------------------------------
+void FMC_null_param(struct FMParameter *param);
+
+//---------------------------------------------------------------------------
+// Creates a copy of a parameter, allocating memory if needed
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+int FMC_copy_param(struct FMState *state, struct FMParameter *param, struct FMParameter *dest);
+
 
 //---------------------------------------------------------------------------
 // Frees all memory in entry
 //---------------------------------------------------------------------------
 void FMC_delete_entry(struct FMEntry *entry);
 
-
-// TODO: Consider making this a more generic function (like clone_parameter)
-//---------------------------------------------------------------------------
-// Clones a string parameter from src and stores in dest
-//
-// Return value:
-//   *  0: Success
-//   * -1: Abort
-//---------------------------------------------------------------------------
-int FMC_clone_string_param(struct FMState *state, struct FMParameter *src, struct FMParameter *dest);
 
 //---------------------------------------------------------------------------
 // Creates an FMParameter of "string" type
@@ -200,12 +204,14 @@ void FMC_clear_state(struct FMState *state);
 void FMC_define_word(struct FMState *state, const char* name, int immediate, code_p code);
 
 
+
 //================================================
 // Macros
 //================================================
 
 #define M_is_dictionary_full(state)   ((state)->last_entry_index >= MAX_ENTRIES - 1)
 #define M_last_entry(state)   (&((state)->dictionary[(state)->last_entry_index]))
+
 
 
 #endif

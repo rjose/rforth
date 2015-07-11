@@ -336,21 +336,16 @@ int step_colon_def(struct FMState *state) {
     struct FMParameter tmp_param;                           // Used in case we need to clone a param
 
     if (cur_instruction->type == INT_PARAM ||
-        cur_instruction->type == DOUBLE_PARAM) {            // If an int or double,
-        if (FMC_push(state, *cur_instruction) < 0) {         // push param itself onto stack,
+        cur_instruction->type == DOUBLE_PARAM ||
+        cur_instruction->type == STRING_PARAM) {            // If an int, double, or string..
+        if (FMC_copy_param(state, cur_instruction,
+                           &tmp_param) == -1) {             // ..copy param,
             return 0;
         }
-        state->next_instruction.index++;                    // and go to next instruction.
-    }
-    else if (cur_instruction->type == STRING_PARAM) {       // If a string param,
-        if (FMC_clone_string_param(state, cur_instruction,
-                               &tmp_param) == -1) {         // clone it,
+        if (FMC_push(state, tmp_param) < 0) {               // and push it onto the stack
             return 0;
         }
-        if (FMC_push(state, tmp_param) < 0) {                // push clone onto stack,
-            return 0;
-        }
-        state->next_instruction.index++;                    // and go to next instruction.
+        state->next_instruction.index++;                    // and then go to next instruction.
     }
     else if (cur_instruction->type == ENTRY_PARAM) {        // If an entry,
         state->next_instruction.index++;                    // advance to next instruction,

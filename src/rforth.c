@@ -276,7 +276,8 @@ int main(int argc, char* argv[]) {
     run_string(&fm1, "2-M");
 
     run_string(&fm1, "VARIABLE response");
-    run_string(&fm1, "response");
+    run_string(&fm1, "20 response !");
+    run_string(&fm1, "response @");
 
     /*
     forth_machine forth_server = create_forth_server();

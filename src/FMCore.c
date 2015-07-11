@@ -211,6 +211,43 @@ void FMC_delete_param(struct FMParameter *param) {
 
 
 //---------------------------------------------------------------------------
+// Sets value to NULL if memory for it was allocated
+//---------------------------------------------------------------------------
+void FMC_null_param(struct FMParameter *param) {
+    if (param->type == STRING_PARAM) {
+        param->value.string_param = NULL;
+    }
+}
+
+
+//---------------------------------------------------------------------------
+// Creates a copy of a parameter, allocating memory if needed
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+int FMC_copy_param(struct FMState *state, struct FMParameter *param, struct FMParameter *dest) {
+    dest->type = param->type;                              // Copy the param type
+    dest->value.int_param = 0;                             // Zero out value to start
+
+    if (dest->type == STRING_PARAM) {                      // Handle strings
+        size_t len = strlen(param->value.string_param)+1;  // Include NUL in length
+        if (len > 0 && (dest->value.string_param = malloc(len)) == NULL) {
+            FMC_abort(state, "malloc failed", __FILE__, __LINE__);
+            return -1;
+        }
+        strncpy(dest->value.string_param, param->value.string_param, len);
+    }
+    else {
+        dest->value.int_param = param->value.int_param;    // Since value is a union, this handles all other cases
+    }
+    return 0;
+}
+
+
+
+//---------------------------------------------------------------------------
 // Frees all memory in entry
 //---------------------------------------------------------------------------
 void FMC_delete_entry(struct FMEntry *entry) {
@@ -286,38 +323,4 @@ void FMC_define_word(struct FMState *state, const char* name, int immediate, cod
     strncpy(cur_entry->name, name, NAME_LEN);
     cur_entry->immediate = immediate;
     cur_entry->code = code;
-}
-
-
-// TODO: Consider making this a more generic function (like clone_parameter)
-//---------------------------------------------------------------------------
-// Clones a string parameter from src and stores in dest
-//
-// Return value:
-//   *  0: Success
-//   * -1: Abort
-//---------------------------------------------------------------------------
-int FMC_clone_string_param(struct FMState *state, struct FMParameter *src, struct FMParameter *dest) {
-    if (src->type != STRING_PARAM) {                        // If not a STRING_PARAM..
-        FMC_abort(state, "Can only clone string params",
-                 __FILE__, __LINE__);                       // ..abort
-        return -1;
-    }
-
-    // Copy string
-    size_t len = strlen(src->value.string_param);           // Get string length,
-    char *new_string;
-    if ((new_string = malloc(len+1)) == NULL) {             // allocate space for it,
-        FMC_abort(state, "malloc failure",                   // (aborting on failure)
-                 __FILE__, __LINE__);
-        return -1;
-    }
-    strncpy(new_string, src->value.string_param, len);      // Copy string
-    new_string[len] = NUL;                                  // (NUL terminating it, too)
-
-    // Store in destination
-    dest->type = STRING_PARAM;
-    dest->value.string_param = new_string;
-
-    return 0;                                               // Success
 }
