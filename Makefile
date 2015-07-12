@@ -26,7 +26,9 @@ help:
 #=======================================
 # Build Targets
 #======================================
-source_files = rforth FMCore ForthMachine GenericForthMachine Drop Variable DotQuote
+source_files = rforth FMCore ForthMachine GenericForthMachine Drop Variable DotQuote \
+               Constant
+
 obj_files = $(foreach f, $(source_files), src/$(f).o)
 dbg_obj_files = $(foreach f, $(source_files), src/$(f)_dbg.o)
 

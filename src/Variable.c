@@ -32,8 +32,6 @@ int run_variable_code(struct FMState *state, struct FMEntry *entry) {
 //   * -1: Abort
 //---------------------------------------------------------------------------
 int VARIABLE_code(struct FMState *state, struct FMEntry *entry) {
-#define M_last_entry(state)   (&((state)->dictionary[(state)->last_entry_index]))
-
     if (FMC_read_word(state) < 0) {                         // If couldn't read word,
         FMC_abort(state,
                  "Can't define a variable without a name",
