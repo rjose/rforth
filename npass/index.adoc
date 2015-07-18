@@ -1,8 +1,6 @@
 = rforth2 development passes
 
-* [ ] Pass 11: Implement IF, THEN, ELSE
-
-* [ ] Pass : Implement WHILE, REPEAT
+* [ ] Pass 12: Implement WHILE, REPEAT
 * [ ] Pass : Implement previous forth server using Forth
 
 * [ ] Pass : Design forth machines for parsing requests, sending responses,
@@ -21,5 +19,6 @@
 * [x] Pass 6: Execute code from a dictionary entr
 * [x] Pass 7: Push a string onto a stack
 * [x] Pass 8: Create colon definitions
-* [x] Pass 9: Execute a colon definiti
+* [x] Pass 9: Execute a colon definition
 * [x] Pass 10: Store data in variable/constant
+* [x] Pass 11: Implement IF, THEN, ELSE

@@ -1,6 +1,8 @@
 #ifndef FM_CORE_H
 #define FM_CORE_H
 
+#include <stdio.h>
+
 //=================================================
 // Defines and Declarations
 //=================================================

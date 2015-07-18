@@ -1,0 +1,17 @@
+= Pass 12: Implement WHILE and REPEAT
+
+
+== Tasks
+- [x] Create WHILE word
+- [x] Create REPEAT word
+- [x] Test a "TEST? WHILE .. REPEAT"
+
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015

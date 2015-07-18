@@ -285,11 +285,14 @@ int main(int argc, char* argv[]) {
 
     run_string(&fm1, "3.14 CONSTANT pi");
     run_string(&fm1, "pi");
-    */
-
 
     run_string(&fm1, ": BRANCH   IF 10 ELSE IF 20 THEN THEN ;");
     run_string(&fm1, "0 1 BRANCH");
+    */
+
+    run_string(&fm1, ": LOOP   NOP WHILE REPEAT ;");
+    run_string(&fm1, "0 0 1 LOOP");
+
 
 
     /*

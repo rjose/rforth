@@ -38,9 +38,7 @@ int is_whitespace(char c) {
 // Return value:
 //   *  0: Success
 //---------------------------------------------------------------------------
-static
-int nop_code(struct FMState *state, struct FMEntry *entry) {
-    printf("NOP\n");
+int NOP_code(struct FMState *state, struct FMEntry *entry) {
     return 0;
 }
 
@@ -190,7 +188,7 @@ int FMC_create_entry(struct FMState *state, const char *name) {
             state->word_buffer, NAME_LEN);             // Entry name is last word read
     cur_entry->immediate = 0;                          // Default to not "immediate"
     cur_entry->pseudo_entry = 0;                       // Entries in dictionary aren't pseudo entries
-    cur_entry->code = nop_code;                        // Default code to do nothing
+    cur_entry->code = NOP_code;                        // Default code to do nothing
 
     cur_entry->params = NULL;
     cur_entry->num_params = 0;                         // Start with no params
