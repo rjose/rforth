@@ -1,0 +1,32 @@
+= Pass 11: Implement IF, THEN, ELSE
+
+
+== Tasks
+- [x] Create IF word
+- [x] Create THEN word
+- [x] Test an IF .. THEN construction
+- [x] Create ELSE word
+- [x] Test an IF .. ELSE .. THEN construction
+- [x] Test nested IF .. ELSE .. THEN construction
+
+To implement an IF, we need to add a pseudo entry that does a jump if
+false. IF is an immediate word that executes during a compile. It
+creates a pseudo entry that gets filled out by a THEN.
+
+We'll need to use the return stack to keep track of where the dangling
+IFs need to be wrapped up. We should probably do a check at the end of
+a definition to make sure the return stack is unchanged. If so, we
+should delete the entry and toss it.
+
+Actually, I believe we can just create an ENTRY param during the
+execution of the IF. What makes it a pseudo param is that the IF
+created it and that it wasn't looked up in the dictionary.
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015
