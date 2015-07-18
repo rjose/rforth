@@ -1,17 +1,18 @@
 #include "GenericForthMachine.h"
 
-// Declare code for words
-extern int DROP_code(struct FMState *state, struct FMEntry *entry);
-extern int VARIABLE_code(struct FMState *state, struct FMEntry *entry);
-extern int dot_quote_code(struct FMState *state, struct FMEntry *entry);
-extern int bang_code(struct FMState *state, struct FMEntry *entry);
-extern int at_code(struct FMState *state, struct FMEntry *entry);
-extern int CONSTANT_code(struct FMState *state, struct FMEntry *entry);
-extern int IF_code(struct FMState *state, struct FMEntry *entry);
-extern int THEN_code(struct FMState *state, struct FMEntry *entry);
-extern int ELSE_code(struct FMState *state, struct FMEntry *entry);
-
 #define M_define_word(name, immediate, code)  FMC_define_word(&result, name, immediate, code);
+#define M_func(name)   extern int name(struct FMState *state, struct FMEntry *entry)
+
+// Declare code for words
+M_func(DROP_code);
+M_func(dot_quote_code);
+M_func(VARIABLE_code);
+M_func(bang_code);
+M_func(at_code);
+M_func(CONSTANT_code);
+M_func(IF_code);
+M_func(THEN_code);
+M_func(ELSE_code);
 
 //---------------------------------------------------------------------------
 // Creates a generic forth machine
