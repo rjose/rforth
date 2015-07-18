@@ -19,6 +19,7 @@ extern char *INT_PARAM;
 extern char *DOUBLE_PARAM;
 extern char *STRING_PARAM;
 extern char *ENTRY_PARAM;
+extern char *PSEUDO_ENTRY_PARAM;
 
 struct FMState;
 struct FMEntry;
@@ -83,8 +84,8 @@ struct FMState {
     struct FMParameter stack[MAX_STACK];                    // Forth value stack
     int stack_top;                                          // Index of top of value stack (-1 if empty)
 
-    struct FMInstruction return_stack[MAX_RETURN_STACK];    // Forth return stack
-    int return_stack_top;                                   // Index of top of return stack (-1 if empty)
+    struct FMInstruction rstack[MAX_RETURN_STACK];          // Forth return stack
+    int rstack_top;                                         // Index of top of return stack (-1 if empty)
     struct FMInstruction next_instruction;                  // Address of next instruction to execute
 };
 
@@ -142,6 +143,43 @@ int FMC_push(struct FMState *state, struct FMParameter value);
 // NOTE: Other forth machines use this
 //---------------------------------------------------------------------------
 int FMC_drop(struct FMState *state);
+
+
+//---------------------------------------------------------------------------
+// Pushes value onto forth return stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// NOTE: If return stack is full, this aborts
+//---------------------------------------------------------------------------
+int FMC_rpush(struct FMState *state, struct FMInstruction value);
+
+
+//---------------------------------------------------------------------------
+// Pops value from return stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// The previous top of stack is returned via |res|.
+//---------------------------------------------------------------------------
+int FMC_rpop(struct FMState *state, struct FMInstruction *res);
+
+
+//---------------------------------------------------------------------------
+// Drops top of return stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// NOTE: Whatever's on the return stack is owned by someone, so no memory
+//       should be freed here.
+//---------------------------------------------------------------------------
+int FMC_rdrop(struct FMState *state);
 
 
 //---------------------------------------------------------------------------

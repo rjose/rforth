@@ -16,6 +16,7 @@ char *INT_PARAM = "int";
 char *DOUBLE_PARAM = "double";
 char *STRING_PARAM = "string";
 char *ENTRY_PARAM = "entry";
+char *PSEUDO_ENTRY_PARAM = "pseudo_entry";
 
 
 //---------------------------------------------------------------------------
@@ -58,7 +59,7 @@ int nop_code(struct FMState *state, struct FMEntry *entry) {
 //---------------------------------------------------------------------------
 void FMC_clear_state(struct FMState *state) {
     state->stack_top = -1;                             // Nothing in stack
-    state->return_stack_top = -1;                      // Nothing in return stack
+    state->rstack_top = -1;                            // Nothing in return stack
     state->word_len = 0;                               // No word has been read
     state->input_string = NULL;                        // No input has been set
     state->input_index = 0;                            // Input index is at the beginning
@@ -204,8 +205,12 @@ int FMC_create_entry(struct FMState *state, const char *name) {
 // NOTE: Only strings are allocated
 //---------------------------------------------------------------------------
 void FMC_delete_param(struct FMParameter *param) {
-    if (param->type == STRING_PARAM) {
-        free(param->value.string_param);
+    if (param->type == STRING_PARAM) {                      // If a string,
+        free(param->value.string_param);                    // free its memory
+    }
+    else if (param->type == ENTRY_PARAM) {                  // If an entry,
+        FMC_delete_entry(param->value.entry_param);         // delete the entry contents
+        free(param->value.entry_param);                     // and then free the entry itself
     }
 }
 
@@ -304,6 +309,67 @@ int FMC_drop(struct FMState *state) {
     }
 
     state->stack_top--;                                // Drop the item
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+// Pushes value onto forth return stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// NOTE: If return stack is full, this aborts
+//---------------------------------------------------------------------------
+int FMC_rpush(struct FMState *state, struct FMInstruction value) {
+    if (state->rstack_top == MAX_RETURN_STACK - 1) {        // Abort if stack is full
+        FMC_abort(state, "Return stack overflow", __FILE__, __LINE__);
+        return -1;
+    }
+
+    state->rstack[++state->rstack_top] = value;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+// Pops value from return stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// The previous top of stack is returned via |res|.
+//---------------------------------------------------------------------------
+int FMC_rpop(struct FMState *state, struct FMInstruction *res) {
+    if (state->rstack_top == -1) {                    // If stack is empty..
+        FMC_abort(state, "Return stack underflow",
+                 __FILE__, __LINE__);                       // ..abort,
+        return -1;                                          // and return.
+    }
+
+    *res = state->rstack[state->rstack_top];    // Otherwise, set res to top of return stack,
+    state->rstack_top--;                              // drop the top of return stack,
+    return 0;                                               // and indicate success
+}
+
+
+//---------------------------------------------------------------------------
+// Drops top of return stack
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// NOTE: Whatever's on the return stack is owned by someone, so no memory
+//       should be freed here.
+//---------------------------------------------------------------------------
+int FMC_rdrop(struct FMState *state) {
+    if (state->rstack_top == -1) {                     // Abort if stack is empty
+        FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
+        return -1;
+    }
+
+    state->rstack_top--;                                // Drop the item
     return 0;
 }
 

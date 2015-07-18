@@ -57,51 +57,6 @@ void load_entry_param(struct FMEntry *entry_val, struct FMParameter *param) {
 
 
 //---------------------------------------------------------------------------
-// Pushes value onto return stack
-//
-// Return value:
-//   *  0: Success
-//   * -1: Abort
-//
-// NOTE: If stack is full, this aborts
-//---------------------------------------------------------------------------
-static
-int rs_push(struct FMState *state, struct FMInstruction value) {
-    if (state->return_stack_top == MAX_RETURN_STACK - 1) {  // If stack is full..
-        FMC_abort(state, "Return stack overflow",
-                 __FILE__, __LINE__);                       // ..abort
-        return -1;
-    }
-
-    state->return_stack[++state->return_stack_top] = value;
-    return 0;
-}
-
-
-//---------------------------------------------------------------------------
-// Pops value from return stack
-//
-// Return value:
-//   *  0: Success
-//   * -1: Abort
-//
-// The previous top of stack is returned via |res|.
-//---------------------------------------------------------------------------
-static
-int rs_pop(struct FMState *state, struct FMInstruction *res) {
-    if (state->return_stack_top == -1) {                    // If stack is empty..
-        FMC_abort(state, "Return stack underflow",
-                 __FILE__, __LINE__);                       // ..abort,
-        return -1;                                          // and return.
-    }
-
-    *res = state->return_stack[state->return_stack_top];    // Otherwise, set res to top of return stack,
-    state->return_stack_top--;                              // drop the top of return stack,
-    return 0;                                               // and indicate success
-}
-
-
-//---------------------------------------------------------------------------
 // Executes a colon definition
 //
 // Args:
@@ -113,7 +68,7 @@ int rs_pop(struct FMState *state, struct FMInstruction *res) {
 //---------------------------------------------------------------------------
 static
 int run_colon_def_code(struct FMState *state, struct FMEntry *entry) {
-    rs_push(state, state->next_instruction);                // Push previous instruction onto ret stack
+    FMC_rpush(state, state->next_instruction);                // Push previous instruction onto ret stack
     state->next_instruction.entry = entry;                  // Set next instruction to first one of this entry
     state->next_instruction.index = 0;
     return 0;
@@ -130,7 +85,7 @@ int run_colon_def_code(struct FMState *state, struct FMEntry *entry) {
 static
 int exit_code(struct FMState *state, struct FMEntry *entry) {
     struct FMInstruction previous;
-    if (rs_pop(state, &previous) != 0) {                    // Pop previous instruction from ret stack
+    if (FMC_rpop(state, &previous) != 0) {                    // Pop previous instruction from ret stack
         return -1;                                          // (returning -1 if an abort)
     }
 
@@ -160,7 +115,7 @@ int compile_word(struct FMState *state, struct FMEntry *entry) {
 
     state->compile = 1;                               // Put forth machine in compile mode
 
-    if (FMC_read_word(state) != 0) {                      // If no next word, return -1
+    if (FMC_read_word(state) != 0) {                  // If no next word, return -1
         FMC_abort(state, "Incomplete definition",
                  __FILE__, __LINE__);
         RETURN_FROM_COMPILE(-1);
@@ -170,7 +125,7 @@ int compile_word(struct FMState *state, struct FMEntry *entry) {
         entry->params + entry->num_params;            // Compiled word goes here
 
     struct FMEntry *word_entry =
-        FMC_find_entry(state, state->word_buffer);        // Look up word entry
+        FMC_find_entry(state, state->word_buffer);    // Look up word entry
 
     int result = 0;
 
@@ -263,19 +218,20 @@ int colon_code(struct FMState *state, struct FMEntry *entry) {
 #define NUM_ALLOCATED_PARAMS   10
 
     // Get name of entry to define
-    if (FMC_read_word(state) < 0) {                             // If couldn't read word,
+    if (FMC_read_word(state) < 0) {                         // If couldn't read word,
         return 0;                                           // there's nothing to interpret
     }
     const char *name = state->word_buffer;
 
-    if (FMC_create_entry(state, name) != 0) {                   // Create entry,
+    if (FMC_create_entry(state, name) != 0) {               // Create entry,
         return -1;                                          // (returning -1 on failure)
     }
 
     struct FMEntry *cur_entry = M_last_entry(state);        // Get a pointer to newly created entry and
     cur_entry->code = run_colon_def_code;                   // set its code to be a colon def runner
 
-    
+    int start_return_stack_top = state->rstack_top;   // Note state of return stack before we start
+
     // Compile each word of the definition
     int params_left = 0;
     size_t param_size = sizeof(struct FMParameter);
@@ -315,6 +271,13 @@ int colon_code(struct FMState *state, struct FMEntry *entry) {
         return -1;
     }
 
+    // Check that the return stack is unchanged
+    if (start_return_stack_top != state->rstack_top) {
+        FMC_abort(state, "Return stack was changed when compiling a colon def", __FILE__, __LINE__);
+        M_delete_entry();
+        return -1;
+   }
+
     return 0;
 }
 
@@ -346,6 +309,12 @@ int step_colon_def(struct FMState *state) {
             return 0;
         }
         state->next_instruction.index++;                    // and then go to next instruction.
+    }
+    else if (cur_instruction->type == PSEUDO_ENTRY_PARAM) {
+        struct FMEntry *pseudo_entry =
+            cur_instruction->value.entry_param;             // Get pointer to pseudo entry
+        return (pseudo_entry->
+                code(state, pseudo_entry) == 0);            // and execute it, returning 1 if OK
     }
     else if (cur_instruction->type == ENTRY_PARAM) {        // If an entry,
         state->next_instruction.index++;                    // advance to next instruction,

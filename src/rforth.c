@@ -272,6 +272,7 @@ int main(int argc, char* argv[]) {
     //run_string(&fm1, ": ONE   1 ;  : TWO ONE ONE ;");
     //run_string(&fm1, "TWO");
 
+    /*
     run_string(&fm1, ": MESSAGE .\" Hello, everyone!\" ; : 2-M MESSAGE MESSAGE ;");
     run_string(&fm1, "2-M");
 
@@ -284,6 +285,12 @@ int main(int argc, char* argv[]) {
 
     run_string(&fm1, "3.14 CONSTANT pi");
     run_string(&fm1, "pi");
+    */
+
+
+    run_string(&fm1, ": BRANCH   IF 10 THEN ;");
+    run_string(&fm1, "1 BRANCH");
+
 
     /*
     forth_machine forth_server = create_forth_server();

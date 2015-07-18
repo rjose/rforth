@@ -7,6 +7,8 @@ extern int dot_quote_code(struct FMState *state, struct FMEntry *entry);
 extern int bang_code(struct FMState *state, struct FMEntry *entry);
 extern int at_code(struct FMState *state, struct FMEntry *entry);
 extern int CONSTANT_code(struct FMState *state, struct FMEntry *entry);
+extern int IF_code(struct FMState *state, struct FMEntry *entry);
+extern int THEN_code(struct FMState *state, struct FMEntry *entry);
 
 #define M_define_word(name, immediate, code)  FMC_define_word(&result, name, immediate, code);
 
@@ -24,6 +26,8 @@ struct FMState CreateGenericFM() {
     M_define_word("!", 0, bang_code);
     M_define_word("@", 0, at_code);
     M_define_word("CONSTANT", 0, CONSTANT_code);
+    M_define_word("IF", 1, IF_code);
+    M_define_word("THEN", 1, THEN_code);
 
     return result;
 }
