@@ -288,8 +288,8 @@ int main(int argc, char* argv[]) {
     */
 
 
-    run_string(&fm1, ": BRANCH   IF 10 THEN ;");
-    run_string(&fm1, "1 BRANCH");
+    run_string(&fm1, ": BRANCH   IF 10 ELSE IF 20 THEN THEN ;");
+    run_string(&fm1, "0 1 BRANCH");
 
 
     /*
