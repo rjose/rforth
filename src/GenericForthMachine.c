@@ -5,6 +5,7 @@
 
 // Declare code for words
 M_func(NOP_code);
+M_func(DUP_code);
 M_func(DROP_code);
 M_func(dot_quote_code);
 M_func(VARIABLE_code);
@@ -16,6 +17,8 @@ M_func(THEN_code);
 M_func(ELSE_code);
 M_func(WHILE_code);
 M_func(REPEAT_code);
+M_func(Comment_code);
+M_func(minus_code);
 
 //---------------------------------------------------------------------------
 // Creates a generic forth machine
@@ -27,6 +30,7 @@ struct FMState CreateGenericFM() {
     // Define generically useful words
     M_define_word(".\"", 1, dot_quote_code);
     M_define_word("NOP", 0, NOP_code);
+    M_define_word("DUP", 0, DUP_code);
     M_define_word("DROP", 0, DROP_code);
     M_define_word("VARIABLE", 0, VARIABLE_code);
     M_define_word("!", 0, bang_code);
@@ -37,6 +41,8 @@ struct FMState CreateGenericFM() {
     M_define_word("ELSE", 1, ELSE_code);
     M_define_word("WHILE", 1, WHILE_code);
     M_define_word("REPEAT", 1, REPEAT_code);
+    M_define_word("#", 1, Comment_code);
+    M_define_word("-", 0, minus_code);
 
     return result;
 }

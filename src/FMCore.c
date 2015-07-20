@@ -208,7 +208,6 @@ void FMC_delete_param(struct FMParameter *param) {
     }
     else if (param->type == ENTRY_PARAM) {                  // If an entry,
         FMC_delete_entry(param->value.entry_param);         // delete the entry contents
-        free(param->value.entry_param);                     // and then free the entry itself
     }
 }
 
@@ -387,4 +386,38 @@ void FMC_define_word(struct FMState *state, const char* name, int immediate, cod
     strncpy(cur_entry->name, name, NAME_LEN);
     cur_entry->immediate = immediate;
     cur_entry->code = code;
+}
+
+
+//---------------------------------------------------------------------------
+// Aborts if the number of stack elements is less than |num_args|
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+int FMC_check_stack_args(struct FMState *state, int num_args) {
+    int top = state->stack_top;
+
+    if (top + 1 < num_args) {                               // Check that stack has enough args
+        FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
+        return -1;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+// Returns stack arg |from_top| elems from top of stack
+//
+// Return value:
+//   * On success, pointer to stack arg; otherwise, NULL
+//---------------------------------------------------------------------------
+struct FMParameter *FMC_stack_arg(struct FMState *state, int from_top) {
+    int index = state->stack_top - from_top;                // Get index of stack elem
+    if (index < 0) {                                        // (aborting of < 0)
+        FMC_abort(state, "Invalid stack arg", __FILE__, __LINE__);
+        return NULL;
+    }
+
+    return &(state->stack[index]);                          // If all is good, return pointer to elem
 }

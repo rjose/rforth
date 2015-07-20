@@ -80,7 +80,7 @@ int VARIABLE_code(struct FMState *state, struct FMEntry *entry) {
 int bang_code(struct FMState *state, struct FMEntry *entry) {
     int top = state->stack_top;
 
-    if (top < 1) {                                          // Check that we have enough args
+    if (top + 1 < 2) {                                       // Check that stack has at least 2 elems
         FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
         return -1;
     }

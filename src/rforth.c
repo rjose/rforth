@@ -12,7 +12,10 @@
 
 #include "defines.h"
 #include "GenericForthMachine.h"
+#include "ForthServer.h"
 
+
+/*
 //------------------------------------------------------------------------------
 // Delays by specified number of ms
 //------------------------------------------------------------------------------
@@ -26,8 +29,10 @@ void wait_ms(int ms_delay) {
         exit(ERR_NANOSLEEP);
     }
 }
+*/
 
 
+/*
 //------------------------------------------------------------------------------
 // Creates a nonblocking socket and listens on it
 //
@@ -75,7 +80,10 @@ int make_http_socket(int port) {
     }
     return result;
 }
+*/
 
+
+/*
 //------------------------------------------------------------------------------
 // Uses epoll to monitor state of socket
 //
@@ -100,6 +108,7 @@ int monitor_fd(int new_fd) {
     }
     return result;
 }
+*/
 
 
 //------------------------------------------------------------------------------
@@ -190,6 +199,7 @@ void update_connections(int epoll_fd, int http_fd) {
 }
 
 
+/*
 //------------------------------------------------------------------------------
 // Ensure cycle period is no less than CYCLE_PERIOD_MS
 //------------------------------------------------------------------------------
@@ -199,6 +209,7 @@ void wait_if_needed(long cycle_duration_ms) {
         wait_ms(additional_delay);
     }
 }
+*/
 
 //------------------------------------------------------------------------------
 // Returns current time in ms from some reference
@@ -262,12 +273,57 @@ void run_string(struct FMState *machine, const char *input) {
     while (FM_Step(machine)) {};                            // Step through input until done
 }
 
+//------------------------------------------------------------------------------
+// Loads a file and runs it
+//------------------------------------------------------------------------------
+void run_file(struct FMState *machine, const char *filename) {
+    char *buf;                                              // Will hold contents of file
+    const size_t alloc_step = 256;                          // Step size of memory allocation
+    size_t buf_len = 0;                                     // How big is the buffer
+    size_t space_left = 0;                                  // How much space is left in buf
+    long bytes_read;
+
+    int fd = open(filename, O_RDONLY);                      // Open file
+    if (fd == -1) {
+        printf("Ugh. Couldn't open file: %s\n", filename);
+        exit(ERR_OPEN);
+    }
+
+    // Read contents into buf
+    while(1) {
+        if (space_left == 0) {                              // If we don't have any space left,
+            if (NULL == (buf = realloc(buf, buf_len + alloc_step))) {
+                                                            // allocate alloc_step more
+                printf("Ugh. Couldn't realloc memory\n");
+                exit(ERR_REALLOC);
+            }
+            space_left = alloc_step;
+        }
+        bytes_read = read(fd, buf + buf_len, space_left);
+        buf_len += bytes_read;
+        space_left -= bytes_read;
+        if (space_left > 0) {
+            break;
+        }
+    }
+
+    // Resize buf and NUL terminate
+    if (NULL == (buf = realloc(buf, buf_len + 1))) {
+        printf("Ugh. Couldn't realloc memory\n");
+        exit(ERR_REALLOC);
+    }
+    buf[buf_len] = NUL;
+
+
+    // Run string
+    run_string(machine, buf);
+}
 
 //------------------------------------------------------------------------------
 // Main function
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-    struct FMState fm1 = CreateGenericFM();
+    //struct FMState fm1 = CreateGenericFM();
 
     //run_string(&fm1, ": ONE   1 ;  : TWO ONE ONE ;");
     //run_string(&fm1, "TWO");
@@ -288,10 +344,16 @@ int main(int argc, char* argv[]) {
 
     run_string(&fm1, ": BRANCH   IF 10 ELSE IF 20 THEN THEN ;");
     run_string(&fm1, "0 1 BRANCH");
-    */
 
     run_string(&fm1, ": LOOP   NOP WHILE REPEAT ;");
     run_string(&fm1, "0 0 1 LOOP");
+    */
+
+    struct FMState forth_server = CreateForthServer();
+    run_string(&forth_server, "TIMESTAMP 200 WAIT TIMESTAMP");
+    run_string(&forth_server, "-");
+
+    run_file(&forth_server , "server.fth");
 
 
 

@@ -1,0 +1,32 @@
+= Pass 13: Implement previous forth server in Forth
+
+Finally, we're at a point to do this!
+
+
+== Tasks
+- [x] Add run_file
+- [-] Add required words
+  - [x] Comment
+  - [x] TIMESTAMP
+  - [x] WAIT
+  - [x] DUP
+  - [x] TRUE
+  - [ ] -
+  - [ ] LOG
+
+- [ ] Create a RUN word that loops, prints a message, and sleeps for 2 sec
+- [ ] Add variables for http port, http fd, and epoll fd
+- [ ] Add ability to monitor connections
+- [ ] Stub out words to update the forth machines and the mailer
+- [ ] Test ability to accept connections via a curl
+
+We'll start by writing a forth server file.
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015

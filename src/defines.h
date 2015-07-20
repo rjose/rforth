@@ -19,5 +19,7 @@
 #define ERR_EPOLL_CTL         16
 #define ERR_EPOLL_WAIT        17
 #define ERR_CLOSE             18
+#define ERR_OPEN              19
+#define ERR_REALLOC           20
 
 #endif

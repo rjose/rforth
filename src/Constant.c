@@ -28,7 +28,7 @@ int run_constant_code(struct FMState *state, struct FMEntry *entry) {
 // Defines a constant
 //
 // Stack args:
-//   * top: constant's value
+//   * 0: constant's value
 //
 // Return value:
 //   *  0: Success
@@ -44,7 +44,7 @@ int CONSTANT_code(struct FMState *state, struct FMEntry *entry) {
     const char *name = state->word_buffer;                  // Get pointer to constant's name
 
     int top = state->stack_top;                             // Get index of stack top,
-    if (top < 1) {                                          // and check that we have enough args
+    if (top + 1 < 1) {                                      // and check that stack has at least one elem
         FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
         return -1;
     }

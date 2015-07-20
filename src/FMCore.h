@@ -244,6 +244,24 @@ void FMC_clear_state(struct FMState *state);
 void FMC_define_word(struct FMState *state, const char* name, int immediate, code_p code);
 
 
+//---------------------------------------------------------------------------
+// Aborts if the number of stack elements is less than |num_args|
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+int FMC_check_stack_args(struct FMState *state, int num_args);
+
+
+//---------------------------------------------------------------------------
+// Returns stack arg |from_top| elems from top of stack
+//
+// Return value:
+//   * On success, pointer to stack arg; otherwise, NULL
+//---------------------------------------------------------------------------
+struct FMParameter *FMC_stack_arg(struct FMState *state, int from_top);
+
 
 //================================================
 // Macros

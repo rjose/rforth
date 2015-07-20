@@ -1,14 +1,12 @@
 = rforth2 development passes
 
-* [ ] Pass 12: Implement WHILE, REPEAT
-* [ ] Pass : Implement previous forth server using Forth
+* [ ] Pass 13: Implement previous forth server using Forth
 
 * [ ] Pass : Design forth machines for parsing requests, sending responses,
              routing messages, sending and waiting for responses
-
 * [ ] Pass : Study OTP and design forth machines with similar behaviors
-
 * [ ] Pass : Push a list onto a stack
+
 
 === Completed Passes
 * [x] Pass 1: Build an empty rforth program
@@ -22,3 +20,4 @@
 * [x] Pass 9: Execute a colon definition
 * [x] Pass 10: Store data in variable/constant
 * [x] Pass 11: Implement IF, THEN, ELSE
+* [x] Pass 12: Implement WHILE, REPEAT

@@ -149,7 +149,8 @@ int compile_word(struct FMState *state, struct FMEntry *entry) {
         }
         else {                                         // Otherwise, abort compilation
             snprintf(FMC_err_message, ERR_MESSAGE_LEN,
-                     "%s '%s'", "Unable to compile:",state->word_buffer);
+                     "In definition %s, unable to compile word: '%s'",
+                     entry->name, state->word_buffer);
             FMC_abort(state, FMC_err_message, __FILE__, __LINE__);
             RETURN_FROM_COMPILE(-1);
         }
@@ -211,6 +212,9 @@ int interpret_next_word(struct FMState *state) {
 // Return value:
 //   *  0: Success
 //   * -1: Abort
+//
+// NOTE: |entry| is the colon's entry. The entry that it is defining is
+//       referred to as |cur_entry| in this function.
 //---------------------------------------------------------------------------
 static
 int colon_code(struct FMState *state, struct FMEntry *entry) {
