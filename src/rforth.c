@@ -350,8 +350,8 @@ int main(int argc, char* argv[]) {
     */
 
     struct FMState forth_server = CreateForthServer();
-    run_string(&forth_server, "TIMESTAMP 200 WAIT TIMESTAMP");
-    run_string(&forth_server, "-");
+    //run_string(&forth_server, "TIMESTAMP 200 WAIT TIMESTAMP");
+    //run_string(&forth_server, "- 0 <");
 
     run_file(&forth_server , "server.fth");
 

@@ -19,6 +19,8 @@ M_func(WHILE_code);
 M_func(REPEAT_code);
 M_func(Comment_code);
 M_func(minus_code);
+M_func(less_than_code);
+M_func(LOG_code);
 
 //---------------------------------------------------------------------------
 // Creates a generic forth machine
@@ -43,6 +45,8 @@ struct FMState CreateGenericFM() {
     M_define_word("REPEAT", 1, REPEAT_code);
     M_define_word("#", 1, Comment_code);
     M_define_word("-", 0, minus_code);
+    M_define_word("<", 0, less_than_code);
+    M_define_word("LOG", 0, LOG_code);
 
     return result;
 }

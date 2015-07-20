@@ -78,3 +78,55 @@ int minus_code(struct FMState *state, struct FMEntry *entry) {
 
     return 0;
 }
+
+
+//---------------------------------------------------------------------------
+// Compares top 2 stack elements and returns 1 if l_value < r_value, 0 otherwise
+//
+// Stack args (l_value r_value -- is_less)
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+int less_than_code(struct FMState *state, struct FMEntry *entry) {
+    struct FMParameter *l_value;
+    struct FMParameter *r_value;
+
+    if (get_two_stack_args(state,
+                           &l_value, &r_value) < 0) {       // Get top two args
+        return -1;
+    }
+
+
+    struct FMParameter result;
+    if (l_value->type == INT_PARAM) {                       // If INT_PARAM..
+        result.type = INT_PARAM;
+        result.value.int_param =
+            l_value->value.int_param <
+            r_value->value.int_param;                       // ..compute int difference
+    }
+    else if (l_value->type == DOUBLE_PARAM) {               // If DOUBLE_PARAM..
+        result.type = INT_PARAM;
+        result.value.int_param =
+            l_value->value.double_param <
+            r_value->value.double_param;                    // Compute double difference
+    }
+    else {                                                  // Otherwise, abort
+        snprintf(FMC_err_message, ERR_MESSAGE_LEN,
+                 "Unhandled type for less_than_code: %s",
+                 l_value->type);
+        FMC_abort(state, FMC_err_message,
+                  __FILE__, __LINE__);
+        return -1;
+    }
+
+    // Drop l_value and r_value..
+    if (FMC_drop(state) < 0) {return -1;}
+    if (FMC_drop(state) < 0) {return -1;}
+
+    // ..and then push result onto stack
+    if (FMC_push(state, result) < 0) {return -1;}
+
+    return 0;
+}

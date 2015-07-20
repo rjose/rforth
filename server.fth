@@ -64,16 +64,16 @@ VARIABLE loop_timestamp
 # Stack args:
 #   * Top:  Port number to listen for HTTP requests
 # -----------------------------------------------------------
-# : RUN   INIT-HTTP-SOCKET
-#         TRUE WHILE
-#            TIMESTAMP loop_timestamp !
-#            UPDATE-CONNECTIONS
-#            UPDATE-FORTH-MACHINES
-#            WAIT-IF-NEEDED
-#         REPEAT
-# ;
+: RUN   INIT-HTTP-SOCKET
+        TRUE WHILE
+           TIMESTAMP loop_timestamp !
+           UPDATE-CONNECTIONS
+           UPDATE-FORTH-MACHINES
+           WAIT-IF-NEEDED
+        REPEAT
+;
 
 
 
 # Run server with port 9876
-# 9876 RUN
+9876 RUN
