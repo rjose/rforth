@@ -69,7 +69,7 @@ int VARIABLE_code(struct FMState *state, struct FMEntry *entry) {
 // Defines "!" for storing values in variables
 //
 // Stack effect:
-//   (value var_address -- epoll_fd)
+//   (value variable -- )
 //
 // Return value:
 //   *  0: Success
@@ -107,7 +107,7 @@ int bang_code(struct FMState *state, struct FMEntry *entry) {
 // Defines "@" for retrieving values from variables
 //
 // Stack effect:
-//   (var_addr -- value)
+//   (variable -- value)
 //
 // Return value:
 //   *  0: Success
