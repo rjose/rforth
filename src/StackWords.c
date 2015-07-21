@@ -27,13 +27,13 @@ int DROP_code(struct FMState *state, struct FMEntry *entry) {
 //   * -1: Abort
 //---------------------------------------------------------------------------
 int DUP_code(struct FMState *state, struct FMEntry *entry) {
-    int top = state->stack_top;
-
-    if (top + 1 < 1) {                                       // Check that stack has at least 1 elem
-        FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elem
         return -1;
     }
-    struct FMParameter *original = &(state->stack[top]);    // Get value
+    struct FMParameter *original;;
+    if (NULL == (original = FMC_stack_arg(state, 0))) {      // original is on top
+        return -1;
+    }
 
     struct FMParameter copy;
     if (FMC_copy_param(state, original, &copy) < 0) {       // Make a copy of the top of the stack and

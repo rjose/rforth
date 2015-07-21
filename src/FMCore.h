@@ -270,6 +270,4 @@ struct FMParameter *FMC_stack_arg(struct FMState *state, int from_top);
 #define M_is_dictionary_full(state)   ((state)->last_entry_index >= MAX_ENTRIES - 1)
 #define M_last_entry(state)   (&((state)->dictionary[(state)->last_entry_index]))
 
-
-
 #endif

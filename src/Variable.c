@@ -68,24 +68,22 @@ int VARIABLE_code(struct FMState *state, struct FMEntry *entry) {
 //---------------------------------------------------------------------------
 // Defines "!" for storing values in variables
 //
-// Stack args:
-//   * top: variable address
-//   * top-1: value
+// Stack effect:
+//   (value var_address -- epoll_fd)
 //
 // Return value:
 //   *  0: Success
 //   * -1: Abort
 //---------------------------------------------------------------------------
 int bang_code(struct FMState *state, struct FMEntry *entry) {
-    int top = state->stack_top;
-
-    if (top + 1 < 2) {                                       // Check that stack has at least 2 elems
-        FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
+    if (FMC_check_stack_args(state, 2) < 0) {               // Check that stack has at least 2 elems
         return -1;
     }
-
-    struct FMParameter *variable = &(state->stack[top]);    // Access
-    struct FMParameter *value = &(state->stack[top-1]);     // stack arguments
+    struct FMParameter *variable = FMC_stack_arg(state, 0); // Get variable and
+    struct FMParameter *value = FMC_stack_arg(state, 1);    // value from stack,
+    if (variable == NULL || value == NULL) {                // aborting if something went wrong
+        return -1;
+    }
 
     if (variable->type != ENTRY_PARAM) {                    // Make sure "variable" is an entry
         FMC_abort(state, "Exepcting a variable", __FILE__, __LINE__);
@@ -108,21 +106,21 @@ int bang_code(struct FMState *state, struct FMEntry *entry) {
 //---------------------------------------------------------------------------
 // Defines "@" for retrieving values from variables
 //
-// Stack args:
-//   * top: variable address
+// Stack effect:
+//   (var_addr -- value)
 //
 // Return value:
 //   *  0: Success
 //   * -1: Abort
 //---------------------------------------------------------------------------
 int at_code(struct FMState *state, struct FMEntry *entry) {
-    int top = state->stack_top;
-    if (top < 0) {                                          // Check that we have enough args
-        FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elems
         return -1;
     }
-
-    struct FMParameter *variable = &(state->stack[top]);    // Access stack arg
+    struct FMParameter *variable = FMC_stack_arg(state, 0); // Get variable and
+    if (variable == NULL) {                                 // aborting if something went wrong
+        return -1;
+    }
 
     if (variable->type != ENTRY_PARAM) {                    // Make sure "variable" is an entry
         FMC_abort(state, "Exepcting a variable", __FILE__, __LINE__);

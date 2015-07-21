@@ -81,13 +81,14 @@ int make_http_socket(int port) {
 //---------------------------------------------------------------------------
 static
 int make_http_socket_code(struct FMState *state, struct FMEntry *entry) {
-    int top = state->stack_top;
-
-    if (top + 1 < 1) {                                       // Check that stack has at least 1 elem
-        FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elem
         return -1;
     }
-    struct FMParameter *http_port = &(state->stack[top]);    // Get http port to listen on
+    struct FMParameter *http_port;
+    if (NULL == (http_port = FMC_stack_arg(state, 0))) {    // http_port is on top
+        return -1;
+    }
+
     if (http_port->type != INT_PARAM) {
         FMC_abort(state, "http_port should be an int", __FILE__, __LINE__);
         return -1;
@@ -147,13 +148,13 @@ int monitor_fd(int new_fd) {
 //---------------------------------------------------------------------------
 static
 int monitor_fd_code(struct FMState *state, struct FMEntry *entry) {
-    int top = state->stack_top;
-
-    if (top + 1 < 1) {                                       // Check that stack has at least 1 elem
-        FMC_abort(state, "Stack underflow", __FILE__, __LINE__);
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elem
         return -1;
     }
-    struct FMParameter *http_fd = &(state->stack[top]);      // Get http fd to monitor
+    struct FMParameter *http_fd;
+    if (NULL == (http_fd = FMC_stack_arg(state, 0))) {      // http_fd is on top
+        return -1;
+    }
     if (http_fd->type != INT_PARAM) {
         FMC_abort(state, "http_fd should be an int", __FILE__, __LINE__);
         return -1;

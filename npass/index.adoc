@@ -1,6 +1,5 @@
 = rforth2 development passes
 
-* [ ] Pass 13: Implement previous forth server using Forth
 
 * [ ] Pass : Design forth machines for parsing requests, sending responses,
              routing messages, sending and waiting for responses
@@ -21,3 +20,4 @@
 * [x] Pass 10: Store data in variable/constant
 * [x] Pass 11: Implement IF, THEN, ELSE
 * [x] Pass 12: Implement WHILE, REPEAT
+* [x] Pass 13: Implement previous forth server using Forth
