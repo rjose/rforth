@@ -24,4 +24,17 @@ void FM_SetInput(struct FMState *state, const char *string);
 //---------------------------------------------------------------------------
 int FM_Step(struct FMState *state);
 
+
+//------------------------------------------------------------------------------
+// Runs a string using forth machine
+//------------------------------------------------------------------------------
+void FM_run_string(struct FMState *machine, const char *input);
+
+
+//------------------------------------------------------------------------------
+// Loads a file and runs it
+//------------------------------------------------------------------------------
+void FM_run_file(struct FMState *machine, const char *filename);
+
+
 #endif
