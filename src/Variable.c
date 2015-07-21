@@ -10,7 +10,6 @@
 //   *  0: Success
 //   * -1: Abort
 //---------------------------------------------------------------------------
-static
 int run_variable_code(struct FMState *state, struct FMEntry *entry) {
     struct FMParameter value;                               // Create a param to push onto stack
     value.type = ENTRY_PARAM;                               // of type ENTRY

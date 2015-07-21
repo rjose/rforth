@@ -39,13 +39,6 @@ VARIABLE loop_timestamp
      THEN
 ;
 
-# -----------------------------------------------------------
-# Updates any sockets requiring attention
-# -----------------------------------------------------------
-: UPDATE-CONNECTIONS
-     ." TODO: Implement UPDATE-CONNECTIONS" LOG
-;
-
 
 # -----------------------------------------------------------
 # Updates all active forth machines
