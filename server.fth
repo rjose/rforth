@@ -14,6 +14,16 @@ VARIABLE loop_timestamp
 # -----------------------------------------------------------
 : TRUE   1 ;
 
+# -----------------------------------------------------------
+# Subtracts 1 from top of stack
+#
+# Stack effect: (num -- num)
+# -----------------------------------------------------------
+: DEC
+   1 -
+;
+
+
 
 # -----------------------------------------------------------
 # Opens and monitors an http socket
@@ -48,6 +58,56 @@ VARIABLE loop_timestamp
 ;
 
 
+# EPOLL-WAIT ( -- count) Checks for epoll events and pushes count onto stack
+# EPOLL-WEB-FD: (index -- fd)  Pushes web fd associated with index onto stack
+# UPDATE-WEB-FD (fd -- ) If a new connection, creates a connection.
+#                        Otherwise, reads/writes data and does something with it
+
+
+
+: MAKE-HTTP-CONNECTIONS
+   DROP
+   ." TODO: Implement MAKE-HTTP-CONNECTIONS" LOG
+;
+
+# -----------------------------------------------------------
+# If web fd is http-fd, establishes a connection; otherwise, reads/writes data
+#
+# (web-fd -- )
+# -----------------------------------------------------------
+: UPDATE-WEB-FD
+   DUP http_fd @ === IF                                     # If web-fd == http_fd,
+      MAKE-HTTP-CONNECTIONS                                 # then establish new HTTP connections to clients
+   ELSE                                                     # Otherwise,
+      DROP                                                  # handle existing connections
+      ." TODO: Handle existing connections" LOG
+   THEN
+;
+
+# -----------------------------------------------------------
+# Decrements top of stack then pushes 1 if >= 0, 0 otherwise
+# -----------------------------------------------------------
+: DEC>=0?
+   DEC DUP 0 >=
+;
+
+
+# -----------------------------------------------------------
+# Updates any connections requiring attention
+#
+# This also includes the main http_fd for handling requests
+# -----------------------------------------------------------
+: UPDATE-CONNECTIONS
+   epoll_fd @ EPOLL-WAIT                                    # Check for epoll events (gets a count of them)
+   DEC>=0? WHILE                                            # Decrement loop index and repeat while >= 0:
+      DUP                                                   # DUP loop index since EPOLL-WEB-FD consumes it
+      EPOLL-WEB-FD                                          # Get fd at loop index,
+      UPDATE-WEB-FD                                         #    and update it
+   REPEAT
+   DROP                                                     # Drop the loop index
+;
+
+
 
 # -----------------------------------------------------------
 # Runs main server loop
@@ -65,7 +125,6 @@ VARIABLE loop_timestamp
            WAIT-IF-NEEDED
         REPEAT
 ;
-
 
 
 # Run server with port 9876

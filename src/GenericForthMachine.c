@@ -18,8 +18,14 @@ M_func(ELSE_code);
 M_func(WHILE_code);
 M_func(REPEAT_code);
 M_func(Comment_code);
-M_func(minus_code);
-M_func(less_than_code);
+M_func(Minus_code);
+M_func(Less_than_code);
+M_func(Less_than_eq_code);
+M_func(Greater_than_code);
+M_func(Greater_than_eq_code);
+M_func(AND_code);
+M_func(OR_code);
+M_func(Identical_code);
 M_func(LOG_code);
 
 //---------------------------------------------------------------------------
@@ -44,8 +50,14 @@ struct FMState CreateGenericFM() {
     M_define_word("WHILE", 1, WHILE_code);
     M_define_word("REPEAT", 1, REPEAT_code);
     M_define_word("#", 1, Comment_code);
-    M_define_word("-", 0, minus_code);
-    M_define_word("<", 0, less_than_code);
+    M_define_word("-", 0, Minus_code);
+    M_define_word("<", 0, Less_than_code);
+    M_define_word(">", 0, Greater_than_code);
+    M_define_word("===", 0, Identical_code);
+    M_define_word("<=", 0, Less_than_eq_code);
+    M_define_word(">=", 0, Greater_than_eq_code);
+    M_define_word("AND", 0, AND_code);
+    M_define_word("OR", 0, OR_code);
     M_define_word("LOG", 0, LOG_code);
 
     return result;

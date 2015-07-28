@@ -1,6 +1,7 @@
 = rforth2 development passes
 
 
+* [ ] Pass 14: Construct a proper HTTP response
 * [ ] Pass : Design forth machines for parsing requests, sending responses,
              routing messages, sending and waiting for responses
 * [ ] Pass : Study OTP and design forth machines with similar behaviors

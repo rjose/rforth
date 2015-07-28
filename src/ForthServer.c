@@ -19,6 +19,14 @@ extern int run_variable_code(struct FMState *state, struct FMEntry *entry);
 
 #define M_define_word(name, immediate, code)  FMC_define_word(&result, name, immediate, code);
 
+
+//============================
+// Globals
+//============================
+static
+struct epoll_event G_epoll_events[MAX_EPOLL_EVENTS];
+
+
 //------------------------------------------------------------------------------
 // Creates a nonblocking socket and listens on it
 //
@@ -97,7 +105,8 @@ int make_http_socket_code(struct FMState *state, struct FMEntry *entry) {
     int http_fd =
         make_http_socket(http_port->value.int_param);       // Make a nonblocking socket
 
-    struct FMParameter result;                              // Package resulting http_fd
+    if (FMC_drop(state) < 0) {return -1;}                   // Drop the http_port, and
+    struct FMParameter result;                              // package resulting http_fd
     result.type = INT_PARAM;                                // into an
     result.value.int_param = http_fd;                       // INT_PARAM and
     if (FMC_push(state, result) < 0) {                      // push it onto stack
@@ -163,7 +172,8 @@ int monitor_fd_code(struct FMState *state, struct FMEntry *entry) {
     int epoll_fd =
         monitor_fd(http_fd->value.int_param);               // Make a nonblocking socket
 
-    struct FMParameter result;                              // Package resulting epoll_fd
+    if (FMC_drop(state) < 0) {return -1;}                   // Drop http_fd, and then
+    struct FMParameter result;                              // package resulting epoll_fd
     result.type = INT_PARAM;                                // into an
     result.value.int_param = epoll_fd;                      // INT_PARAM and
     if (FMC_push(state, result) < 0) {                      // push it onto stack
@@ -245,6 +255,7 @@ void establish_all_pending_connections(int http_fd) {
 //------------------------------------------------------------------------------
 static
 void update_connections(int epoll_fd, int http_fd) {
+    // TODO: Make this global
     static struct epoll_event evlist[MAX_EPOLL_EVENTS];
 
     int num_descriptors = epoll_wait(epoll_fd, evlist, MAX_EPOLL_EVENTS, 0);
@@ -297,8 +308,9 @@ struct FMParameter *get_int_variable(struct FMState *state, const char *name) {
     return result;                                          // Otherwise, return variable's param
 }
 
+/*
 //---------------------------------------------------------------------------
-// Monitors file descriptor using epoll, leaving the epoll_fd on the stack
+// Update connections
 //
 // Stack effect:
 //   ( -- )
@@ -325,6 +337,90 @@ int UPDATE_CONNECTIONS_code(struct FMState *state, struct FMEntry *entry) {
                        http_fd->value.int_param);           // Update connections and
     return 0;                                               // indicate success
 }
+*/
+
+//---------------------------------------------------------------------------
+// Checks for epoll events, stores them, and pushes num events onto stack
+//
+// Stack effect:
+//   (epoll_fd -- count)
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// NOTE: This modifies G_epoll_events
+//---------------------------------------------------------------------------
+static
+int EPOLL_WAIT_code(struct FMState *state, struct FMEntry *entry) {
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elem
+        return -1;
+    }
+    struct FMParameter *epoll_fd;
+    if (NULL == (epoll_fd = FMC_stack_arg(state, 0))) {    // epoll_fd is on top
+        return -1;
+    }
+
+    int num_descriptors =
+        epoll_wait(epoll_fd->value.int_param,
+                   G_epoll_events, MAX_EPOLL_EVENTS, 0);    // Check for any fd needing an update
+
+    if (num_descriptors == -1) {                            // If something went wrong,
+        if (errno != EINTR) {                               // and it wasn't because of an interrupt,
+            printf("Ugh. epoll_wait failed\n");             // then exit hard (we may want to revisit this)
+            exit(ERR_EPOLL_WAIT);
+        }
+        num_descriptors = 0;                                // If just interrupted, set num fds to 0
+    }
+    if (num_descriptors > 0) {
+        printf("Got something\n");
+    }
+
+    // Push result onto stack
+    if (FMC_drop(state) < 0) {return -1;}                   // First, drop the epoll_fd..
+    struct FMParameter result;
+    result.type = INT_PARAM;
+    result.value.int_param = num_descriptors;
+    if (FMC_push(state, result) < 0) {return -1;}           // ..then push num descriptors
+
+    return 0;
+}
+
+
+//---------------------------------------------------------------------------
+// Pushes web fd associated with index onto stack
+//
+// Stack effect:
+//   (index -- fd)
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// NOTE: This reads from G_epoll_events
+//---------------------------------------------------------------------------
+static
+int EPOLL_WEB_FD_code(struct FMState *state, struct FMEntry *entry) {
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elem
+        return -1;
+    }
+    struct FMParameter *index;
+    if (NULL == (index = FMC_stack_arg(state, 0))) {    // index is on top
+        return -1;
+    }
+
+    // Push result onto stack
+    struct FMParameter result;
+    result.type = INT_PARAM;
+    result.value.int_param =
+        G_epoll_events[index->value.int_param].data.fd;     // File descriptor is in G_epoll_events
+
+    if (FMC_drop(state) < 0) {return -1;}                   // Drop index from stack,
+    if (FMC_push(state, result) < 0) {return -1;}           // and push result.
+
+    return 0;
+}
+
 
 //---------------------------------------------------------------------------
 // Creates a forth server
@@ -336,7 +432,9 @@ struct FMState CreateForthServer() {
     M_define_word("MONITOR-FD", 0, monitor_fd_code);
     M_define_word("TIMESTAMP", 0, TIMESTAMP_code);
     M_define_word("WAIT", 0, WAIT_code);
-    M_define_word("UPDATE-CONNECTIONS", 0, UPDATE_CONNECTIONS_code);
+    //    M_define_word("UPDATE-CONNECTIONS", 0, UPDATE_CONNECTIONS_code);
+    M_define_word("EPOLL-WAIT", 0, EPOLL_WAIT_code);
+    M_define_word("EPOLL-WEB-FD", 0, EPOLL_WEB_FD_code);
 
     return result;
 }
