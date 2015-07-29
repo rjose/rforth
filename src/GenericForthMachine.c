@@ -33,6 +33,7 @@ M_func(CONCAT_code);
 M_func(WRITE_code);
 M_func(CLOSE_code);
 M_func(OVER_code);
+M_func(STRLEN_code);
 
 //---------------------------------------------------------------------------
 // Creates a generic forth machine
@@ -71,6 +72,7 @@ struct FMState CreateGenericFM() {
     M_define_word("WRITE", 0, WRITE_code);
     M_define_word("CLOSE", 0, CLOSE_code);
     M_define_word("OVER", 0, OVER_code);
+    M_define_word("STRLEN", 0, STRLEN_code);
 
     return result;
 }

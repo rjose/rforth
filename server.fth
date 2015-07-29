@@ -95,14 +95,18 @@ VARIABLE loop_timestamp
 ;
 
 
+
 # -----------------------------------------------------------
-# Writes string to fd and closes it
+# CONTENT-LENGTH-HEADER
 #
-# Stack effect (fd string -- )
+# Adds a content length header like "Content-Length: 123"
+#
+# Stack effect (message -- header)
 # -----------------------------------------------------------
-: WRITE-AND-CLOSE
-   OVER SWAP                                                # (fd string -- fd fd string)
-   WRITE CLOSE
+: CONTENT-LENGTH-HEADER
+   STRLEN TO-STR                                            # Gets len(message)
+   ." Content-Length: " SWAP                                # Adds "Content-Length: " as prefix
+   CONCAT
 ;
 
 # -----------------------------------------------------------
@@ -112,9 +116,12 @@ VARIABLE loop_timestamp
 # -----------------------------------------------------------
 : RESPOND
    MAKE-STATUS-LINE                                         # Constructs status line with status-code
+   OVER                                                     # (fd body accum body)
+   CONTENT-LENGTH-HEADER CONCAT                             # (fd body accum)
+   ." \r\n" CONCAT                                          # Adds CRLF
    ." \r\n" CONCAT                                          # Adds CRLF
    SWAP CONCAT                                              # Puts |body| at end of string
-   WRITE-AND-CLOSE                                          # Writes to fd and closes connection
+   WRITE                                                    # Writes to fd
 ;
 
 

@@ -119,3 +119,43 @@ int CONCAT_code(struct FMState *state, struct FMEntry *entry) {
 
     return 0;
 }
+
+//---------------------------------------------------------------------------
+// Gets length of string
+//
+// Stack effect: (s -- len)
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//---------------------------------------------------------------------------
+int STRLEN_code(struct FMState *state, struct FMEntry *entry) {
+    // Get values
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elem
+        return -1;
+    }
+    struct FMParameter *s;
+    M_get_stack_arg(s, 0);                                 // s is at top of stack
+
+    // Check that s is string
+    if (s->type != STRING_PARAM) {
+        FMC_abort(state, "STRLEN expecting a string",
+                  __FILE__, __LINE__);
+        return -1;
+    }
+
+    // Size of result is len(s1) + len(s2) + 1
+    size_t s_len = strlen(s->value.string_param);
+
+
+    // Push result onto stack
+    struct FMParameter result;
+    result.type = INT_PARAM;
+    result.value.int_param = s_len;
+
+    // Push value onto stack
+    if (FMC_drop(state) < 0) {return -1;}                   // Drop s,
+    if (FMC_push(state, result) < 0) {return -1;}           // and then push result onto stack
+
+    return 0;
+}

@@ -9,7 +9,7 @@ The code for updating a connection should be able to create a proper response
 - [x] Move response functions to their own file
 - [x] Come up with a design that can store an fd, spin up a new
       forth machine, and handle the response
-- [ ] Write content-length header
+- [x] Write content-length header
 
 == Thoughts
 Each http connection should be handled by its own forth machine. A
