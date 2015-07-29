@@ -15,6 +15,11 @@ VARIABLE loop_timestamp
 : TRUE   1 ;
 
 # -----------------------------------------------------------
+# Pushes a 0 onto the stack
+# -----------------------------------------------------------
+: FALSE   0 ;
+
+# -----------------------------------------------------------
 # Subtracts 1 from top of stack
 #
 # Stack effect: (num -- num)
@@ -22,8 +27,6 @@ VARIABLE loop_timestamp
 : DEC
    1 -
 ;
-
-
 
 # -----------------------------------------------------------
 # Opens and monitors an http socket
@@ -58,16 +61,107 @@ VARIABLE loop_timestamp
 ;
 
 
-# EPOLL-WAIT ( -- count) Checks for epoll events and pushes count onto stack
-# EPOLL-WEB-FD: (index -- fd)  Pushes web fd associated with index onto stack
-# UPDATE-WEB-FD (fd -- ) If a new connection, creates a connection.
-#                        Otherwise, reads/writes data and does something with it
+
+# -----------------------------------------------------------
+# CLAIM-MACHINE
+#
+# Stack args ( -- machine-index), on error ( -- -1)
+# -----------------------------------------------------------
+: CLAIM-MACHINE
+   ." TODO: Implement CLAIM-MACHINE" LOG
+   10  # Bogus index
+;
+
+
+# -----------------------------------------------------------
+# CONCAT
+#
+# Concatenates two strings
+#
+# Stack effect ( s1 s2 -- s1s2)
+# -----------------------------------------------------------
+
+# -----------------------------------------------------------
+# Constructs an HTTP response status line given a code
+#
+# Stack effect (status-code -- str)
+#
+# Result looks like: "HTTP/1.1 200 OK"
+# -----------------------------------------------------------
+: MAKE-STATUS-LINE
+   TO-STR                                                   # Convert status code to a string
+   ." HTTP/1.1 " SWAP CONCAT                                # Put HTTP/1.1 first and then concatenate
+   ." \ TODO: Get message\r\n" CONCAT                       # Then add message and CRLF
+;
+
+
+# -----------------------------------------------------------
+# Writes string to fd and closes it
+#
+# Stack effect (fd string -- )
+# -----------------------------------------------------------
+: WRITE-AND-CLOSE
+   OVER SWAP                                                # (fd string -- fd fd string)
+   WRITE CLOSE
+;
+
+# -----------------------------------------------------------
+# Constructs an HTTP response
+#
+# Stack effect (fd body status-code -- )
+# -----------------------------------------------------------
+: RESPOND
+   MAKE-STATUS-LINE                                         # Constructs status line with status-code
+   ." \r\n" CONCAT                                          # Adds CRLF
+   SWAP CONCAT                                              # Puts |body| at end of string
+   WRITE-AND-CLOSE                                          # Writes to fd and closes connection
+;
 
 
 
+# -----------------------------------------------------------
+# DELEGATE-REQUEST
+#
+# Stack args ( fd machine-index -- )
+#
+# If the machine-index is -1, then we need to return a 500
+# -----------------------------------------------------------
+: DELEGATE-REQUEST
+   DUP 0 < IF                                               # If machine couldn't be claimed,
+      DROP                                                  # drop machine index, and
+      ." All forth machines in use" 500 RESPOND             # return a 500 response to the fd
+   ELSE
+      DROP # TODO: Implement for reals
+      ." Success!" 200 RESPOND
+   THEN
+;
+
+
+# -----------------------------------------------------------
+# Establishes a connection and claims forth machine to handle it
+#
+# Stack args (http_fd -- http_fd)
+# -----------------------------------------------------------
+: MAKE-SINGLE-CONNECTION
+   DUP                                                      # dup http_fd so we have it for later
+   ACCEPT-CONNECTION 0 >= IF                                # Try to accept a connection
+      CLAIM-MACHINE DELEGATE-REQUEST                        # If OK, then spin up a machine to handle request
+      TRUE                                                  # and indicate success
+   ELSE
+      DROP                                                  # Otherwise, drop bogus fd
+      FALSE                                                 # And indicate failure
+   THEN
+;
+
+
+# -----------------------------------------------------------
+# Establishes all pending HTTP connections
+#
+# Stack args (http_fd -- )
+# -----------------------------------------------------------
 : MAKE-HTTP-CONNECTIONS
-   DROP
-   ." TODO: Implement MAKE-HTTP-CONNECTIONS" LOG
+   MAKE-SINGLE-CONNECTION WHILE REPEAT                      # Make connections while pending requests
+   DROP                                                     # Drop the http_fd
 ;
 
 # -----------------------------------------------------------

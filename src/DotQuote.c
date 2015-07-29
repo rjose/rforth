@@ -6,6 +6,42 @@
 #include <string.h>
 
 //---------------------------------------------------------------------------
+// Converts \r, \n, etc. to their byte counterpart
+//
+// NOTE: This leaves some extra space at the end of the string (one byte for
+//       each escaped char)
+//---------------------------------------------------------------------------
+static
+void unescape(char *string) {
+    size_t len = strlen(string);
+    size_t src_i = 0;                                       // Start with src_i at beginning
+    size_t dest_i = 0;                                      // and dest_i at beginning
+
+    while(src_i <= len) {
+        if (string[src_i] == '\\' && string[src_i+1] == 'r') {
+            string[dest_i] = '\r';
+            src_i += 2;
+            dest_i += 1;
+            continue;
+        }
+        if (string[src_i] == '\\' && string[src_i+1] == 'n') {
+            string[dest_i] = '\n';
+            src_i += 2;
+            dest_i += 1;
+            continue;
+        }
+        if (string[src_i] == '\\' && string[src_i+1] == ' ') {
+            string[dest_i] = ' ';
+            src_i += 2;
+            dest_i += 1;
+            continue;
+        }
+        string[dest_i++] = string[src_i++];
+    }
+}
+
+
+//---------------------------------------------------------------------------
 // Create a string and put it on the stack
 //
 // Return value:
@@ -44,6 +80,7 @@ int dot_quote_code(struct FMState *state, struct FMEntry *entry) {
     strncpy(new_string, state->input_string + start_index,
             string_len);                                    // Copy string to new string,
     new_string[string_len] = NUL;                           // and NUL terminate
+    unescape(new_string);                                   // Unescape sequences like \r
 
     struct FMParameter string_param =
         FMC_make_string_param(new_string);                      // Package string into a param

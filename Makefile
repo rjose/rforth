@@ -26,8 +26,8 @@ help:
 #=======================================
 # Build Targets
 #======================================
-source_files = rforth FMCore ForthMachine GenericForthMachine StackWords Variable DotQuote \
-               Constant If Comment Time Math Log \
+source_files = rforth FMCore ForthMachine GenericForthMachine Stack Variable DotQuote \
+               Constant If Comment Time Math Log String File \
                ForthServer
 
 obj_files = $(foreach f, $(source_files), src/$(f).o)

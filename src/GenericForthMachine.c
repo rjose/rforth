@@ -27,6 +27,12 @@ M_func(AND_code);
 M_func(OR_code);
 M_func(Identical_code);
 M_func(LOG_code);
+M_func(TO_STR_code);
+M_func(SWAP_code);
+M_func(CONCAT_code);
+M_func(WRITE_code);
+M_func(CLOSE_code);
+M_func(OVER_code);
 
 //---------------------------------------------------------------------------
 // Creates a generic forth machine
@@ -59,6 +65,12 @@ struct FMState CreateGenericFM() {
     M_define_word("AND", 0, AND_code);
     M_define_word("OR", 0, OR_code);
     M_define_word("LOG", 0, LOG_code);
+    M_define_word("TO-STR", 0, TO_STR_code);
+    M_define_word("SWAP", 0, SWAP_code);
+    M_define_word("CONCAT", 0, CONCAT_code);
+    M_define_word("WRITE", 0, WRITE_code);
+    M_define_word("CLOSE", 0, CLOSE_code);
+    M_define_word("OVER", 0, OVER_code);
 
     return result;
 }

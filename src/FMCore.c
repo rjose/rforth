@@ -233,12 +233,14 @@ int FMC_copy_param(struct FMState *state, struct FMParameter *param, struct FMPa
     dest->type = param->type;                              // Copy the param type
     dest->value.int_param = 0;                             // Zero out value to start
 
+    char *ptr;
     if (dest->type == STRING_PARAM) {                      // Handle strings
         size_t len = strlen(param->value.string_param)+1;  // Include NUL in length
-        if (len > 0 && (dest->value.string_param = malloc(len)) == NULL) {
+        if ((ptr = malloc(len)) == NULL) {
             FMC_abort(state, "malloc failed", __FILE__, __LINE__);
             return -1;
         }
+        dest->value.string_param = ptr;
         strncpy(dest->value.string_param, param->value.string_param, len);
     }
     else {

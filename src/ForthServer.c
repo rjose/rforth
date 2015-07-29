@@ -73,6 +73,7 @@ int make_http_socket(int port) {
         printf("Ugh. listen failed\n");
         exit(ERR_LISTEN);
     }
+    printf("Socket: %d\n", result);
     return result;
 }
 
@@ -245,7 +246,7 @@ void establish_all_pending_connections(int http_fd) {
     }
 }
 
-
+/*
 //------------------------------------------------------------------------------
 // Updates any sockets requiring attention
 //
@@ -276,7 +277,7 @@ void update_connections(int epoll_fd, int http_fd) {
         }
     }
 }
-
+*/
 
 //---------------------------------------------------------------------------
 // Looks up int variable, returning NULL if a problem
@@ -423,6 +424,62 @@ int EPOLL_WEB_FD_code(struct FMState *state, struct FMEntry *entry) {
 
 
 //---------------------------------------------------------------------------
+// Attempts to accept an HTTP connection
+//
+// Stack effect:
+//   (http_fd -- fd status)
+//
+// Return value:
+//   *  0: Success
+//   * -1: Abort
+//
+// On establish connection, push "fd 0" onto stack. On failure, push "-1 -1".
+//---------------------------------------------------------------------------
+static
+int ACCEPT_CONNECTION_code(struct FMState *state, struct FMEntry *entry) {
+    if (FMC_check_stack_args(state, 1) < 0) {               // Check that stack has at least 1 elem
+        return -1;
+    }
+    struct FMParameter *http_fd;
+    if (NULL == (http_fd = FMC_stack_arg(state, 0))) {        // http_fd is on top
+        return -1;
+    }
+
+    // Try to accept connection
+    struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    int connected_fd = accept(http_fd->value.int_param, (struct sockaddr*) &client_addr, &client_len);
+    if (connected_fd == -1) {
+        if (errno && (EWOULDBLOCK | ECONNABORTED | EPROTO | EINTR)) {
+            // Not really an error. Just no connection to make
+        }
+        else {
+            FMC_abort(state, "accept failed", __FILE__, __LINE__);
+            return -1;
+        }
+    }
+
+    // Push result onto stack
+    if (FMC_drop(state) < 0) {return -1;}                   // Drop http_fd from stack,
+
+    struct FMParameter fd;
+    fd.type = INT_PARAM;
+    fd.value.int_param = connected_fd;                      // Prepare first result
+    
+    struct FMParameter status;
+    status.type = INT_PARAM;
+    status.value.int_param = 0;                             // Status is OK,
+    if (connected_fd == -1) {                               // unless connected_fd is -1,
+        status.value.int_param = -1;                        // in which case status is -1
+    }
+
+    if (FMC_push(state, fd) < 0) {return -1;}               // Push fd and
+    if (FMC_push(state, status) < 0) {return -1;}           // then status,
+    return 0;                                               // returning 0 for OK
+}
+
+
+//---------------------------------------------------------------------------
 // Creates a forth server
 //---------------------------------------------------------------------------
 struct FMState CreateForthServer() {
@@ -432,9 +489,9 @@ struct FMState CreateForthServer() {
     M_define_word("MONITOR-FD", 0, monitor_fd_code);
     M_define_word("TIMESTAMP", 0, TIMESTAMP_code);
     M_define_word("WAIT", 0, WAIT_code);
-    //    M_define_word("UPDATE-CONNECTIONS", 0, UPDATE_CONNECTIONS_code);
     M_define_word("EPOLL-WAIT", 0, EPOLL_WAIT_code);
     M_define_word("EPOLL-WEB-FD", 0, EPOLL_WEB_FD_code);
+    M_define_word("ACCEPT-CONNECTION", 0, ACCEPT_CONNECTION_code);
 
     return result;
 }

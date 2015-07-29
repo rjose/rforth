@@ -1,0 +1,76 @@
+= Pass 14: Construct a proper HTTP response
+
+The code for updating a connection should be able to create a proper response
+
+
+== Tasks
+- [x] Break down UPDATE_CONNECTIONS into smaller pieces
+- [x] Create functions that can construct proper responses
+- [x] Move response functions to their own file
+- [x] Come up with a design that can store an fd, spin up a new
+      forth machine, and handle the response
+- [ ] Write content-length header
+
+== Thoughts
+Each http connection should be handled by its own forth machine. A
+forth machine may spin up other forth machines to help process a
+request. Every new forth machine is added to the ForthServer's bank of
+machines, which are updated during each pass of the event loop.
+
+We need a function like |handle_request| which passes a connected fd
+in and creates a new forth machine to deal with it.
+
+There has to be a way to create and free these machines. Let's create
+a pool of these and then push their indices onto a stack. As we use
+them, we pop their values off the stack. When we're done with them, we
+push their indices back onto the stack. If the stack underflows, we
+return a 500 to the client.
+
+The indices of the active machines are stored in an array. This is
+what gets iterated over each pass. A machine waiting for a response
+should have a check for this (i.e., it should be in a while loop).
+
+We could have banks of different kinds of machines that are ready to
+do work. They would have different capabilities. Their dictionaries
+can be reset to a "factory state" when clients are done with them.
+
+Machines can ask different types of machines for help. We need a way
+for machines to request help and for those machines to respond
+back. This was the concept of the mailer.
+
+The mailer should be operable locally or across different machines. We
+should use IP addresses for machine addresses and label-indexes to
+refer to a specific machine. Later, we could come up with some key to
+refer to a given machine.
+
+Here's an example. When a request comes in, the ForthServer creates a
+connection and then hands it off to a new forth machine for
+handling. It would do a StartMachine(HANDLER) which would claim a
+machine from the HANDLER pool and add it to an active machine
+list. Let's make this a linked list. It would then send a message to
+this machine (whose ID was returned by StartMachine) to handle a
+request. This might look like "3 HANDLE-HTTP-REQUEST" (where 3 is the
+fd for the connection).
+
+We'd have a SendMessageToFM function that would take an address and a
+machine ID. This would add a message to the ForthMachine's mailbox.
+
+Each ForthMachine must have a mailbox that it can pull messages
+from. We should make this part of the FMState? We should implement a
+queue using head and tail pointers. I suppose the mailer could be
+responsible for adding messages to ForthMachine queues. For now, these
+will all be local.
+
+We need a machine to be able to make multiple asynchronous requests. A
+machine should be prepared to handle each one as it returns. A machine
+should also be able to cancel requests. This closes all open file
+descriptors. 
+
+== Status
+- Effort spent: h
+- Effort left: 0h
+- Initial estimate: 3h
+
+== Log
+
+=== Saturday, 04/25/2015
